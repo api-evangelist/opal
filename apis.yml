@@ -1,8 +1,14 @@
 aid: opal
 name: Opal
-description: 'Opal is a company surfaced as a portfolio company of accel, battery-ventures, speedinvest
-  and added to the API Evangelist network as a stub for enrichment. Sector: consumer. This profile is
-  a lead awaiting the enrichment pipeline.'
+description: >-
+  Opal is a marketing planning and content calendar platform that gives marketing teams a
+  single visual workspace to plan campaigns, build editorial and content calendars, manage
+  creative workflows and approvals, and connect strategy to execution across channels and
+  markets. It is used by enterprise brands such as Target, Starbucks, GM, and SAP, and pairs a
+  unified planning calendar with a "Gem" AI co-pilot plus prebuilt integrations to tools like
+  Salesforce, Snowflake, Google Analytics, Google Sheets, and Zapier. Opal publishes a public
+  marketing site, pricing, and a security/trust posture (SOC 2, ISO 27001, GDPR) but does not
+  expose a public developer API, documentation portal, or SDK surface.
 url: https://raw.githubusercontent.com/api-evangelist/opal/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -12,12 +18,30 @@ x-backed-by:
 - speedinvest
 x-tier: stub
 x-tier-reason: portfolio-lead
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source: []
+  generated: '2026-07-22'
+  method: derived
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-20'
+image: https://workwithopal.com/wp-content/uploads/2022/09/opal_logo.png
 tags:
 - Company
 - Consumer
+- Marketing
+- Content Planning
+- Marketing Calendar
+- Campaign Management
+- Collaboration
+- SaaS
 apis: []
 maintainers:
 - FN: Kin Lane
@@ -26,4 +50,21 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: http://www.workwithopal.com
+  url: https://www.workwithopal.com
+- type: Pricing
+  url: https://workwithopal.com/pricing/
+- type: TermsOfService
+  url: https://workwithopal.com/terms-of-service/
+- type: PrivacyPolicy
+  url: https://workwithopal.com/privacy-policy/
+- type: TrustCenter
+  url: security/opal-trust-center.yml
+- type: Compliance
+  url: https://workwithopal.com/security/
+- type: DomainSecurity
+  url: security/opal-domain-security.yml
+x-enrichment:
+  date: '2026-07-20'
+  status: enriched
+  artifacts_added: 2
+  pass: local-v1
