@@ -1,0 +1,24 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Opal (asgard-bff)
+  version: 1.0.0
+extends: openapi/opal-asgard-bff-openapi.yml
+x-generated: '2026-08-13'
+x-method: generated
+x-source: https://login.ouropal.com/api/documentation/asgard_bff
+actions:
+- target: $.info
+  update:
+    x-apievangelist-profile: https://apis.io/provider/opal/
+    x-apievangelist-harvested: '2026-08-13'
+    x-apievangelist-source: https://login.ouropal.com/api/documentation/static/asgard_bff/opal.json
+    x-apievangelist-operation-count: 11
+    x-apievangelist-access: documentation public; credentials require an active Opal account or an NDA
+      plus approval from Opal leadership
+    x-apievangelist-error-format: jsonapi-errors
+    x-apievangelist-idempotency: none published
+    x-apievangelist-rate-limits: none published
+- target: $.servers
+  update:
+  - url: https://login.ouropal.com
+    description: Production (as published by Opal)

@@ -1,0 +1,77 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/opal-v2-openapi.yml, openapi/opal-v3-openapi.yml, openapi/opal-asgard-bff-openapi.yml
+sources:
+- https://login.ouropal.com/api/documentation/v2
+- https://login.ouropal.com/api/documentation/v3
+- https://workwithopal.com/security/
+note: >-
+  Cross-cutting standards asserted from Opal's own published OpenAPI documents and the compliance
+  posture published on its security page. Where Opal states conformance in its own words, the
+  statement is quoted in `evidence`.
+standards:
+- id: openapi-3.0
+  conforms: true
+  evidence: >-
+    Three documents published at https://login.ouropal.com/api/documentation, all declaring
+    openapi 3.0.0 — v2 (66 paths / 97 operations), v3 (97 paths / 154 operations) and Asgard BFF
+    (11 paths / 11 operations). Every operation carries a unique operationId.
+- id: jsonapi
+  conforms: true
+  evidence: >-
+    Opal states v2 endpoints in the "JSON:API", "Unstable" and "Proposed" categories "are JSON:API-
+    compliant (specification) and can be used with any JSON:API-compliant client", and that
+    requests MUST set Accept: application/vnd.api+json. Resources use the type/id/attributes/
+    relationships document shape and errors use the JSON:API `errors` array.
+  scope: v2 JSON:API/Unstable/Proposed categories and the v3 surface; NOT the v2 "Other" category.
+- id: oauth2
+  conforms: true
+  evidence: >-
+    securitySchemes declare an authorizationCode flow (authorizationUrl /oauth2/auth, tokenUrl
+    /oauth2/token, scope offline_access) and a clientCredentials flow (tokenUrl /oauth/token, scope
+    write:onboarding). The narrative documents the full consent, token and refresh sequence.
+- id: rfc6750-bearer-token
+  conforms: true
+  evidence: >-
+    "Set an authorization header in your requests, specifying your access token as documented here:
+    https://tools.ietf.org/html/rfc6750#section-2.1" — Authorization: Bearer ACCESS_TOKEN.
+- id: bcp14-rfc2119
+  conforms: true
+  evidence: >-
+    Every published document opens by binding MUST/SHOULD/MAY to BCP 14 (RFC 2119 + RFC 8174).
+- id: oidc
+  conforms: false
+  evidence: >-
+    No openIdConnect security scheme is declared, and /.well-known/openid-configuration is not
+    served (login.ouropal.com answers every /.well-known/* path with the single-page-app shell).
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    No application/problem+json media type appears in any spec. Errors use the JSON:API errors
+    array instead — see errors/opal-problem-types.yml.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: >-
+    No Sunset or Deprecation response header is declared. Opal expresses lifecycle through stability
+    tag groups instead — see lifecycle/opal-lifecycle.yml.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: >-
+    /.well-known/security.txt returns 404 on workwithopal.com and the SPA shell on
+    login.ouropal.com — see well-known/opal-well-known.yml.
+- id: rfc8615-well-known
+  conforms: false
+  evidence: >-
+    No /.well-known document of any kind is served. See well-known/opal-well-known.yml.
+- id: idempotency-key
+  conforms: false
+  evidence: No Idempotency-Key header or equivalent appears in any published spec.
+- id: soc2
+  conforms: true
+  evidence: 'Published on https://workwithopal.com/security/ — see security/opal-trust-center.yml.'
+- id: iso-27001
+  conforms: true
+  evidence: 'Published on https://workwithopal.com/security/ — see security/opal-trust-center.yml.'
+- id: gdpr
+  conforms: true
+  evidence: 'Published on https://workwithopal.com/security/ — see security/opal-trust-center.yml.'

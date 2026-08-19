@@ -1,0 +1,611 @@
+generated: '2026-08-13'
+method: derived
+status: candidate
+source: openapi/opal-v2-openapi.yml, openapi/opal-v3-openapi.yml
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: oauth
+  verified: searched
+note: Opal ships no MCP server. No hosted endpoint, no npm/PyPI package and no MCP entry appears in Opal's
+  documentation, help center or any public registry, and the wildcard *.ouropal.com SPA means any guessed
+  /mcp path would answer 200 with HTML and prove nothing. The tools[] below are a CANDIDATE surface derived
+  from Opal's own published OpenAPI operationIds for the stable marquee resources — they are what an MCP
+  server over this API would expose, not something Opal operates. No MCPServer pointer is wired into apis.yml,
+  because none exists. Each tool's real input contract is the parameters + requestBody of the operation
+  named in source_operation.
+server: null
+auth_note: Any client would authenticate with an OAuth 2.0 bearer token from https://login.ouropal.com/oauth2/token;
+  Opal registers OAuth clients manually through its integrations team, so an MCP deployment is not self-serve.
+tool_count: 98
+tools:
+- name: read_accounts_v2
+  description: Get all accounts available to the authenticated user
+  source_operation: openapi/opal-v2-openapi.yml#ReadAccountsV2
+  method: GET
+  path: /accounts/v2
+  category: Accounts
+- name: read_account_v2
+  description: Get the specified account
+  source_operation: openapi/opal-v2-openapi.yml#ReadAccountV2
+  method: GET
+  path: /accounts/v2/{account_id}
+  category: Accounts
+- name: read_placements_v0
+  description: List placements associated with given account
+  source_operation: openapi/opal-v2-openapi.yml#ReadPlacementsV0
+  method: GET
+  path: /accounts/{account_id}/placements
+  category: Accounts
+- name: create_placement_v0
+  description: Create a placement to associate with the given account
+  source_operation: openapi/opal-v2-openapi.yml#CreatePlacementV0
+  method: POST
+  path: /accounts/{account_id}/placements
+  category: Accounts
+- name: read_placement_v0
+  description: Get placement by ID
+  source_operation: openapi/opal-v2-openapi.yml#ReadPlacementV0
+  method: GET
+  path: /accounts/{account_id}/placements/{id}
+  category: Accounts
+- name: update_placement_v0
+  description: Update placement
+  source_operation: openapi/opal-v2-openapi.yml#UpdatePlacementV0
+  method: PATCH
+  path: /accounts/{account_id}/placements/{id}
+  category: Accounts
+- name: delete_placement_v0
+  description: Delete placement
+  source_operation: openapi/opal-v2-openapi.yml#DeletePlacementV0
+  method: DELETE
+  path: /accounts/{account_id}/placements/{id}
+  category: Accounts
+- name: create_asset_v2
+  description: Upload an asset available to the authenticated user.
+  source_operation: openapi/opal-v2-openapi.yml#CreateAssetV2
+  method: POST
+  path: /assets/v2
+  category: Assets
+- name: get_assets_v2
+  description: '[UNSTABLE] Get a collection of assets available to the authenticated user.'
+  source_operation: openapi/opal-v2-openapi.yml#GetAssetsV2
+  method: GET
+  path: /assets/v2
+  category: Assets
+- name: get_asset_v2
+  description: Get an assets metadata
+  source_operation: openapi/opal-v2-openapi.yml#GetAssetV2
+  method: GET
+  path: /assets/v2/{asset_id}
+  category: Assets
+- name: read_contents_v2
+  description: Get a batch of content
+  source_operation: openapi/opal-v2-openapi.yml#ReadContentsV2
+  method: GET
+  path: /content/v2
+  category: Content
+- name: create_content_v2
+  description: Create a piece of Content
+  source_operation: openapi/opal-v2-openapi.yml#CreateContentV2
+  method: POST
+  path: /content/v2
+  category: Content
+- name: read_content_v2
+  description: Get a single piece of content
+  source_operation: openapi/opal-v2-openapi.yml#ReadContentV2
+  method: GET
+  path: /content/v2/{content_id}
+  category: Content
+- name: update_content_v2
+  description: Update a piece of Content
+  source_operation: openapi/opal-v2-openapi.yml#UpdateContentV2
+  method: PATCH
+  path: /content/v2/{content_id}
+  category: Content
+- name: delete_content_v2
+  description: Delete the specified Content
+  source_operation: openapi/opal-v2-openapi.yml#DeleteContentV2
+  method: DELETE
+  path: /content/v2/{content_id}
+  category: Content
+- name: delete_post_placement_v2
+  description: Remove a piece of content from a placement.
+  source_operation: openapi/opal-v2-openapi.yml#DeletePostPlacementV2
+  method: DELETE
+  path: /content/v2/{content_id}/placements
+  category: Content
+- name: create_post_placement_v2
+  description: Join content to a placement
+  source_operation: openapi/opal-v2-openapi.yml#CreatePostPlacementV2
+  method: POST
+  path: /content/v2/{content_id}/placements/{placement_id}
+  category: Content
+- name: put_post_placement_v2
+  description: Attach content to a different placement
+  source_operation: openapi/opal-v2-openapi.yml#PutPostPlacementV2
+  method: PUT
+  path: /content/v2/{content_id}/placements/{placement_id}
+  category: Content
+- name: read_labels_v2
+  description: Find labels for a Workspace.
+  source_operation: openapi/opal-v2-openapi.yml#ReadLabelsV2
+  method: GET
+  path: /labels/v2
+  category: Labels
+- name: create_label_v2
+  description: Create a new label.
+  source_operation: openapi/opal-v2-openapi.yml#CreateLabelV2
+  method: POST
+  path: /labels/v2
+  category: Labels
+- name: update_label_v2
+  description: Update a label.
+  source_operation: openapi/opal-v2-openapi.yml#UpdateLabelV2
+  method: PATCH
+  path: /labels/v2/{label_id}
+  category: Labels
+- name: delete_label_v2
+  description: Delete a label.
+  source_operation: openapi/opal-v2-openapi.yml#DeleteLabelV2
+  method: DELETE
+  path: /labels/v2/{label_id}
+  category: Labels
+- name: read_moments_v2
+  description: Return all moments available to the authenticated user.
+  source_operation: openapi/opal-v2-openapi.yml#ReadMomentsV2
+  method: GET
+  path: /moments/v2
+  category: Moments
+- name: create_moment_v2
+  description: Create a new public or private moment.
+  source_operation: openapi/opal-v2-openapi.yml#CreateMomentV2
+  method: POST
+  path: /moments/v2
+  category: Moments
+- name: read_moment_v2
+  description: Return the specified Moment
+  source_operation: openapi/opal-v2-openapi.yml#ReadMomentV2
+  method: GET
+  path: /moments/v2/{moment_id}
+  category: Moments
+- name: update_moment_v2
+  description: Update the specified Moment
+  source_operation: openapi/opal-v2-openapi.yml#UpdateMomentV2
+  method: PATCH
+  path: /moments/v2/{moment_id}
+  category: Moments
+- name: delete_moment_v2
+  description: Delete the specified Moment
+  source_operation: openapi/opal-v2-openapi.yml#DeleteMomentV2
+  method: DELETE
+  path: /moments/v2/{moment_id}
+  category: Moments
+- name: read_stories_v2
+  description: Get a collection of stories
+  source_operation: openapi/opal-v2-openapi.yml#ReadStoriesV2
+  method: GET
+  path: /stories/v2
+  category: Stories
+- name: create_story_v2
+  description: Create a story
+  source_operation: openapi/opal-v2-openapi.yml#CreateStoryV2
+  method: POST
+  path: /stories/v2
+  category: Stories
+- name: read_story_v2
+  description: Find a Story by ID
+  source_operation: openapi/opal-v2-openapi.yml#ReadStoryV2
+  method: GET
+  path: /stories/v2/{story_id}
+  category: Stories
+- name: update_story_v2
+  description: Update the specified story
+  source_operation: openapi/opal-v2-openapi.yml#UpdateStoryV2
+  method: PATCH
+  path: /stories/v2/{story_id}
+  category: Stories
+- name: read_me_v2
+  description: Return the authenticated user
+  source_operation: openapi/opal-v2-openapi.yml#ReadMeV2
+  method: GET
+  path: /users/v2/me
+  category: Users
+- name: update_moments_setting_v2
+  description: Update the Moments Setting for the authenticated user
+  source_operation: openapi/opal-v2-openapi.yml#UpdateMomentsSettingV2
+  method: PATCH
+  path: /users/v2/me/moments_setting
+  category: Users
+- name: read_users_v2
+  description: List all users in the requesting users Opal
+  source_operation: openapi/opal-v2-openapi.yml#ReadUsersV2
+  method: GET
+  path: /users/v2/users
+  category: Users
+- name: read_user_v2
+  description: Return a user by ID
+  source_operation: openapi/opal-v2-openapi.yml#ReadUserV2
+  method: GET
+  path: /users/v2/{user_id}
+  category: Users
+- name: update_user_v2
+  description: Update the specified user
+  source_operation: openapi/opal-v2-openapi.yml#UpdateUserV2
+  method: PATCH
+  path: /users/v2/{user_id}
+  category: Users
+- name: read_assignments_v2
+  description: Get a collection of assignments
+  source_operation: openapi/opal-v2-openapi.yml#ReadAssignmentsV2
+  method: GET
+  path: /workflows/v2/assignments
+  category: Workflows
+- name: create_assignment_v2
+  description: Create an assignment
+  source_operation: openapi/opal-v2-openapi.yml#CreateAssignmentV2
+  method: POST
+  path: /workflows/v2/assignments
+  category: Workflows
+- name: read_assignment_v2
+  description: Get an Assignment
+  source_operation: openapi/opal-v2-openapi.yml#ReadAssignmentV2
+  method: GET
+  path: /workflows/v2/assignments/{assignment_id}
+  category: Workflows
+- name: update_assignment_v2
+  description: Update an assignment by id
+  source_operation: openapi/opal-v2-openapi.yml#UpdateAssignmentV2
+  method: PATCH
+  path: /workflows/v2/assignments/{assignment_id}
+  category: Workflows
+- name: delete_assignment_v2
+  description: Delete an Assignment
+  source_operation: openapi/opal-v2-openapi.yml#DeleteAssignmentV2
+  method: DELETE
+  path: /workflows/v2/assignments/{assignment_id}
+  category: Workflows
+- name: create_context_v2
+  description: Create a Context
+  source_operation: openapi/opal-v2-openapi.yml#CreateContextV2
+  method: POST
+  path: /workflows/v2/contexts
+  category: Workflows
+- name: create_response_v2
+  description: Create a Response for an Assignment
+  source_operation: openapi/opal-v2-openapi.yml#CreateResponseV2
+  method: POST
+  path: /workflows/v2/responses
+  category: Workflows
+- name: read_response_v2
+  description: Fetch a Response for an Assignment
+  source_operation: openapi/opal-v2-openapi.yml#ReadResponseV2
+  method: GET
+  path: /workflows/v2/responses/{response_id}
+  category: Workflows
+- name: create_stage_v2
+  description: Create a stage
+  source_operation: openapi/opal-v2-openapi.yml#CreateStageV2
+  method: POST
+  path: /workflows/v2/stages
+  category: Workflows
+- name: read_stage_v2
+  description: Get a stage by ID
+  source_operation: openapi/opal-v2-openapi.yml#ReadStageV2
+  method: GET
+  path: /workflows/v2/stages/{stage_id}
+  category: Workflows
+- name: update_stage_v2
+  description: Update a Stage by id
+  source_operation: openapi/opal-v2-openapi.yml#UpdateStageV2
+  method: PATCH
+  path: /workflows/v2/stages/{stage_id}
+  category: Workflows
+- name: delete_stage_v2
+  description: Delete a stage
+  source_operation: openapi/opal-v2-openapi.yml#DeleteStageV2
+  method: DELETE
+  path: /workflows/v2/stages/{stage_id}
+  category: Workflows
+- name: read_workflows_v2
+  description: Get a collection of workflows
+  source_operation: openapi/opal-v2-openapi.yml#ReadWorkflowsV2
+  method: GET
+  path: /workflows/v2/workflows
+  category: Workflows
+- name: create_workflows_v2
+  description: Create a workflow
+  source_operation: openapi/opal-v2-openapi.yml#CreateWorkflowsV2
+  method: POST
+  path: /workflows/v2/workflows
+  category: Workflows
+- name: read_workflow_v2
+  description: Get a Workflow
+  source_operation: openapi/opal-v2-openapi.yml#ReadWorkflowV2
+  method: GET
+  path: /workflows/v2/workflows/{workflow_id}
+  category: Workflows
+- name: duplicate_workflow_v2
+  description: Duplicate a Workflow
+  source_operation: openapi/opal-v2-openapi.yml#DuplicateWorkflowV2
+  method: POST
+  path: /workflows/v2/workflows/{workflow_id}/duplicate
+  category: Workflows
+- name: rewind_workflow_v2
+  description: Rewind a Workflow
+  source_operation: openapi/opal-v2-openapi.yml#RewindWorkflowV2
+  method: PATCH
+  path: /workflows/v2/workflows/{workflow_id}/rewind
+  category: Workflows
+- name: get_board_object_collections_v3
+  description: Get Object Collections available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#GetBoardObjectCollectionsV3
+  method: GET
+  path: /board_object_collections/v3
+  category: Boards
+- name: create_board_object_collection_v3
+  description: Create a new Board Object Collection.
+  source_operation: openapi/opal-v3-openapi.yml#CreateBoardObjectCollectionV3
+  method: POST
+  path: /board_object_collections/v3
+  category: Boards
+- name: read_board_object_collection_v3
+  description: Get a Board Object Collection.
+  source_operation: openapi/opal-v3-openapi.yml#ReadBoardObjectCollectionV3
+  method: GET
+  path: /board_object_collections/v3/{board_object_collection_id}
+  category: Boards
+- name: update_board_object_collection_v3
+  description: Update a new Board Object Collection.
+  source_operation: openapi/opal-v3-openapi.yml#UpdateBoardObjectCollectionV3
+  method: PATCH
+  path: /board_object_collections/v3/{board_object_collection_id}
+  category: Boards
+- name: delete_board_object_collection_v3
+  description: Delete an Object Collection.
+  source_operation: openapi/opal-v3-openapi.yml#DeleteBoardObjectCollectionV3
+  method: DELETE
+  path: /board_object_collections/v3/{board_object_collection_id}
+  category: Boards
+- name: read_board_objects_v3
+  description: Get Board Objects available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#ReadBoardObjectsV3
+  method: GET
+  path: /board_objects/v3
+  category: Board Objects
+- name: create_board_object_v3
+  description: Create a new Board Object.
+  source_operation: openapi/opal-v3-openapi.yml#CreateBoardObjectV3
+  method: POST
+  path: /board_objects/v3
+  category: Board Objects
+- name: read_board_object_v3
+  description: Get a Board Object
+  source_operation: openapi/opal-v3-openapi.yml#ReadBoardObjectV3
+  method: GET
+  path: /board_objects/v3/{board_object_id}
+  category: Board Objects
+- name: update_board_object_v3
+  description: Update an existing Board Object.
+  source_operation: openapi/opal-v3-openapi.yml#UpdateBoardObjectV3
+  method: PATCH
+  path: /board_objects/v3/{board_object_id}
+  category: Board Objects
+- name: delete_board_object_v3
+  description: Delete a Board Object.
+  source_operation: openapi/opal-v3-openapi.yml#DeleteBoardObjectV3
+  method: DELETE
+  path: /board_objects/v3/{board_object_id}
+  category: Board Objects
+- name: read_boards_v3
+  description: Get Boards available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#ReadBoardsV3
+  method: GET
+  path: /boards/v3
+  category: Boards
+- name: create_board_v3
+  description: Create a new Board.
+  source_operation: openapi/opal-v3-openapi.yml#CreateBoardV3
+  method: POST
+  path: /boards/v3
+  category: Boards
+- name: read_board_v3
+  description: Get a Board.
+  source_operation: openapi/opal-v3-openapi.yml#ReadBoardV3
+  method: GET
+  path: /boards/v3/{board_id}
+  category: Boards
+- name: update_board_v3
+  description: Update an existing Board.
+  source_operation: openapi/opal-v3-openapi.yml#UpdateBoardV3
+  method: PATCH
+  path: /boards/v3/{board_id}
+  category: Boards
+- name: delete_board_v3
+  description: Delete a Board.
+  source_operation: openapi/opal-v3-openapi.yml#DeleteBoardV3
+  method: DELETE
+  path: /boards/v3/{board_id}
+  category: Boards
+- name: update_board_user_setting_v3
+  description: '[UNSTABLE] Update the user’s settings for a given Board'
+  source_operation: openapi/opal-v3-openapi.yml#UpdateBoardUserSettingV3
+  method: PATCH
+  path: /boards/v3/{board_id}/user_setting
+  category: Boards
+- name: read_contents_v3
+  description: '[UNSTABLE] Return all content available to the authenticated user.'
+  source_operation: openapi/opal-v3-openapi.yml#ReadContentsV3
+  method: GET
+  path: /content/v3
+  category: Content
+- name: read_content_v3
+  description: '[UNSTABLE] Get a content resource available to the authenticated user.'
+  source_operation: openapi/opal-v3-openapi.yml#ReadContentV3
+  method: GET
+  path: /content/v3/{content_id}
+  category: Content
+- name: update_content_v3
+  description: '[UNSTABLE] Update a content resource.'
+  source_operation: openapi/opal-v3-openapi.yml#UpdateContentV3
+  method: PATCH
+  path: /content/v3/{content_id}
+  category: Content
+- name: read_custom_fields_v3
+  description: Get CustomFields available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#ReadCustomFieldsV3
+  method: GET
+  path: /loupe/v3/custom_fields
+  category: Custom Fields
+- name: create_custom_field_v3
+  description: Create a new CustomField.
+  source_operation: openapi/opal-v3-openapi.yml#CreateCustomFieldV3
+  method: POST
+  path: /loupe/v3/custom_fields
+  category: Custom Fields
+- name: read_custom_field_v3
+  description: Get a CustomField.
+  source_operation: openapi/opal-v3-openapi.yml#ReadCustomFieldV3
+  method: GET
+  path: /loupe/v3/custom_fields/{custom_field_id}
+  category: Custom Fields
+- name: update_custom_field_v3
+  description: Update an existing CustomField.
+  source_operation: openapi/opal-v3-openapi.yml#UpdateCustomFieldV3
+  method: PATCH
+  path: /loupe/v3/custom_fields/{custom_field_id}
+  category: Custom Fields
+- name: delete_custom_field_v3
+  description: Delete a CustomField.
+  source_operation: openapi/opal-v3-openapi.yml#DeleteCustomFieldV3
+  method: DELETE
+  path: /loupe/v3/custom_fields/{custom_field_id}
+  category: Custom Fields
+- name: read_moments_v3
+  description: Return all moments available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#ReadMomentsV3
+  method: GET
+  path: /moments/v3
+  category: Moments
+- name: create_moment_v3
+  description: Create a new public or private moment.
+  source_operation: openapi/opal-v3-openapi.yml#CreateMomentV3
+  method: POST
+  path: /moments/v3
+  category: Moments
+- name: read_moment_v3
+  description: Return the specified Moment
+  source_operation: openapi/opal-v3-openapi.yml#ReadMomentV3
+  method: GET
+  path: /moments/v3/{moment_id}
+  category: Moments
+- name: update_moment_v3
+  description: Update the specified Moment
+  source_operation: openapi/opal-v3-openapi.yml#UpdateMomentV3
+  method: PATCH
+  path: /moments/v3/{moment_id}
+  category: Moments
+- name: delete_moment_v3
+  description: Delete the specified Moment
+  source_operation: openapi/opal-v3-openapi.yml#DeleteMomentV3
+  method: DELETE
+  path: /moments/v3/{moment_id}
+  category: Moments
+- name: read_rich_text_documents_v3
+  description: Get Rich Text Documents available to the authenticated user.
+  source_operation: openapi/opal-v3-openapi.yml#ReadRichTextDocumentsV3
+  method: GET
+  path: /rich_texts/v3/documents
+  category: Rich Text Documents
+- name: create_rich_text_document_v3
+  description: Create a new Rich Text Document.
+  source_operation: openapi/opal-v3-openapi.yml#CreateRichTextDocumentV3
+  method: POST
+  path: /rich_texts/v3/documents
+  category: Rich Text Documents
+- name: read_rich_text_document_v3
+  description: Get a Rich Text Document.
+  source_operation: openapi/opal-v3-openapi.yml#ReadRichTextDocumentV3
+  method: GET
+  path: /rich_texts/v3/documents/{rich_text_document_id}
+  category: Rich Text Documents
+- name: update_rich_text_document_v3
+  description: Update an existing Rich Text Document.
+  source_operation: openapi/opal-v3-openapi.yml#UpdateRichTextDocumentV3
+  method: PATCH
+  path: /rich_texts/v3/documents/{rich_text_document_id}
+  category: Rich Text Documents
+- name: delete_rich_text_document_v3
+  description: Delete a Rich Text Document.
+  source_operation: openapi/opal-v3-openapi.yml#DeleteRichTextDocumentV3
+  method: DELETE
+  path: /rich_texts/v3/documents/{rich_text_document_id}
+  category: Rich Text Documents
+- name: duplicate_rich_text_document_v3
+  description: Duplicate a Rich Text Document
+  source_operation: openapi/opal-v3-openapi.yml#DuplicateRichTextDocumentV3
+  method: POST
+  path: /rich_texts/v3/documents/{rich_text_document_id}/duplicate
+  category: Rich Text Documents
+- name: get_collaboration_token_v3
+  description: Get a JWT for use with the TipTap Collaboration server.
+  source_operation: openapi/opal-v3-openapi.yml#GetCollaborationTokenV3
+  method: GET
+  path: /rich_texts/v3/get_collaboration_token
+  category: Rich Text Documents
+- name: get_story_v3
+  description: Get a story by ID
+  source_operation: openapi/opal-v3-openapi.yml#GetStoryV3
+  method: GET
+  path: /stories/v3/{story_id}
+  category: Stories
+- name: update_story_v3
+  description: Update the specified Story
+  source_operation: openapi/opal-v3-openapi.yml#UpdateStoryV3
+  method: PATCH
+  path: /stories/v3/{story_id}
+  category: Stories
+- name: migrate_story_moments_v3
+  description: Migrate moments from a story to plans and/or boards
+  source_operation: openapi/opal-v3-openapi.yml#MigrateStoryMomentsV3
+  method: POST
+  path: /stories/v3/{story_id}/migrate_moments
+  category: Stories
+- name: read_users_v3
+  description: '[UNSTABLE] Get users available to the authenticated user.'
+  source_operation: openapi/opal-v3-openapi.yml#ReadUsersV3
+  method: GET
+  path: /users/v3/users
+  category: Users
+- name: read_user_v3
+  description: '[UNSTABLE] Get a specific user''s information.'
+  source_operation: openapi/opal-v3-openapi.yml#ReadUserV3
+  method: GET
+  path: /users/v3/users/{user_id}
+  category: Users
+- name: read_workflows_v3
+  description: Get a collection of workflows
+  source_operation: openapi/opal-v3-openapi.yml#ReadWorkflowsV3
+  method: GET
+  path: /v3/workflows
+  category: Workflows
+- name: create_workflows_v3
+  description: Create a workflow
+  source_operation: openapi/opal-v3-openapi.yml#CreateWorkflowsV3
+  method: POST
+  path: /v3/workflows
+  category: Workflows
+- name: read_workflow_v3
+  description: Get a Workflow by ID
+  source_operation: openapi/opal-v3-openapi.yml#ReadWorkflowV3
+  method: GET
+  path: /v3/workflows/{workflow_id}
+  category: Workflows
+- name: duplicate_workflow_v3
+  description: Duplicate a Workflow
+  source_operation: openapi/opal-v3-openapi.yml#DuplicateWorkflowV3
+  method: POST
+  path: /v3/workflows/{workflow_id}/duplicate
+  category: Workflows

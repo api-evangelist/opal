@@ -1,0 +1,131 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/opal-v2-openapi.yml, openapi/opal-v3-openapi.yml, openapi/opal-asgard-bff-openapi.yml
+format: jsonapi-errors
+note: 'Opal does NOT use RFC 9457 application/problem+json. Every 4xx/5xx response in all three specs
+  returns a JSON:API error document: a top-level `errors` array whose members carry `status` (required),
+  `title`, `detail` and a system-readable `code`. Content-Type is application/json (application/vnd.api+json
+  on the JSON:API-categorised endpoints). Opal publishes no enumerated error-code registry, so the `code`
+  values themselves are not documented anywhere public — only the envelope is.'
+envelope:
+  container: errors
+  type: array
+  members:
+  - field: status
+    required: true
+    description: The http status code of the error response.
+  - field: title
+    required: false
+    description: A short, human-readable summary of the error.
+  - field: detail
+    required: false
+    description: A human-readable explanation of the error.
+  - field: code
+    required: false
+    description: A system-readable error code to provide additional specificity for the error.
+problems:
+- status: 400
+  title: Bad request
+  code_field: errors[].code
+  occurrences: 171
+  specs:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: Malformed request — check query parameters, JSON:API member names and the Accept header
+    (application/vnd.api+json on JSON:API endpoints).
+  source_operations:
+  - openapi/opal-v2-openapi.yml#ReadAccountsV2
+  - openapi/opal-v2-openapi.yml#ReadAccountV2
+  - openapi/opal-v2-openapi.yml#CreateAssetV2
+- status: 401
+  title: Unauthorized
+  code_field: errors[].code
+  occurrences: 202
+  specs:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: 'Missing or expired credentials. Send `Authorization: Bearer <access_token>`; refresh the
+    token at https://login.ouropal.com/oauth2/token when it expires.'
+  source_operations:
+  - openapi/opal-v2-openapi.yml#CreateAssetV2
+  - openapi/opal-v2-openapi.yml#GetAssetsV2
+  - openapi/opal-v2-openapi.yml#GetAssetV2
+- status: 403
+  title: Forbidden
+  code_field: errors[].code
+  occurrences: 86
+  specs:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: The authenticated user lacks permission. Note Opal's documented "Obscurity" principle —
+    many authorization failures are returned as 404 instead of 403.
+  source_operations:
+  - openapi/opal-v2-openapi.yml#ReadAccountsV2
+  - openapi/opal-v2-openapi.yml#ReadAccountV2
+  - openapi/opal-v2-openapi.yml#GetAssetV2
+- status: 404
+  title: Account not found. Account ID invalid or user does not have permission to view.
+  code_field: errors[].code
+  occurrences: 177
+  specs:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: Resource does not exist OR the caller is not authorized to see it. Per the published Obscurity
+    principle, do not treat 404 as proof of non-existence.
+  source_operations:
+  - openapi/opal-v2-openapi.yml#ReadPlacementsV0
+  - openapi/opal-v2-openapi.yml#CreatePlacementV0
+  - openapi/opal-v2-openapi.yml#ReadPlacementV0
+- status: 409
+  title: Conflict
+  code_field: errors[].code
+  occurrences: 53
+  specs:
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: Conflicting state (e.g. duplicate association). Re-read the resource and retry with the
+    current state.
+  source_operations:
+  - openapi/opal-v2-openapi.yml#CreateAssetReferenceV1
+  - openapi/opal-v2-openapi.yml#UpdateAssetReferenceV1
+  - openapi/opal-v2-openapi.yml#CreateAssetReferenceOptionV1
+- status: 412
+  title: Precondition Failed
+  code_field: errors[].code
+  occurrences: 1
+  specs:
+  - openapi/opal-v3-openapi.yml
+  remediation: Precondition failed on a conditional write — the resource changed since the `if-unmodified-since`
+    timestamp you sent. Re-read and re-apply.
+  source_operations:
+  - openapi/opal-v3-openapi.yml#UpdateRichTextDocumentV3
+- status: 422
+  title: Unprocessable entity
+  code_field: errors[].code
+  occurrences: 131
+  specs:
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: The request parsed but is semantically invalid; read `errors[].detail` and `errors[].code`
+    for the failing member.
+  source_operations:
+  - openapi/opal-v2-openapi.yml#CreateAssetV2
+  - openapi/opal-v2-openapi.yml#GetAssetV2
+  - openapi/opal-v2-openapi.yml#CreateAssetReferenceV1
+- status: 500
+  title: Internal Server Error
+  code_field: errors[].code
+  occurrences: 16
+  specs:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+  remediation: Server error. Retry with backoff; contact Opal support with the request details if it persists.
+  source_operations:
+  - openapi/opal-v2-openapi.yml#CreateUrlPreviewV1
+  - openapi/opal-v2-openapi.yml#CreateRichTextV1
+  - openapi/opal-v3-openapi.yml#ReadCustomFieldOptionsV3

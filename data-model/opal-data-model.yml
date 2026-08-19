@@ -1,0 +1,1925 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/opal-v3-openapi.yml, openapi/opal-v2-openapi.yml
+note: Entity graph derived from components.schemas in Opal's published v3 and v2 OpenAPI definitions.
+  Both surfaces are JSON:API, so each resource carries `type`, `id`, `attributes` and `relationships`;
+  relationships[] below are read from the JSON:API relationship members and from *_id / *_ids reference
+  fields on attributes. v3 resource identifiers are opaque UUIDv4 strings and carry the matching v2 identifier
+  in attributes.legacy_id.
+identifier_convention:
+  v2: integers (generally); MAY vary by endpoint
+  v3: opaque strings, currently UUIDv4; MUST NOT be parsed
+  cross_version: v3 responses expose the v2 id at attributes.legacy_id
+entity_count: 75
+entities:
+- entity: account
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 2
+  attributes:
+  - name
+  - uuid
+  relationship_fields:
+  - brand
+  - dispatch_provider_account
+  - placements
+  - service
+- entity: asset
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 12
+  attributes:
+  - bytes
+  - created_at
+  - download_url_override
+  - duration
+  - file_extension
+  - file_name
+  - height
+  - mime_type
+  - pages
+  - updated_at
+  - url
+  - width
+  relationship_fields:
+  - opal
+- entity: asset_reference
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 17
+  attributes:
+  - asset_type
+  - content_type
+  - created_at
+  - description
+  - escaped_filename
+  - filename
+  - filesize
+  - format
+  - full_url
+  - height
+  - legacy_id
+  - meta_data
+  - original_url
+  - preview_url
+  - public_id
+  - updated_at
+  - width
+  relationship_fields:
+  - asset
+  - cover_asset_reference
+- entity: assignment
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 6
+  attributes:
+  - assignment_type
+  - created_at
+  - deleted_at
+  - metadata
+  - position
+  - updated_at
+  relationship_fields:
+  - assigned_user
+  - created_by_user
+  - responses
+  - stage
+- entity: block
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 15
+  attributes:
+  - browsable
+  - color
+  - created_at
+  - description
+  - duration
+  - end_at
+  - is_template
+  - is_workspace_wide_template
+  - row_index
+  - start_at
+  - template_description
+  - template_name
+  - title
+  - updated_at
+  - y_scale
+  relationship_fields:
+  - asset
+  - block_connectors
+  - boards
+  - category
+  - category_type
+  - child_view
+  - creator
+  - custom_field_values
+  - inherited_custom_field_values
+  - owner
+  - paired_moment
+  - rich_text_document
+  - view
+  - workspace
+- entity: block_connector
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - row_index
+  - updated_at
+  - y_scale
+  relationship_fields:
+  - block
+  - category
+  - view
+- entity: block_custom_field_value
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - updated_at
+  - value
+  relationship_fields:
+  - block
+  - custom_field
+  - groups
+  - users
+- entity: block_duplication
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 9
+  attributes:
+  - created_at
+  - description
+  - is_template
+  - is_workspace_wide_template
+  - status
+  - template_description
+  - template_name
+  - title
+  - updated_at
+  relationship_fields:
+  - category
+  - duplicated_block
+  - source_block
+  - view
+- entity: board
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - description
+  - is_archived
+  - is_public
+  - title
+  - updated_at
+  relationship_fields:
+  - asset_reference
+  - board_collaborators
+  - board_columns
+  - board_objects
+  - board_user_setting
+  - collaborators
+  - created_by_user
+  - default_story
+  - object_collections
+  - workspace
+- entity: board_collaborator
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 2
+  attributes:
+  - created_at
+  - updated_at
+  relationship_fields:
+  - board
+  - collaborator
+  - collaborator_group
+- entity: board_column
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - is_enabled
+  - position
+  - updated_at
+  relationship_fields:
+  - board
+  - board_standard_column
+  - custom_field
+  - custom_field_type
+- entity: board_object
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - position
+  - updated_at
+  relationship_fields:
+  - board
+  - board_object_collection
+  - moment
+  - rich_text_document
+- entity: board_object_collection
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - description
+  - hide_empty_table
+  - position
+  - title
+  - updated_at
+  relationship_fields:
+  - board
+  - board_objects
+  - created_by_user
+- entity: board_standard_column
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - default_position
+  - display_name
+  - system_name
+  - updated_at
+  relationship_fields: []
+- entity: board_user_setting
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - is_starred
+  - is_subscribed
+  - updated_at
+  relationship_fields:
+  - board
+  - user
+- entity: brand
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 7
+  attributes:
+  - created_at
+  - name
+  - slug
+  - start_of_week
+  - timezone
+  - updated_at
+  - uuid
+  relationship_fields:
+  - accounts
+  - dispatch_providers
+  - logo
+  - primary_label_set
+- entity: budget
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 6
+  attributes:
+  - content_type
+  - moment_allocation
+  - moment_spend
+  - post_spend
+  - story_allocation
+  - value
+  relationship_fields:
+  - moment
+  - opal
+  - post
+  - story
+- entity: bulk_operation
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - status
+  - updated_at
+  relationship_fields:
+  - created_by_user
+  - operations
+- entity: category
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 10
+  attributes:
+  - block_size
+  - created_at
+  - depth
+  - group_by_exclude_empty_groupings
+  - group_by_strategy
+  - is_supportive
+  - position
+  - title
+  - updated_at
+  - view_mode
+  relationship_fields:
+  - block_connectors
+  - block_template
+  - blocks
+  - category_type
+  - charts
+  - creator
+  - filter_set
+  - group_by_custom_field
+  - parent_category
+  - view
+- entity: category_type
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 7
+  attributes:
+  - created_at
+  - deactivated_at
+  - description
+  - has_explicit_custom_field_order
+  - name
+  - supported_paired_type
+  - updated_at
+  relationship_fields:
+  - creator
+  - custom_fields
+  - default_child_type
+  - in_support_of_category_types
+  - workspace
+- entity: channel
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 13
+  attributes:
+  - color
+  - content_name
+  - created_at
+  - has_placements
+  - icon_name
+  - icon_path
+  - is_active
+  - is_visible
+  - legacy_id
+  - name
+  - system_name
+  - updated_at
+  - web_modules_channel
+  relationship_fields:
+  - asset_reference
+  - content_types
+  - workspace
+- entity: chart
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - data
+  - title
+  - updated_at
+  relationship_fields:
+  - workspace
+- entity: content
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 9
+  attributes:
+  - content
+  - created_at
+  - default_snapshot_url
+  - legacy_id
+  - name
+  - scheduled_at
+  - status
+  - takedown_scheduled_at
+  - updated_at
+  relationship_fields:
+  - account
+  - asset_references
+  - channel
+  - inherited_label_sets
+  - inherited_labels
+  - label_sets
+  - labels
+  - moment
+  - note
+  - stories
+  - user
+  - workspace
+- entity: content_schedule
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - start_interval
+  - takedown_interval
+  - timezone
+  - updated_at
+  relationship_fields:
+  - content
+  - moment_schedule
+- entity: content_type
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - legacy_id
+  - name
+  - system_name
+  - updated_at
+  relationship_fields:
+  - opal
+  - workspace
+- entity: context
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - deleted_at
+  - updated_at
+  relationship_fields:
+  - created_by_user
+  - moment
+  - workflow
+- entity: custom_field
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 9
+  attributes:
+  - created_at
+  - description
+  - display_name
+  - is_cascading
+  - is_color_disabled
+  - is_deactivated
+  - is_system_generated
+  - metadata
+  - updated_at
+  relationship_fields:
+  - active_options
+  - creator
+  - custom_field_type
+  - deleted_options
+  - paired_label_set
+  - workspace
+- entity: custom_field_color
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - color
+  - created_at
+  - is_system_generated
+  - position
+  - updated_at
+  relationship_fields: []
+- entity: custom_field_option
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - deleted_at
+  - display_name
+  - position
+  - updated_at
+  relationship_fields:
+  - custom_field
+  - custom_field_color
+  - paired_label
+- entity: custom_field_type
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 8
+  attributes:
+  - created_at
+  - datatype
+  - description
+  - display_name
+  - schema
+  - schema_version
+  - system_type
+  - updated_at
+  relationship_fields: []
+- entity: dispatch_provider
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - display_name
+  - system_name
+  - updated_at
+  relationship_fields: []
+- entity: embedded_resource
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - color
+  - default_snapshot_url
+  - kind
+  - title
+  relationship_fields: []
+- entity: filter_set
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - deleted_at
+  - filter
+  - resource_type
+  - updated_at
+  relationship_fields:
+  - creator
+  - workspace
+- entity: gem_chat
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - title
+  - updated_at
+  relationship_fields:
+  - user
+  - workspace
+- entity: gem_file
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - file_identifier
+  - filename
+  - filesize
+  - mime_type
+  relationship_fields:
+  - creator
+  - workspace
+- entity: key_date
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 6
+  attributes:
+  - color
+  - created_at
+  - end_date
+  - start_date
+  - title
+  - updated_at
+  relationship_fields:
+  - view
+- entity: label
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 5
+  attributes:
+  - color
+  - is_active
+  - name
+  - position
+  - uuid
+  relationship_fields:
+  - label_set
+- entity: label_set
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 5
+  attributes:
+  - is_active
+  - is_shared
+  - label_sort_method
+  - name
+  - uuid
+  relationship_fields:
+  - labels
+  - paired_custom_field
+  - parent_label
+- entity: link
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 2
+  attributes:
+  - created_at
+  - updated_at
+  relationship_fields:
+  - link_data
+- entity: link_data
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - description
+  - domain
+  - title
+  - updated_at
+  - url
+  relationship_fields:
+  - asset_references
+- entity: moment
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 7
+  attributes:
+  - color
+  - content_count
+  - created_at
+  - is_ghost
+  - legacy_id
+  - title
+  - updated_at
+  relationship_fields:
+  - asset_references
+  - assignees
+  - board_objects
+  - channels
+  - contents
+  - labels
+  - moment_assignees
+  - moment_custom_fields
+  - note
+  - owner
+  - paired_block
+  - planning_status
+  - primary_asset_reference
+  - primary_story
+  - privacy_group
+  - schedules
+  - stories
+  - workflow
+  - workspace
+- entity: moment_assignee
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 2
+  attributes:
+  - created_at
+  - updated_at
+  relationship_fields:
+  - assignee
+  - created_by_user
+  - moment
+- entity: moment_custom_field
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - date_value
+  - hash_value
+  - text_value
+  - updated_at
+  relationship_fields:
+  - custom_field
+  - groups
+  - moment
+  - users
+- entity: moment_schedule
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - day_segment
+  - end_at
+  - should_end_at_cascade
+  - start_at
+  - updated_at
+  relationship_fields:
+  - moment
+- entity: moments_setting
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 15
+  attributes:
+  - budget_panel_moment_view_collapsed
+  - chat_activity_hub_view_preference
+  - collapsed_sections
+  - content_queue_filters_open
+  - created_at
+  - current_brand_id
+  - longform_editor_theme
+  - moment_shroud_card_view
+  - moment_shroud_layout
+  - moments_filters_open
+  - pinned_brand_ids
+  - post_view_modes
+  - stories_filters_open
+  - timeslice_duration
+  - updated_at
+  relationship_fields:
+  - user
+- entity: note
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - comment
+  - created_at
+  - legacy_id
+  - updated_at
+  relationship_fields: []
+- entity: opal
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - name
+  - status
+  - subdomain
+  - updated_at
+  - uuid
+  relationship_fields:
+  - plan
+- entity: option
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 3
+  attributes:
+  - display_name
+  - input_type
+  - system_name
+  relationship_fields:
+  - values
+- entity: option_value
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 1
+  attributes:
+  - display_name
+  relationship_fields: []
+- entity: phase_item
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 8
+  attributes:
+  - created_at
+  - is_starred
+  - phase_item_type
+  - request
+  - response
+  - status
+  - type
+  - updated_at
+  relationship_fields:
+  - approvable
+  - brand
+  - from_user
+  - phase
+  - proxy_user
+  - to_user
+- entity: plan
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - display_name
+  - system_name
+  - updated_at
+  relationship_fields: []
+- entity: planning_status
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - color
+  - created_at
+  - display_name
+  - updated_at
+  relationship_fields: []
+- entity: post_component
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - position
+  - updated_at
+  relationship_fields:
+  - content
+  - post_options
+- entity: post_option
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - position
+  - updated_at
+  - value
+  relationship_fields:
+  - asset_references
+  - content
+  - option
+  - option_value
+  - post_component
+- entity: presentation_theme
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - legacy_id
+  - name
+  - styles
+  - updated_at
+  relationship_fields:
+  - pptx_template_asset_reference
+  - workspace
+- entity: response
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - deleted_at
+  - details
+  - updated_at
+  relationship_fields:
+  - assignment
+  - created_by_user
+- entity: rich_text_document
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - body
+  - client_library
+  - created_at
+  - updated_at
+  relationship_fields:
+  - asset_references
+  - assets
+  - created_by_user
+  - embedded_resources
+- entity: service
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 13
+  attributes:
+  - color
+  - content_name
+  - created_at
+  - has_placements
+  - icon_name
+  - icon_path
+  - is_active
+  - is_visible
+  - name
+  - system_name
+  - updated_at
+  - uuid
+  - web_modules_channel
+  relationship_fields:
+  - accounts
+  - asset_reference
+  - brand
+  - post_types
+- entity: stage
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 9
+  attributes:
+  - activated_at
+  - created_at
+  - deleted_at
+  - due_date
+  - metadata
+  - position
+  - stage_type
+  - status
+  - updated_at
+  relationship_fields:
+  - assignments
+  - workflow
+- entity: stamp
+  spec: openapi/opal-v2-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - is_limited
+  - name
+  - permission_mode
+  - stamp_type
+  - uuid
+  relationship_fields:
+  - moment
+  - post
+  - user
+- entity: story
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 9
+  attributes:
+  - color
+  - created_at
+  - description
+  - is_shared
+  - legacy_id
+  - name
+  - scheduled_end_at
+  - scheduled_start_at
+  - updated_at
+  relationship_fields:
+  - shared_workspaces
+  - workspace
+- entity: user
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 12
+  attributes:
+  - created_at
+  - email
+  - feature_flags
+  - first_name
+  - full_name
+  - is_active
+  - last_name
+  - legacy_id
+  - role_name
+  - title
+  - transliterated_full_name
+  - updated_at
+  relationship_fields:
+  - profile
+  - workspaces
+- entity: user_group
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 6
+  attributes:
+  - created_at
+  - description
+  - external_resource_type
+  - is_archived
+  - name
+  - updated_at
+  relationship_fields:
+  - asset
+  - created_by_user
+  - external_resource
+  - inherited_groups
+  - members
+- entity: user_profile
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 7
+  attributes:
+  - bio
+  - created_at
+  - job_title
+  - legacy_id
+  - location
+  - segments
+  - updated_at
+  relationship_fields:
+  - avatar_asset_reference
+  - user
+- entity: view
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 12
+  attributes:
+  - created_at
+  - default_timescale
+  - description
+  - end_at
+  - kind
+  - show_smart_swimlane_datasource
+  - start_at
+  - start_month_index
+  - start_weekday_index
+  - swimlane_title_column_width
+  - title
+  - updated_at
+  relationship_fields:
+  - blocks
+  - categories
+  - category_type
+  - colors
+  - creator
+  - key_dates
+  - owner
+  - parent_block
+  - workspace
+- entity: view_colors
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - color
+  - created_at
+  - label
+  - updated_at
+  relationship_fields:
+  - view
+- entity: view_column
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - position
+  - updated_at
+  relationship_fields:
+  - custom_field
+  - custom_field_type
+  - view_standard_column
+- entity: view_standard_column
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - created_at
+  - default_position
+  - display_name
+  - system_name
+  - updated_at
+  relationship_fields: []
+- entity: workflow
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 4
+  attributes:
+  - created_at
+  - is_approved
+  - status
+  - updated_at
+  relationship_fields:
+  - context
+  - created_by_user
+  - stages
+- entity: workflow_assignment
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - assignment_type
+  - created_at
+  - metadata
+  - position
+  - updated_at
+  relationship_fields:
+  - assigned_user
+  - created_by_user
+  - responses
+  - stage
+- entity: workflow_context
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 2
+  attributes:
+  - created_at
+  - updated_at
+  relationship_fields:
+  - block
+  - created_by_user
+  - moment
+  - workflow
+- entity: workflow_response
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 3
+  attributes:
+  - created_at
+  - details
+  - updated_at
+  relationship_fields:
+  - assignment
+  - created_by_user
+- entity: workflow_stage
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 8
+  attributes:
+  - activated_at
+  - created_at
+  - due_date
+  - metadata
+  - position
+  - stage_type
+  - status
+  - updated_at
+  relationship_fields:
+  - assignments
+  - workflow
+- entity: workspace
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 7
+  attributes:
+  - created_at
+  - legacy_id
+  - name
+  - slug
+  - start_of_week
+  - timezone
+  - updated_at
+  relationship_fields:
+  - logo
+  - workspace_defaults
+- entity: workspace_defaults
+  spec: openapi/opal-v3-openapi.yml
+  attribute_count: 5
+  attributes:
+  - disable_permission_notifications
+  - new_boards_inherit_workspace
+  - new_plans_inherit_workspace
+  - new_stories_inherit_workspace
+  - restrict_content_email_notifications
+  relationship_fields:
+  - workspace
+relationship_count: 151
+relationships:
+- from: asset
+  to: opal
+  cardinality: has_one
+  via: relationships.opal
+  spec: openapi/opal-v3-openapi.yml
+- from: asset_reference
+  to: asset
+  cardinality: has_one
+  via: relationships.asset
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: asset
+  cardinality: has_one
+  via: relationships.asset
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: board
+  cardinality: has_many
+  via: relationships.boards
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: block_connector
+  cardinality: has_many
+  via: relationships.block_connectors
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: category
+  cardinality: has_one
+  via: relationships.category
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: category_type
+  cardinality: has_one
+  via: relationships.category_type
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: rich_text_document
+  cardinality: has_one
+  via: relationships.rich_text_document
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: block
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: block_connector
+  to: block
+  cardinality: has_one
+  via: relationships.block
+  spec: openapi/opal-v3-openapi.yml
+- from: block_connector
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: block_connector
+  to: category
+  cardinality: has_one
+  via: relationships.category
+  spec: openapi/opal-v3-openapi.yml
+- from: block_custom_field_value
+  to: block
+  cardinality: has_one
+  via: relationships.block
+  spec: openapi/opal-v3-openapi.yml
+- from: block_custom_field_value
+  to: custom_field
+  cardinality: has_one
+  via: relationships.custom_field
+  spec: openapi/opal-v3-openapi.yml
+- from: block_custom_field_value
+  to: user
+  cardinality: has_many
+  via: relationships.users
+  spec: openapi/opal-v3-openapi.yml
+- from: block_duplication
+  to: category
+  cardinality: has_one
+  via: relationships.category
+  spec: openapi/opal-v3-openapi.yml
+- from: block_duplication
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: asset_reference
+  cardinality: has_one
+  via: relationships.asset_reference
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: board_collaborator
+  cardinality: has_many
+  via: relationships.board_collaborators
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: board_object
+  cardinality: has_many
+  via: relationships.board_objects
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: board_column
+  cardinality: has_many
+  via: relationships.board_columns
+  spec: openapi/opal-v3-openapi.yml
+- from: board
+  to: board_user_setting
+  cardinality: has_one
+  via: relationships.board_user_setting
+  spec: openapi/opal-v3-openapi.yml
+- from: board_collaborator
+  to: board
+  cardinality: has_one
+  via: relationships.board
+  spec: openapi/opal-v3-openapi.yml
+- from: board_column
+  to: board
+  cardinality: has_one
+  via: relationships.board
+  spec: openapi/opal-v3-openapi.yml
+- from: board_column
+  to: board_standard_column
+  cardinality: has_one
+  via: relationships.board_standard_column
+  spec: openapi/opal-v3-openapi.yml
+- from: board_column
+  to: custom_field
+  cardinality: has_one
+  via: relationships.custom_field
+  spec: openapi/opal-v3-openapi.yml
+- from: board_column
+  to: custom_field_type
+  cardinality: has_one
+  via: relationships.custom_field_type
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object
+  to: board
+  cardinality: has_one
+  via: relationships.board
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object
+  to: board_object_collection
+  cardinality: has_one
+  via: relationships.board_object_collection
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object
+  to: rich_text_document
+  cardinality: has_one
+  via: relationships.rich_text_document
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object_collection
+  to: board
+  cardinality: has_one
+  via: relationships.board
+  spec: openapi/opal-v3-openapi.yml
+- from: board_object_collection
+  to: board_object
+  cardinality: has_many
+  via: relationships.board_objects
+  spec: openapi/opal-v3-openapi.yml
+- from: board_user_setting
+  to: board
+  cardinality: has_one
+  via: relationships.board
+  spec: openapi/opal-v3-openapi.yml
+- from: board_user_setting
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: block_connector
+  cardinality: has_many
+  via: relationships.block_connectors
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: block
+  cardinality: has_many
+  via: relationships.blocks
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: category_type
+  cardinality: has_one
+  via: relationships.category_type
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: chart
+  cardinality: has_many
+  via: relationships.charts
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: filter_set
+  cardinality: has_one
+  via: relationships.filter_set
+  spec: openapi/opal-v3-openapi.yml
+- from: category
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: category_type
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: category_type
+  to: custom_field
+  cardinality: has_many
+  via: relationships.custom_fields
+  spec: openapi/opal-v3-openapi.yml
+- from: channel
+  to: asset_reference
+  cardinality: has_one
+  via: relationships.asset_reference
+  spec: openapi/opal-v3-openapi.yml
+- from: channel
+  to: content_type
+  cardinality: has_many
+  via: relationships.content_types
+  spec: openapi/opal-v3-openapi.yml
+- from: channel
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: chart
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: asset_reference
+  cardinality: has_many
+  via: relationships.asset_references
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: account
+  cardinality: has_one
+  via: relationships.account
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: channel
+  cardinality: has_one
+  via: relationships.channel
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: label
+  cardinality: has_many
+  via: relationships.labels
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: label_set
+  cardinality: has_many
+  via: relationships.label_sets
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: note
+  cardinality: has_one
+  via: relationships.note
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: story
+  cardinality: has_many
+  via: relationships.stories
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v3-openapi.yml
+- from: content
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: content_schedule
+  to: content
+  cardinality: has_one
+  via: relationships.content
+  spec: openapi/opal-v3-openapi.yml
+- from: content_schedule
+  to: moment_schedule
+  cardinality: has_one
+  via: relationships.moment_schedule
+  spec: openapi/opal-v3-openapi.yml
+- from: content_type
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: content_type
+  to: opal
+  cardinality: has_one
+  via: relationships.opal
+  spec: openapi/opal-v3-openapi.yml
+- from: custom_field
+  to: custom_field_type
+  cardinality: has_one
+  via: relationships.custom_field_type
+  spec: openapi/opal-v3-openapi.yml
+- from: custom_field
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: custom_field_option
+  to: custom_field
+  cardinality: has_one
+  via: relationships.custom_field
+  spec: openapi/opal-v3-openapi.yml
+- from: custom_field_option
+  to: custom_field_color
+  cardinality: has_one
+  via: relationships.custom_field_color
+  spec: openapi/opal-v3-openapi.yml
+- from: filter_set
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: gem_chat
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v3-openapi.yml
+- from: gem_chat
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: gem_file
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: key_date
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: asset_reference
+  cardinality: has_many
+  via: relationships.asset_references
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: board_object
+  cardinality: has_many
+  via: relationships.board_objects
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: label
+  cardinality: has_many
+  via: relationships.labels
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: note
+  cardinality: has_one
+  via: relationships.note
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: content
+  cardinality: has_many
+  via: relationships.contents
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: channel
+  cardinality: has_many
+  via: relationships.channels
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: story
+  cardinality: has_many
+  via: relationships.stories
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: workflow
+  cardinality: has_one
+  via: relationships.workflow
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: planning_status
+  cardinality: has_one
+  via: relationships.planning_status
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: moment_assignee
+  cardinality: has_many
+  via: relationships.moment_assignees
+  spec: openapi/opal-v3-openapi.yml
+- from: moment
+  to: moment_custom_field
+  cardinality: has_many
+  via: relationships.moment_custom_fields
+  spec: openapi/opal-v3-openapi.yml
+- from: moment_assignee
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: moment_custom_field
+  to: custom_field
+  cardinality: has_one
+  via: relationships.custom_field
+  spec: openapi/opal-v3-openapi.yml
+- from: moment_custom_field
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: moment_custom_field
+  to: user
+  cardinality: has_many
+  via: relationships.users
+  spec: openapi/opal-v3-openapi.yml
+- from: moment_schedule
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: view_column
+  to: view_standard_column
+  cardinality: has_one
+  via: relationships.view_standard_column
+  spec: openapi/opal-v3-openapi.yml
+- from: view_column
+  to: custom_field
+  cardinality: has_one
+  via: relationships.custom_field
+  spec: openapi/opal-v3-openapi.yml
+- from: view_column
+  to: custom_field_type
+  cardinality: has_one
+  via: relationships.custom_field_type
+  spec: openapi/opal-v3-openapi.yml
+- from: presentation_theme
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: rich_text_document
+  to: asset
+  cardinality: has_many
+  via: relationships.assets
+  spec: openapi/opal-v3-openapi.yml
+- from: rich_text_document
+  to: asset_reference
+  cardinality: has_many
+  via: relationships.asset_references
+  spec: openapi/opal-v3-openapi.yml
+- from: rich_text_document
+  to: embedded_resource
+  cardinality: has_many
+  via: relationships.embedded_resources
+  spec: openapi/opal-v3-openapi.yml
+- from: story
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: user
+  to: workspace
+  cardinality: has_many
+  via: relationships.workspaces
+  spec: openapi/opal-v3-openapi.yml
+- from: user_group
+  to: asset
+  cardinality: has_one
+  via: relationships.asset
+  spec: openapi/opal-v3-openapi.yml
+- from: user_profile
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v3-openapi.yml
+- from: view
+  to: category
+  cardinality: has_many
+  via: relationships.categories
+  spec: openapi/opal-v3-openapi.yml
+- from: view
+  to: category_type
+  cardinality: has_one
+  via: relationships.category_type
+  spec: openapi/opal-v3-openapi.yml
+- from: view
+  to: block
+  cardinality: has_many
+  via: relationships.blocks
+  spec: openapi/opal-v3-openapi.yml
+- from: view
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: view
+  to: key_date
+  cardinality: has_many
+  via: relationships.key_dates
+  spec: openapi/opal-v3-openapi.yml
+- from: view_colors
+  to: view
+  cardinality: has_one
+  via: relationships.view
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow
+  to: context
+  cardinality: has_one
+  via: relationships.context
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow
+  to: stage
+  cardinality: has_many
+  via: relationships.stages
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_assignment
+  to: stage
+  cardinality: has_one
+  via: relationships.stage
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_assignment
+  to: response
+  cardinality: has_many
+  via: relationships.responses
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_context
+  to: block
+  cardinality: has_one
+  via: relationships.block
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_context
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_context
+  to: workflow
+  cardinality: has_one
+  via: relationships.workflow
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_response
+  to: assignment
+  cardinality: has_one
+  via: relationships.assignment
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_stage
+  to: assignment
+  cardinality: has_many
+  via: relationships.assignments
+  spec: openapi/opal-v3-openapi.yml
+- from: workflow_stage
+  to: workflow
+  cardinality: has_one
+  via: relationships.workflow
+  spec: openapi/opal-v3-openapi.yml
+- from: workspace
+  to: workspace_defaults
+  cardinality: has_one
+  via: relationships.workspace_defaults
+  spec: openapi/opal-v3-openapi.yml
+- from: workspace_defaults
+  to: workspace
+  cardinality: has_one
+  via: relationships.workspace
+  spec: openapi/opal-v3-openapi.yml
+- from: account
+  to: service
+  cardinality: has_one
+  via: relationships.service
+  spec: openapi/opal-v2-openapi.yml
+- from: account
+  to: brand
+  cardinality: has_one
+  via: relationships.brand
+  spec: openapi/opal-v2-openapi.yml
+- from: assignment
+  to: stage
+  cardinality: has_one
+  via: relationships.stage
+  spec: openapi/opal-v2-openapi.yml
+- from: assignment
+  to: response
+  cardinality: has_many
+  via: relationships.responses
+  spec: openapi/opal-v2-openapi.yml
+- from: brand
+  to: account
+  cardinality: has_many
+  via: relationships.accounts
+  spec: openapi/opal-v2-openapi.yml
+- from: brand
+  to: dispatch_provider
+  cardinality: has_many
+  via: relationships.dispatch_providers
+  spec: openapi/opal-v2-openapi.yml
+- from: budget
+  to: opal
+  cardinality: has_one
+  via: relationships.opal
+  spec: openapi/opal-v2-openapi.yml
+- from: budget
+  to: story
+  cardinality: has_one
+  via: relationships.story
+  spec: openapi/opal-v2-openapi.yml
+- from: budget
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v2-openapi.yml
+- from: context
+  to: workflow
+  cardinality: has_one
+  via: relationships.workflow
+  spec: openapi/opal-v2-openapi.yml
+- from: context
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v2-openapi.yml
+- from: label
+  to: label_set
+  cardinality: has_one
+  via: relationships.label_set
+  spec: openapi/opal-v2-openapi.yml
+- from: label_set
+  to: label
+  cardinality: has_many
+  via: relationships.labels
+  spec: openapi/opal-v2-openapi.yml
+- from: link
+  to: link_data
+  cardinality: has_one
+  via: relationships.link_data
+  spec: openapi/opal-v2-openapi.yml
+- from: link_data
+  to: asset_reference
+  cardinality: has_many
+  via: relationships.asset_references
+  spec: openapi/opal-v2-openapi.yml
+- from: moments_setting
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v2-openapi.yml
+- from: opal
+  to: plan
+  cardinality: has_one
+  via: relationships.plan
+  spec: openapi/opal-v2-openapi.yml
+- from: phase_item
+  to: brand
+  cardinality: has_one
+  via: relationships.brand
+  spec: openapi/opal-v2-openapi.yml
+- from: post_component
+  to: content
+  cardinality: has_one
+  via: relationships.content
+  spec: openapi/opal-v2-openapi.yml
+- from: post_component
+  to: post_option
+  cardinality: has_many
+  via: relationships.post_options
+  spec: openapi/opal-v2-openapi.yml
+- from: post_option
+  to: asset_reference
+  cardinality: has_many
+  via: relationships.asset_references
+  spec: openapi/opal-v2-openapi.yml
+- from: post_option
+  to: content
+  cardinality: has_one
+  via: relationships.content
+  spec: openapi/opal-v2-openapi.yml
+- from: post_option
+  to: option
+  cardinality: has_one
+  via: relationships.option
+  spec: openapi/opal-v2-openapi.yml
+- from: post_option
+  to: option_value
+  cardinality: has_one
+  via: relationships.option_value
+  spec: openapi/opal-v2-openapi.yml
+- from: post_option
+  to: post_component
+  cardinality: has_one
+  via: relationships.post_component
+  spec: openapi/opal-v2-openapi.yml
+- from: response
+  to: assignment
+  cardinality: has_one
+  via: relationships.assignment
+  spec: openapi/opal-v2-openapi.yml
+- from: service
+  to: account
+  cardinality: has_many
+  via: relationships.accounts
+  spec: openapi/opal-v2-openapi.yml
+- from: service
+  to: asset_reference
+  cardinality: has_one
+  via: relationships.asset_reference
+  spec: openapi/opal-v2-openapi.yml
+- from: service
+  to: brand
+  cardinality: has_one
+  via: relationships.brand
+  spec: openapi/opal-v2-openapi.yml
+- from: stage
+  to: workflow
+  cardinality: has_one
+  via: relationships.workflow
+  spec: openapi/opal-v2-openapi.yml
+- from: stage
+  to: assignment
+  cardinality: has_many
+  via: relationships.assignments
+  spec: openapi/opal-v2-openapi.yml
+- from: stamp
+  to: moment
+  cardinality: has_one
+  via: relationships.moment
+  spec: openapi/opal-v2-openapi.yml
+- from: stamp
+  to: user
+  cardinality: has_one
+  via: relationships.user
+  spec: openapi/opal-v2-openapi.yml
+unresolved_reference_fields:
+- account.relationships.dispatch_provider_account
+- account.relationships.placements
+- asset_reference.attributes.legacy_id
+- asset_reference.attributes.public_id
+- asset_reference.relationships.cover_asset_reference
+- assignment.relationships.assigned_user
+- assignment.relationships.created_by_user
+- block.relationships.child_view
+- block.relationships.creator
+- block.relationships.custom_field_values
+- block.relationships.inherited_custom_field_values
+- block.relationships.owner
+- block.relationships.paired_moment
+- block_custom_field_value.relationships.groups
+- block_duplication.relationships.duplicated_block
+- block_duplication.relationships.source_block
+- board.relationships.collaborators
+- board.relationships.created_by_user
+- board.relationships.default_story
+- board.relationships.object_collections
+- board_collaborator.relationships.collaborator
+- board_collaborator.relationships.collaborator_group
+- board_object_collection.relationships.created_by_user
+- brand.relationships.logo
+- brand.relationships.primary_label_set
+- budget.relationships.post
+- bulk_operation.relationships.created_by_user
+- bulk_operation.relationships.operations
+- category.relationships.block_template
+- category.relationships.creator
+- category.relationships.group_by_custom_field
+- category.relationships.parent_category
+- category_type.relationships.creator
+- category_type.relationships.default_child_type
+- category_type.relationships.in_support_of_category_types
+- channel.attributes.legacy_id
+- content.attributes.legacy_id
+- content.relationships.inherited_label_sets
+- content.relationships.inherited_labels
+- content_type.attributes.legacy_id
+- context.relationships.created_by_user
+- custom_field.relationships.active_options
+- custom_field.relationships.creator
+- custom_field.relationships.deleted_options
+- custom_field.relationships.paired_label_set
+- custom_field_option.relationships.paired_label
+- filter_set.relationships.creator
+- gem_file.relationships.creator
+- label_set.relationships.paired_custom_field
+- label_set.relationships.parent_label
+- moment.attributes.legacy_id
+- moment.relationships.assignees
+- moment.relationships.owner
+- moment.relationships.paired_block
+- moment.relationships.primary_asset_reference
+- moment.relationships.primary_story
+- moment.relationships.privacy_group
+- moment.relationships.schedules
+- moment_assignee.relationships.assignee
+- moment_assignee.relationships.created_by_user
+- moment_custom_field.relationships.groups
+- moments_setting.attributes.current_brand_id
+- moments_setting.attributes.pinned_brand_ids
+- note.attributes.legacy_id
+- option.relationships.values
+- phase_item.relationships.approvable
+- phase_item.relationships.from_user
+- phase_item.relationships.phase
+- phase_item.relationships.proxy_user
+- phase_item.relationships.to_user
+- presentation_theme.attributes.legacy_id
+- presentation_theme.relationships.pptx_template_asset_reference
+- response.relationships.created_by_user
+- rich_text_document.relationships.created_by_user
+- service.relationships.post_types
+- stamp.relationships.post
+- story.attributes.legacy_id
+- story.relationships.shared_workspaces
+- user.attributes.legacy_id
+- user.relationships.profile
+- user_group.relationships.created_by_user
+- user_group.relationships.external_resource
+- user_group.relationships.inherited_groups
+- user_group.relationships.members
+- user_profile.attributes.legacy_id
+- user_profile.relationships.avatar_asset_reference
+- view.relationships.colors
+- view.relationships.creator
+- view.relationships.owner
+- view.relationships.parent_block
+- workflow.relationships.created_by_user
+- workflow_assignment.relationships.assigned_user
+- workflow_assignment.relationships.created_by_user
+- workflow_context.relationships.created_by_user
+- workflow_response.relationships.created_by_user
+- workspace.attributes.legacy_id
+- workspace.relationships.logo

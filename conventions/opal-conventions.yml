@@ -1,0 +1,165 @@
+generated: '2026-08-13'
+method: searched
+source: https://login.ouropal.com/api/documentation/v2
+sources:
+- https://login.ouropal.com/api/documentation/v2
+- https://login.ouropal.com/api/documentation/v3
+- openapi/opal-v2-openapi.yml
+- openapi/opal-v3-openapi.yml
+- openapi/opal-asgard-bff-openapi.yml
+note: >-
+  Cross-cutting runtime semantics for the Opal API, read from the info.description narrative that
+  Opal ships inside its published OpenAPI documents (the ReDoc reference at
+  https://login.ouropal.com/api/documentation) and from the specs themselves. Opal writes the
+  narrative in RFC 2119 / BCP 14 language and states so explicitly at the top of every document.
+
+specification_language:
+  rfc: BCP 14 (RFC 2119 + RFC 8174)
+  note: >-
+    "The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED,
+    NOT RECOMMENDED, MAY, and OPTIONAL in this document are to be interpreted as described in
+    BCP 14 ... when, and only when, they appear in all capitals."
+
+media_types:
+  jsonapi: application/vnd.api+json
+  json: application/json
+  rule: >-
+    Endpoints in the "JSON:API", "Unstable" and "Proposed" categories are JSON:API-compliant and
+    requests MUST set Accept: application/vnd.api+json for strict compliance. Those endpoints MAY
+    also accept application/json, but Opal states that support MAY disappear from any endpoint at
+    any time. Endpoints in the "Other" category are stable but NOT JSON:API — requests MUST set
+    Accept: application/json and the body MUST be parsed as generic JSON even where it resembles
+    the JSON:API structure.
+
+authentication:
+  style: oauth2-bearer
+  primary: OAuth 2.0 authorization code (Authorization Code grant)
+  authorization_url: https://login.ouropal.com/oauth2/auth
+  token_url: https://login.ouropal.com/oauth2/token
+  consent_url: https://login.ouropal.com/oauth2/consent
+  refresh: refresh_token grant at the same token endpoint; requires the offline_access scope
+  server_to_server: OAuth 2.0 client credentials (anonymous_oauth) at /oauth/token, scope write:onboarding
+  header: 'Authorization: Bearer <access_token> (RFC 6750 section 2.1)'
+  legacy: >-
+    A Session-Token request header is still accepted and is documented as "(Deprecated)". Opal
+    states the Authorization header supersedes Session-Token — when Authorization is present,
+    Session-Token is not required.
+  client_registration: >-
+    Manual. Applications are registered by the Opal integrations team; the developer supplies an
+    application name, logo URI and redirect URI and receives a client id and client secret. Opal
+    cannot recover a lost secret; compromised secrets are rolled by Opal on request, which
+    invalidates all outstanding access and refresh tokens.
+  token_lifetime: access_token expires_in 3600 seconds (per the documented token response example)
+  detail: authentication/opal-authentication.yml
+
+idempotency:
+  supported: false
+  evidence: >-
+    No Idempotency-Key header, no idempotency section, and no If-Match/ETag support appears in any
+    of the three published specs or in the API narrative. Retrying a POST is not documented as safe.
+  conditional_writes:
+    header: if-unmodified-since
+    scope: PATCH /rich_texts/v3/documents/{rich_text_document_id}
+    failure_status: 412 Precondition Failed
+    note: >-
+      Opal ships one optimistic-concurrency control, not an idempotency system: a conditional
+      update on rich text documents that returns 412 when the document changed since the supplied
+      timestamp.
+
+pagination:
+  style: jsonapi-page-object
+  params:
+  - name: page
+    in: query
+    form: 'page[offset] / page[limit] (deep-object query parameter)'
+  - name: limit
+    in: query
+    note: some non-JSON:API ("Other") endpoints take a flat limit/offset pair instead
+  - name: offset
+    in: query
+  default_behavior: >-
+    Opal publishes a "Firehose Rule": by default an endpoint returns all the data accessible to the
+    authenticated user, and clients MAY narrow it with filters, ordering, pagination and sparse
+    fields. Opal notes existing endpoints MAY NOT follow this maximalist approach but new ones will.
+
+filtering_and_shaping:
+  filter: 'filter[<member>] query parameters, JSON:API style'
+  sort: sort query parameter
+  include: include query parameter for compound documents (related resources returned in `included`)
+  sparse_fieldsets: fields query parameter (documented as sparse fields in the Firehose Rule)
+  omit: omit query parameter on some v3 endpoints
+
+versioning:
+  scheme: uri-path-segment
+  versions:
+  - id: v2
+    status: recommended
+    note: >-
+      More complete than v3. Opal states that where a resource has endpoints in both versions you
+      SHOULD use the v2 endpoints, and that "at some point in the future we will recommend the v3
+      API instead."
+  - id: v3
+    status: work-in-progress
+    note: 'Documented title is literally "Opal API (WIP)".'
+  - id: asgard_bff
+    status: unstable
+    note: Backend-for-frontend service; every operation is Unstable, Proposed or Experimental.
+  stability_categories:
+  - name: JSON:API / Stable
+    guarantee: >-
+      Opal MAY expand the data for these resources but will not change or remove existing
+      attributes or relationships.
+  - name: Other
+    guarantee: Stable, but not JSON:API-shaped.
+  - name: Unstable
+    guarantee: >-
+      Structure and behavior are not guaranteed and MAY change at any time. Opal states these MUST
+      NOT be used for production features.
+  - name: Proposed
+    guarantee: Not yet implemented. MUST NOT be used; MAY change or be removed at any time.
+  - name: Experimental
+    guarantee: No guarantee (v3 and Asgard BFF only).
+
+error_envelope:
+  format: jsonapi-errors
+  shape: '{"errors": [{"status": "...", "title": "...", "detail": "...", "code": "..."}]}'
+  rfc9457: false
+  detail: errors/opal-problem-types.yml
+
+authorization_semantics:
+  principle: Obscurity
+  rule: >-
+    Opal documents that many API calls which fail authorization return 404 Not Found rather than
+    403 Forbidden, deliberately, to protect customer privacy. Clients MUST NOT treat a 404 as
+    proof that a resource does not exist.
+
+request_id_tracing:
+  supported: false
+  evidence: >-
+    No X-Request-Id / Request-Id / correlation header is declared in any published spec, and none
+    was observed on live unauthenticated responses to https://login.ouropal.com/users/v2/me.
+
+custom_headers:
+- name: X-Workspace-Id
+  purpose: Scopes a request to a workspace on Asgard BFF and some v3 operations.
+- name: X-File-Name
+  purpose: Direct asset upload metadata.
+- name: X-File-Size
+  purpose: Direct asset upload metadata.
+- name: X-Mime-Type
+  purpose: Direct asset upload metadata.
+
+rate_limit_signaling:
+  documented: false
+  detail: rate-limits/opal-rate-limits.yml
+  evidence: >-
+    No 429 response, Retry-After, RateLimit-* or X-RateLimit-* header appears in any of the three
+    published specs, and none was returned on live unauthenticated requests.
+
+bulk_operations:
+  endpoint: POST /v3/bulk_operations
+  poll: GET /v3/bulk_operations/{bulk_operation_id}
+  semantics: >-
+    Partial success. The response separates successes[] from failures[], where each failure carries
+    its own status_code and error message, so a bulk call MUST be reconciled per row rather than
+    treated as all-or-nothing.

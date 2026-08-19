@@ -1,0 +1,66 @@
+generated: '2026-08-13'
+method: searched
+source: https://help.workwithopal.com/article/42ysdzfa2y-change-log
+url: https://help.workwithopal.com/article/42ysdzfa2y-change-log
+scope: product
+api_scoped: false
+scheme: dated-entries
+cadence: irregular; multiple entries per week during active periods
+entry_count_published: 57
+current_version: null
+note: >-
+  Opal publishes one dated product changelog, in its help center. It is a product changelog, not an
+  API changelog — no entry references API versions, endpoints or contract changes, and the three
+  published OpenAPI documents carry no per-operation change history. The feed also appears
+  abandoned: the newest dated entry is 9 January 2024 and the oldest on the page is 19 October
+  2023, so nothing has been added in roughly two and a half years as of this probe. A companion
+  "See What's New" category exists at
+  https://help.workwithopal.com/category/y4bnzzhc0u-see-what-s-new but shows only relative
+  timestamps ("Updated 2 years ago") rather than dates.
+staleness:
+  latest_entry: '2024-01-09'
+  oldest_entry_on_page: '2023-10-19'
+  checked: '2026-08-13'
+  days_since_latest_entry: 947
+related:
+  whats_new: https://help.workwithopal.com/category/y4bnzzhc0u-see-what-s-new
+entries:
+- date: '2024-01-09'
+  breaking: false
+  highlights:
+  - Refined drag-and-drop for moments in boards
+  - Improved time zone picker in the Composer
+  - Fixed keyboard navigation and custom channel icon display
+- date: '2024-01-03'
+  breaking: false
+  highlights:
+  - Open moments directly from content cells
+  - Fixed a visual problem affecting file downloads in the Personal Panel
+- date: '2023-12-26'
+  breaking: false
+  highlights:
+  - Resolved duplicate board sharing permissions
+  - Fixed PDF rendering in Asset and Copy content types
+- date: '2023-12-21'
+  breaking: false
+  highlights:
+  - Corrected presentation slides that were not reflecting recent moment order changes
+- date: '2023-12-18'
+  breaking: false
+  highlights:
+  - Reactivate a user group that was previously deactivated
+- date: '2023-12-14'
+  breaking: false
+  highlights: []
+- date: '2023-12-07'
+  breaking: false
+  highlights: []
+- date: '2023-12-05'
+  breaking: false
+  highlights: []
+- date: '2023-11-30'
+  breaking: false
+  highlights: []
+- date: '2023-11-28'
+  breaking: false
+  highlights: []

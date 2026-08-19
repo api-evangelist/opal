@@ -1,0 +1,33 @@
+generated: '2026-08-13'
+method: searched
+source: https://login.ouropal.com/api/documentation
+limit_count: 0
+documented: false
+note: >-
+  Opal publishes no rate limits. All three OpenAPI documents (v2, v3, Asgard BFF) were searched:
+  none declares a 429 response on any operation, and none declares a Retry-After, RateLimit-*,
+  X-RateLimit-* or equivalent response header. The API narrative Opal ships inside those documents
+  covers authentication, pagination, stability and error semantics but says nothing about
+  throttling or quotas. The help center's Opal API article does not mention limits either. Live
+  unauthenticated requests to https://login.ouropal.com/users/v2/me and
+  https://login.ouropal.com/content/v3 returned 302 redirects to the login page with no
+  rate-limit headers present. An integrator therefore has no published runtime signal to back off
+  against and would have to discover limits empirically or ask their Opal contact.
+limits: []
+headers:
+  published: []
+  observed: []
+  exhaustion_status: null
+evidence:
+- url: https://login.ouropal.com/api/documentation/v2
+  status: 200
+  finding: no 429 response, no rate-limit headers, no throttling section
+- url: https://login.ouropal.com/api/documentation/v3
+  status: 200
+  finding: no 429 response, no rate-limit headers, no throttling section
+- url: https://login.ouropal.com/users/v2/me
+  status: 302
+  finding: redirects to /login; no RateLimit-* or Retry-After headers on the response
+- url: https://help.workwithopal.com/article/17imdltzi1-opal-api
+  status: 200
+  finding: access instructions only; no limits documented

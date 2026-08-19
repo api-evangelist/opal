@@ -1,0 +1,48 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/opal-v2-openapi.yml, openapi/opal-v3-openapi.yml
+schemes:
+- name: oauth2
+  source: openapi/opal-v2-openapi.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: /oauth2/auth
+    tokenUrl: /oauth2/token
+  description: This API uses OAuth 2.0 with the authorization code grant flow. You can find
+    more detailed authentication instructions in the [Authentication Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+    section.
+- name: oauth2
+  source: openapi/opal-v3-openapi.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: /oauth2/auth
+    tokenUrl: /oauth2/token
+  description: |-
+    This API uses OAuth 2.0 with the authorization code grant flow. You can
+    find more detailed authentication instructions in the [Authentication
+    Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+    section.
+- name: anonymous_oauth
+  source: openapi/opal-v3-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /oauth/token
+  description: |-
+    The OAuth 2.0 client credentials flow is used for secure server-server
+    requests when Opal does not need to associate a request with a particular
+    Opal user. These anonymous requests are instead authorized based on the
+    OAuth scope.
+scopes:
+- scope: offline_access
+  description: Include this scope if you wish to receive a refresh token
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+- scope: write:onboarding
+  description: Include this scope if you wish to make API requests to onboard new Opals.
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/opal-v3-openapi.yml

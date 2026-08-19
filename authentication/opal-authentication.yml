@@ -1,0 +1,60 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/opal-asgard-bff-openapi.yml, openapi/opal-v2-openapi.yml, openapi/opal-v3-openapi.yml
+summary:
+  types:
+  - apiKey
+  - oauth2
+  api_key_in:
+  - cookie
+  - header
+  oauth2_flows:
+  - authorizationCode
+  - clientCredentials
+schemes:
+- name: api_key
+  type: apiKey
+  in: header
+  parameter: Session-Token
+  description: (Deprecated) This API also supports authentication via an API or session token
+    set in the request headers.
+  sources:
+  - openapi/opal-asgard-bff-openapi.yml
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+- name: oauth2
+  type: oauth2
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: /oauth2/auth
+    tokenUrl: /oauth2/token
+    scopes: 1
+  description: This API uses OAuth 2.0 with the authorization code grant flow. You can find
+    more detailed authentication instructions in the [Authentication Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+    section.
+  sources:
+  - openapi/opal-v2-openapi.yml
+  - openapi/opal-v3-openapi.yml
+- name: anonymous_oauth
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /oauth/token
+    scopes: 1
+  description: |-
+    The OAuth 2.0 client credentials flow is used for secure server-server
+    requests when Opal does not need to associate a request with a particular
+    Opal user. These anonymous requests are instead authorized based on the
+    OAuth scope.
+  sources:
+  - openapi/opal-v3-openapi.yml
+- name: presentation_share_cookie
+  type: apiKey
+  in: cookie
+  parameter: share_token
+  description: |-
+    A cookie set and read by the Monolith service that authorizes a non-opal
+    user to view a presentation and the resources within it. Other services
+    can rely on this cookie by asking Monolith to authenticate it.
+  sources:
+  - openapi/opal-v3-openapi.yml

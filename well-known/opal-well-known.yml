@@ -1,0 +1,67 @@
+generated: '2026-08-13'
+method: probed
+source: live HTTP probes of the apis.yml website host and the OpenAPI servers[] host
+result: none
+note: >-
+  Opal serves no /.well-known documents. Two distinct failure shapes were observed and both are
+  misses. On workwithopal.com (the WordPress marketing site) every path returns a genuine 404. On
+  login.ouropal.com (the API host named in servers[]) every path returns HTTP 200 with the Opal
+  single-page-app HTML shell — *.ouropal.com is a wildcard, and an unrelated random subdomain
+  returns the same body from the same address (20.94.255.92), so these 200s are catch-all
+  responses, not documents. No WellKnown or SecurityTxt pointer is emitted for either host.
+  Note that Opal's OAuth 2.0 endpoints are real and live (GET https://login.ouropal.com/oauth2/auth
+  returns a 302 to an invalid_client error from an Ory Hydra fallback handler, and the v3 spec
+  narrative references a "Hydra admin CLI"), but the corresponding discovery document is shadowed
+  by the SPA: /oauth2/.well-known/openid-configuration returns a bare Go "404 page not found".
+hosts:
+- host: https://workwithopal.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://login.ouropal.com
+  wildcard_spa: true
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    result: spa-shell
+  - path: /.well-known/openid-configuration
+    status: 200
+    result: spa-shell
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    result: spa-shell
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    result: spa-shell
+  - path: /.well-known/jwks.json
+    status: 200
+    result: spa-shell
+  - path: /.well-known/api-catalog
+    status: 200
+    result: spa-shell
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    result: spa-shell
+  - path: /.well-known/agent-card.json
+    status: 200
+    result: spa-shell
+  - path: /oauth2/.well-known/openid-configuration
+    status: 404
+    result: 'bare "404 page not found" from the OAuth service behind the SPA'
+files: []

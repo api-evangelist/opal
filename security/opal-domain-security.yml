@@ -1,4 +1,4 @@
-generated: '2026-07-20'
+generated: '2026-08-13'
 method: probed
 source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
 hosts:
@@ -7,6 +7,12 @@ hosts:
   tls_version: TLSv1.3
   cert_expires: Sep 24 10:29:47 2026 GMT
   hsts: false
+- host: login.ouropal.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec  3 23:59:59 2026 GMT
+  hsts: true
+  hsts_max_age: 63072000
 domains:
 - domain: workwithopal.com
   dnssec: false
@@ -14,3 +20,9 @@ domains:
   spf: true
   dmarc: true
   dmarc_policy: quarantine
+- domain: ouropal.com
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: none

@@ -1,0 +1,96 @@
+generated: '2026-08-13'
+method: searched
+source: https://login.ouropal.com/api/documentation/v2
+sources:
+- https://login.ouropal.com/api/documentation/v2
+- https://login.ouropal.com/api/documentation/v3
+- https://help.workwithopal.com/article/42ysdzfa2y-change-log
+- openapi/opal-v2-openapi.yml
+- openapi/opal-v3-openapi.yml
+- openapi/opal-asgard-bff-openapi.yml
+
+versioning:
+  scheme: uri-path-segment
+  current: v2
+  next: v3
+  docs: https://login.ouropal.com/api/documentation
+  policy: >-
+    Opal publishes three documented surfaces — v2, v3 and an Asgard BFF service. v2 is the
+    recommended surface: "if a resource has endpoints in both the v2 API and the v3 API you SHOULD
+    use the v2 API endpoints. At some point in the future we will recommend the v3 API instead."
+    v3 is titled "Opal API (WIP)". v3 resource identifiers are opaque strings (currently UUIDv4)
+    and every v3 response carries the corresponding v2 identifier at attributes.legacy_id so a
+    client can straddle both versions during migration.
+
+deprecation:
+  policy_url: https://login.ouropal.com/api/documentation/v2
+  policy_published: true
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  policy: >-
+    Opal publishes a breaking-change contract keyed to a documented stability taxonomy rather than
+    a dated sunset schedule. For "JSON:API" and "Other" resources Opal MAY expand the data but
+    "will not change or remove existing attributes or relationships for these resources", and
+    states those expansions should not require client changes. For "Unstable" endpoints (including
+    individual operations whose summary is prefixed [UNSTABLE]) the data structure and behavior are
+    not guaranteed and MAY change at any time, and clients MUST NOT use them for production
+    features. "Proposed" endpoints MUST NOT be used at all — they are published to share plans and
+    MAY change or be removed at any time. No Sunset or Deprecation response header (RFC 8594) is
+    declared anywhere in the specs, and no removal dates are published.
+  deprecated_mechanisms:
+  - mechanism: Session-Token request header (apiKey security scheme `api_key`)
+    status: deprecated
+    replacement: 'OAuth 2.0 bearer token in the Authorization header'
+    evidence: >-
+      Declared in all three specs as "(Deprecated) This API also supports authentication via an API
+      or session token set in the request headers", and the narrative states the Authorization
+      header supersedes it.
+  deprecated_operations: []
+  deprecated_operations_note: >-
+    No operation in any of the three published specs carries `deprecated: true`. Stability is
+    expressed through tag groups (Stable / Unstable / Proposed / Experimental) instead.
+
+stability_tag_groups:
+- spec: openapi/opal-v2-openapi.yml
+  groups: ['JSON:API', 'Other', 'Unstable', 'Proposed', 'Additional Resources']
+- spec: openapi/opal-v3-openapi.yml
+  groups: ['Stable', 'Unstable', 'Proposed', 'Experimental', 'Additional Resources']
+- spec: openapi/opal-asgard-bff-openapi.yml
+  groups: ['Unstable', 'Proposed', 'Experimental']
+
+change_log:
+  url: https://help.workwithopal.com/article/42ysdzfa2y-change-log
+  scope: product
+  api_scoped: false
+  detail: changelog/opal-changelog.yml
+
+status_page:
+  published: false
+  evidence: >-
+    No status page was found. status.workwithopal.com does not resolve, and status.ouropal.com
+    returns HTTP 200 only because *.ouropal.com is a wildcard that serves the Opal single-page app
+    shell for any hostname (an unrelated random subdomain resolves to the same 20.94.255.92 and the
+    same HTML). It is not a status document, so no StatusPage pointer is emitted.
+  probed:
+  - url: https://status.ouropal.com/
+    status: 200
+    result: wildcard SPA shell, not a status page
+  - url: https://workwithopal.com/status/
+    status: 404
+
+sla:
+  published: false
+  note: >-
+    No public SLA or uptime target. Pricing and terms are handled through sales; the API terms are
+    published as an API License at https://workwithopal.com/api-license/.
+
+access:
+  gated: true
+  note: >-
+    The API documentation is public and unauthenticated at
+    https://login.ouropal.com/api/documentation, but credentials are not self-serve. Opal's help
+    center states access to the API requires an active account or an NDA plus approval from Opal
+    leadership, and OAuth client registration "is currently a manual process" handled by the Opal
+    integrations team.
+  evidence: https://help.workwithopal.com/article/17imdltzi1-opal-api

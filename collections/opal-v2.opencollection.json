@@ -1,0 +1,3625 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Opal API",
+    "version": "2.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Accounts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List placements associated with given account",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/accounts/:account_id/placements",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch placements for"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List placements associated with given account"
+        },
+        {
+          "info": {
+            "name": "Create a placement to associate with the given account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/accounts/:account_id/placements",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch placements for"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a placement to associate with the given account"
+        },
+        {
+          "info": {
+            "name": "Get placement by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/accounts/:account_id/placements/:id",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch placements for"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the placement to show/update/destroy"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get placement by ID"
+        },
+        {
+          "info": {
+            "name": "Update placement",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/accounts/:account_id/placements/:id",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch placements for"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the placement to show/update/destroy"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update placement"
+        },
+        {
+          "info": {
+            "name": "Delete placement",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/accounts/:account_id/placements/:id",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch placements for"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the placement to show/update/destroy"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete placement"
+        },
+        {
+          "info": {
+            "name": "Get all accounts available to the authenticated user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/accounts/v2",
+            "params": [
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "query",
+                "description": "The ID of the Brand (a.k.a. Workspace) for which accounts should be retrieved."
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "query",
+                "description": "A service ID by which to filter accounts."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get all accounts available to the authenticated user"
+        },
+        {
+          "info": {
+            "name": "Get the specified account",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/accounts/v2/:account_id",
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the account to fetch."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get the specified account"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Activities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Returns a list of possible activity types for a given object, as specified by the entity_type parameter",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/activities/v1/:entity_type/activity_types",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The type of object to fetch activities for"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns a list of possible activity types for a given object, as specified by the entity_type parameter"
+        },
+        {
+          "info": {
+            "name": "Returns all activities for a given object, as specified by the entity_type parameter.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/activities/v1/:entity_type/:entity_id",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The type of object to fetch activities for"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the entity to fetch activities for. The type is determined by the entity_type parameter"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns all activities for a given object, as specified by the entity_type parameter."
+        },
+        {
+          "info": {
+            "name": "Create an activity for a given moment or piece of content",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/activities/v1/:entity_type/:entity_id",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The type of object to fetch activities for"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the entity to fetch activities for. The type is determined by the entity_type parameter"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create an activity for a given moment or piece of content"
+        },
+        {
+          "info": {
+            "name": "Returns latest checkpoint for a given entity and user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/activities/v1/:entity_type/:entity_id/checkpoint",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The type of object to fetch activities for"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the entity to fetch activities for. The type is determined by the entity_type parameter"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns latest checkpoint for a given entity and user"
+        },
+        {
+          "info": {
+            "name": "Create a checkpoint for a give entity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/activities/v1/:entity_type/:entity_id/checkpoint",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The type of object to fetch activities for"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the entity to fetch activities for. The type is determined by the entity_type parameter"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a checkpoint for a give entity"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Annotations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Delete an annotation",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/annotation/v1/:annotation_id",
+            "params": [
+              {
+                "name": "annotation_id",
+                "value": "",
+                "type": "path",
+                "description": "The is associated with an annotation"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete an annotation"
+        },
+        {
+          "info": {
+            "name": "List of annotations associated with a snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/annotations/v1/:snapshot_id",
+            "params": [
+              {
+                "name": "snapshot_id",
+                "value": "",
+                "type": "path",
+                "description": "The snapshot id used to look up annotations"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List of annotations associated with a snapshot"
+        },
+        {
+          "info": {
+            "name": "Create an annotation associated with a snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/annotations/v1/:snapshot_id",
+            "params": [
+              {
+                "name": "snapshot_id",
+                "value": "",
+                "type": "path",
+                "description": "The snapshot id used to look up annotations"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create an annotation associated with a snapshot"
+        },
+        {
+          "info": {
+            "name": "Create a message association with an annotation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/messages/v1/:annotation_id",
+            "params": [
+              {
+                "name": "annotation_id",
+                "value": "",
+                "type": "path",
+                "description": "The annotation id associated with a message"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a message association with an annotation"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Assets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "[UNSTABLE] Get a collection of assets available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/assets/v2",
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "[UNSTABLE] Get a collection of assets available to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Upload an asset available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/assets/v2",
+            "headers": [
+              {
+                "name": "X-File-Name",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Upload an asset available to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Get an assets metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/assets/v2/:asset_id",
+            "params": [
+              {
+                "name": "asset_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Asset"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get an assets metadata"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Url Uploads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a URL upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/assets/v2/url_uploads/:url_upload_id",
+            "params": [
+              {
+                "name": "url_upload_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the URL upload"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a URL upload"
+        },
+        {
+          "info": {
+            "name": "Get a collection of URL uploads",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/assets/v2/url_uploads",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 50.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Records will be ordered by created_at in ascending order by default.\nIf a pagination limit is not specified, a default page limit of 50 will be used.\n"
+        },
+        {
+          "info": {
+            "name": "Create a url upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/assets/v2/url_uploads",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "sync",
+                "value": "",
+                "type": "query",
+                "description": "By default, an operation will be created with the `pending` status. It will\nreturn early and complete asynchronously. When this parameter is `true`,\nall operations will be processed synchronously and completely within one\nrequest, and the server will not respond until all operations have\ncompleted.\n\nThis option should be used with care as longer-running requests have the\npotential to time out.\n"
+              },
+              {
+                "name": "pdf_from_opal",
+                "value": "",
+                "type": "query",
+                "description": "When set to 'true', transforms the provided source_url into an authenticated URLBox PDF generation URL"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This endpoint creates a URL upload. A URL upload represents a request to\ncreate an asset for a file at the provided `source_url`, with the name\nprovided in `file_name`. Creating the corresponding asset is done\nasynchronously. All URL uploads are created with an initial status of\n\"pending\". While the asset is being created, the status will transition to\n\"in_progress\". If the creation of the asset is successful, the status will\ntransition to \"complete\", and the asset relationship will be set on th"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Asset References",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create an asset reference, optionally associated with Opal objects.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/api/v1/asset_references",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create an asset reference, optionally associated with Opal objects."
+        },
+        {
+          "info": {
+            "name": "Get an asset reference available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/api/v1/asset_references/:asset_reference_id",
+            "params": [
+              {
+                "name": "asset_reference_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Asset Reference"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get an asset reference available to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Updates an asset reference and its associations with Opal objects.",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/api/v1/asset_references/:asset_reference_id",
+            "params": [
+              {
+                "name": "asset_reference_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Asset Reference"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Updates an asset reference and its associations with Opal objects."
+        },
+        {
+          "info": {
+            "name": "Deletes an asset reference.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/api/v1/asset_references/:asset_reference_id",
+            "params": [
+              {
+                "name": "asset_reference_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Asset Reference"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Deletes an asset reference."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Asset Reference Options",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new asset reference option.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/api/v1/asset_references/asset_reference_options",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new asset reference option."
+        },
+        {
+          "info": {
+            "name": "Delete an Asset Reference Option",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/api/v1/asset_references/asset_reference_options",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Asset Reference Option"
+              }
+            ]
+          },
+          "docs": "Delete an Asset Reference Option"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "URL Previews",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new URL Preview.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/api/v1/asset_references/url_preview",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Creates a new `AssetReference` record using the supplied `source_url`."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Asset Reference Usage Rights Options",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get usage rights options available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/api/v1/asset_references/usage_rights_options",
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get usage rights options available to the authenticated user."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Search",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Returns all entities that match query string filtered by brand slug",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/api/v1/search",
+            "params": [
+              {
+                "name": "slug",
+                "value": "",
+                "type": "query",
+                "description": "The workspace to filter for"
+              },
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "The search string to query against"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Provides an elasticsearch query against `JumpSearchIndexV1#display_name`"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Stories V1",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a Story.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/api/v1/stories",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new Moments::Story"
+        },
+        {
+          "info": {
+            "name": "Update a Story.",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://login.ouropal.com/api/v1/stories",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update attributes in an existing Moments::Story"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Brands",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all visible brands in the requesting users Opal",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/brands/v2/brands",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object keyed by resource type, i.e. \\\"story\\\" or a story relationship, where each value is a CSV of attributes to include in the response."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results. Default scoped to the requesting user's Opal.\nAll timestamp filters (`created_at`, `updated_at`) use the syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00`.\nTimestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`.\n`eq` will convert a date to a 24 hour range. Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List all visible brands in the requesting users Opal"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Brand Settings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Returns the namespaced brand settings for this user in this view.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/brand_settings/v2",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "filter_namespace",
+                "value": "",
+                "type": "query",
+                "description": "Namespace of view that is being filtered.\n\nMust be specified in query parameters unless a settings object\nis being patched and the `filter_namespace` is present in the\nattributes of the settings object.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "NOTE: Currently, only filter settings for the content timelines and stories views are supported.\n"
+        },
+        {
+          "info": {
+            "name": "Update a workspace/brand's settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/brand_settings/v2/:brand_setting_id",
+            "params": [
+              {
+                "name": "brand_setting_id",
+                "value": "",
+                "type": "path",
+                "description": "ID of a brand setting"
+              },
+              {
+                "name": "filter_namespace",
+                "value": "",
+                "type": "query",
+                "description": "Namespace of view that is being filtered.\n\nMust be specified in query parameters unless a settings object\nis being patched and the `filter_namespace` is present in the\nattributes of the settings object.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "NOTE: Currently, only filter settings for the content timelines and stories views are supported.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Budgets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a budget associated with a Story.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/budgets/stories/:story_id",
+            "params": [
+              {
+                "name": "story_id",
+                "value": "",
+                "type": "path",
+                "description": "ID of a story"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "NOTE: When the Story exists but has no budget,\n  status 200 with an empty body will be returned instead of 404.\n"
+        },
+        {
+          "info": {
+            "name": "Create a budget for a Story.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/budgets/stories/:story_id",
+            "params": [
+              {
+                "name": "story_id",
+                "value": "",
+                "type": "path",
+                "description": "ID of a story"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a budget for a Story."
+        },
+        {
+          "info": {
+            "name": "Delete the budget with the given Id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/budgets/stories/:budget_id",
+            "params": [
+              {
+                "name": "budget_id",
+                "value": "",
+                "type": "path",
+                "description": "ID of a budget"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete the budget with the given Id."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Content",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a batch of content",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/content/v2",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related entities to include.\\\nNOTE: `brand` and `workspace` are synonyms but this endpoint only accepts the word `brand`.\\\nNOTE: Only `asset_references` that are directly associated to the post.\n"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n\nAll timestamp filters (`created_at`, `updated_at`, and `scheduled_at`), use syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00` Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone.\n\nIf no operator is specified, `eq` will be assumed. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`. `eq` will convert a date to a 24 hour range. Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.\n"
+              },
+              {
+                "name": "omit_count",
+                "value": "",
+                "type": "query",
+                "description": "Optionally omit the `count` field from metadata in the response."
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "Sort by the given property. All of the valid options are enumerated\n(i.e. \"sort=moment,position\" is valid but \"sort=position\" is not).\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a batch of content"
+        },
+        {
+          "info": {
+            "name": "Create a piece of Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/content/v2",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a piece of Content"
+        },
+        {
+          "info": {
+            "name": "Get a single piece of content",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/content/v2/:content_id",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content."
+              },
+              {
+                "name": "fields",
+                "value": "[object Object]",
+                "type": "query",
+                "description": "A JSON:API [sparse fieldset](https://jsonapi.org/format/#fetching-sparse-fieldsets) declaration. The resource type can be that of the primary resource (i.e. `content`) or any of the included resources (e.g. `story` or `account`).\n"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related entities to include.\\\nNOTE: `brand` and `workspace` are synonyms but this endpoint only accepts the word `brand`.\\\nNOTE: Only `asset_references` that are directly associated to the post.\n"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a single piece of content"
+        },
+        {
+          "info": {
+            "name": "Update a piece of Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/content/v2/:content_id",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update a piece of Content"
+        },
+        {
+          "info": {
+            "name": "Delete the specified Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/content/v2/:content_id",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete the specified Content"
+        },
+        {
+          "info": {
+            "name": "Join content to a placement",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/content/v2/:content_id/placements/:placement_id",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content being attached to placement"
+              },
+              {
+                "name": "placement_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the placement attach content to"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Join content to a placement"
+        },
+        {
+          "info": {
+            "name": "Attach content to a different placement",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://login.ouropal.com/content/v2/:content_id/placements/:placement_id",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content being attached to placement"
+              },
+              {
+                "name": "placement_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the placement attach content to"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Attach content to a different placement"
+        },
+        {
+          "info": {
+            "name": "Remove a piece of content from a placement.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/content/v2/:content_id/placements",
+            "params": [
+              {
+                "name": "content_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the content being attached to placement"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Remove a piece of content from a placement."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Delivery Records",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Update a delivery record",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/delivery_records/v2/:delivery_record_id",
+            "params": [
+              {
+                "name": "delivery_record_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Delivery Record."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Updating certain fields will cause other fields and the internal state of a Delivery Record to be updated\ndepending on what fields are set in the request.\n\n* `live_url`: The state will be set to `published`, and the `delivered_at` field wil be set to the current time.\n  The fields `provider_errors`, `failed_at` will be unset.\n\n* `provider_errors`: The state will be set to `failed`, and the `failed_at` field will be set to the current time.\n  The `delivered_at` field will be unset.\n\n* `provider_c"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Labels",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Find labels for a Workspace.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/labels/v2",
+            "params": [
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "query",
+                "description": "The ID of the workspace/brand."
+              },
+              {
+                "name": "label_set_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter labels by label set ID."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 150.\n\n**Deprecated** usage (as a string value):\nThe page number being requested. This should should be used in conjunction with per_page.\nFor example, if there are 50 records, a user can request all of them in two requests by requesting `?page=1&per_page=25` and `?page=2&per_page=25`.\n"
+              },
+              {
+                "name": "per_page",
+                "value": "",
+                "type": "query",
+                "description": "The number of results being requested per page."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Note that this endpoint supports both a deprecated and new representation of pagination in the query parameters of requests.\n\nGoing forward, you should use the `page[offset]` and `page[limit]` query parameters to indicate what \"page\" of results you would like.\n"
+        },
+        {
+          "info": {
+            "name": "Create a new label.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/labels/v2",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new label."
+        },
+        {
+          "info": {
+            "name": "Update a label.",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/labels/v2/:label_id",
+            "params": [
+              {
+                "name": "label_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the label."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This action can only be performed by admin users."
+        },
+        {
+          "info": {
+            "name": "Delete a label.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/labels/v2/:label_id",
+            "params": [
+              {
+                "name": "label_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the label."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This action can only be performed by an admin user, and cannot be undone via the API. It is generally preferable to deactivate a label by sending a `PATCH` request that sets the label's `is_active` field to `false`.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Label Sets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get label sets available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/label_sets/v2",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 150.\n"
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "A JSON:API [sparse fieldset](https://jsonapi.org/format/#fetching-sparse-fieldsets) declaration."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get label sets available to the authenticated user."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Messages",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Delete a message",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/message/v1/:message_id",
+            "params": [
+              {
+                "name": "message_id",
+                "value": "",
+                "type": "path",
+                "description": "The id associated with the message"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete a message"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Moments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Return all moments available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/moments/v2",
+            "params": [
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the moment. When specifying multiple values, each value in the sequence determines the ordering precedence.\n\n\nEach moment in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each moment will appear in descending order for the specified values.\n"
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object keyed by resource type, i.e. \\\"moment\\\" or a moment relationship, where each value is a CSV of attributes to include in the response."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\nAll timestamp filters (`created_at`, `updated_at`, and `scheduled_at`), use syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00`\n\nTimestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`.Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone.\n\nIf no operator is specified, `eq` will be assumed. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`. `eq` will convert a date to a 24 hour range.Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.\n"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Return all moments available to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Create a new public or private moment.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/moments/v2",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new public or private moment."
+        },
+        {
+          "info": {
+            "name": "Return the specified Moment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/moments/v2/:moment_id",
+            "params": [
+              {
+                "name": "moment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Moment."
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object keyed by resource type, i.e. \\\"moment\\\" or a moment relationship, where each value is a CSV of attributes to include in the response."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Return the specified Moment"
+        },
+        {
+          "info": {
+            "name": "Update the specified Moment",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/moments/v2/:moment_id",
+            "params": [
+              {
+                "name": "moment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Moment."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update the specified Moment"
+        },
+        {
+          "info": {
+            "name": "Delete the specified Moment",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/moments/v2/:moment_id",
+            "params": [
+              {
+                "name": "moment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Moment."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete the specified Moment"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Phase Items",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Return all phase items available to the authenticated user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/phase_items/v2",
+            "params": [
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object where each key is a CSV of phase item attributes to include in the response.\nOmit this parameter entirely to retrieve all available fields.\n"
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related resource objects on the phase item to include. These need to be specified when attributes on a relationship are required by the client.\n"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the phase item. When specifying multiple values, each value in the sequence determines the ordering precedence. Lastly, each phase item in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each phase item will appear in descending order for the specified values.\n"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Return all phase items available to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Update a phase item",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/phase_items/v2/:phase_item_id",
+            "params": [
+              {
+                "name": "phase_item_id",
+                "value": "",
+                "type": "path",
+                "description": "The primary identifier for the phase item"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update a phase item"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Privacy",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new Privacy Group Membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/privacy/v2/groups/:group_id/members",
+            "params": [
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "A Privacy Group ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Request membership to the given group.\n\nThe requesting user must be asking for membership on their own behalf.\nThis means the `user` relationship in the request must match the requesting user.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Post Types",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Returns a list of Post Typs",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/post_types/v2",
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns a list of Post Typs"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Reactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create an emoji reaction on a given activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/reactions/v2",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create an emoji reaction on a given activity"
+        },
+        {
+          "info": {
+            "name": "Delete an emoji reaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/reactions/v2/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the reaction to destroy"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete an emoji reaction"
+        },
+        {
+          "info": {
+            "name": "Returns a list of possible reaction types",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/reactions/v2/reaction_types",
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns a list of possible reaction types"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Rich Texts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get latest rich_text by entity_type and entity_id",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/rich_texts/v1/:entity_type/:entity_id/current",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The JSON:API resource type of entity the rich text belongs to"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The id of the entity the rich text belongs to"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get latest rich_text by entity_type and entity_id"
+        },
+        {
+          "info": {
+            "name": "Create a rich_text object, given creator entity_type and entity_id",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/rich_texts/v1/:entity_type/:entity_id",
+            "params": [
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "path",
+                "description": "The JSON:API resource type of entity the rich text belongs to"
+              },
+              {
+                "name": "entity_id",
+                "value": "",
+                "type": "path",
+                "description": "The id of the entity the rich text belongs to"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a rich_text object, given creator entity_type and entity_id"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Services",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Returns a list of Services",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/services/v2",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the story. When specifying multiple values, each value in the sequence determines the ordering precedence.\nEach service in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each story will appear in descending order for the specified values.\nIf no sort parameter is provided, services will be default sorted by created_at, ascending.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Returns a list of Services"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Stamps",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Show all stamps",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/stamps/v2",
+            "params": [
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "query",
+                "description": "The ID of the workspace/brand. Note that `brand` and `workspace` are synomyms,\nbut this endpoint only supports `brand_id`\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 150.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Gets list of stamps for a workspace viewable by the authenticated user.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Stories",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Find a Story by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/stories/v2/:story_id",
+            "params": [
+              {
+                "name": "story_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Story"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Find a Story by ID"
+        },
+        {
+          "info": {
+            "name": "Update the specified story",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/stories/v2/:story_id",
+            "params": [
+              {
+                "name": "story_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Story"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update the specified story"
+        },
+        {
+          "info": {
+            "name": "Get a collection of stories",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/stories/v2",
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\nAll timestamp filters (`created_at`, `updated_at`, `scheduled_start_at`, and `scheduled_end_at`) use the syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00`.\nTimestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`.\n`eq` will convert a date to a 24 hour range. Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.\n"
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object keyed by resource type, i.e. \\\"story\\\" or a story relationship, where each value is a CSV of attributes to include in the response."
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the story. When specifying multiple values, each value in the sequence determines the ordering precedence.\nEach story in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each story will appear in descending order for the specified values.\nIf no sort parameter is provided, stories will be default sorted by created_at, ascending.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a collection of stories"
+        },
+        {
+          "info": {
+            "name": "Create a story",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/stories/v2",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new Story"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Return a user by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/users/v2/:user_id",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the User"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Return a user by ID"
+        },
+        {
+          "info": {
+            "name": "Update the specified user",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/users/v2/:user_id",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the User"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update the specified user"
+        },
+        {
+          "info": {
+            "name": "Return the authenticated user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/users/v2/me",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Return the authenticated user"
+        },
+        {
+          "info": {
+            "name": "Update the Moments Setting for the authenticated user",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/users/v2/me/moments_setting",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update the Moments Setting for the authenticated user"
+        },
+        {
+          "info": {
+            "name": "List all users in the requesting users Opal",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/users/v2/users",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of related objects to include"
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "An object keyed by resource type, i.e. \\\"story\\\" or a story relationship, where each value is a CSV of attributes to include in the response."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results. Default scoped to the requesting user's Opal.\nAll timestamp filters (`created_at`, `updated_at`) use the syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00`.\nTimestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`.\n`eq` will convert a date to a 24 hour range. Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.\n"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the user. When specifying multiple values, each value in the sequence determines the ordering precedence.\nEach user in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each user will appear in descending order for the specified values.\nIf no sort parameter is provided, users will be default sorted by created_at, ascending.\n\nIf sorting by role, users will be sorted by role_id.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Specify an offset and limit for pagination"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List all users in the requesting users Opal"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "User Domain Views",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a User Domain View",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/user_domain_views/v2/user_domain_views",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Creates a `user_domain_view` for the current user on the given domain and provided `last_viewed_at` timestamp. If a `user_domain_view` already exists for the user/domain combination, updates the `last_viewed_at` field on the existing record.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Workflows",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a Context",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/contexts",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "You create a context to tie a Workflow to a particular resource the workflow\nshould operate on. Currently, only `moment` resource is supported. Additionally, the\n`workflow` relationship is required.\n"
+        },
+        {
+          "info": {
+            "name": "Get a collection of workflows",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/workflows",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter the resulting workflows."
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the workflow. If no sort order is provided, resources will be default sorted by created_at, ascending.\n\nWhen specifying multiple values, each value in the sequence determines the ordering precedence. Lastly, each workflow in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each workflow will appear in descending order for the specified values.\n"
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 150.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This endpoint gets a response of created workflows. To be included, \na workflow will need to be put in the context of a StoryFirst resource \n(like a moment) using the `/workflows/v2/contexts` endpoint.\n\nIf you do not specify a pagination limit, a default page limit of 150 workflows will be\nused.\n"
+        },
+        {
+          "info": {
+            "name": "Create a workflow",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/workflows",
+            "params": [
+              {
+                "name": "template",
+                "value": "",
+                "type": "query",
+                "description": "Optionally create a workflow with a template.\n\nUsing templates creates a few workflow resources with one request.\nYou cannot use multiple templates at once.\n\nThe \"approval\" template creates a circuit breaker followed by\nan approval stage. Both contain one unassigned assignment.\n\nThe \"task\" template creates a circuit breaker followed by\na task stage. Both contain one unassigned assignment.\n"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This endpoint creates a workflow without a context.\n\nBefore being used by an end-user of the Opal Platform,\nthe workflow will need to be put in the context of a\nStoryFirst resource (like a moment) using the\n`/workflows/v2/contexts` endpoint.\n\nIf you use the `template` parameter to create a workflow\nthat is pre-populated with stages & assignments, you may also\nwant to use the `include` parameter to include `stages` and\n`stages.assignment` in the response.\n"
+        },
+        {
+          "info": {
+            "name": "Get a Workflow",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/workflows/:workflow_id",
+            "params": [
+              {
+                "name": "workflow_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workflow"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              },
+              {
+                "name": "expose",
+                "value": "",
+                "type": "query",
+                "description": "Expose response data that is only provided by request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a Workflow"
+        },
+        {
+          "info": {
+            "name": "Rewind a Workflow",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/workflows/v2/workflows/:workflow_id/rewind",
+            "params": [
+              {
+                "name": "workflow_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workflow"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Rewinds a Workflow to the start of the given Stage.\n\nNote that a Workflow cannot be rewound to the start of, or earlier than, the final completed Approval Stage. Any Task Stages following the final completed approval Stage may still be rewound.\n"
+        },
+        {
+          "info": {
+            "name": "Duplicate a Workflow",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/workflows/:workflow_id/duplicate",
+            "params": [
+              {
+                "name": "workflow_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workflow"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Duplicates a Workflow with its associated Stages and Assignments.\n\nNote that all due dates will be omitted on duplicate.\n"
+        },
+        {
+          "info": {
+            "name": "Create a stage",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/stages",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a stage"
+        },
+        {
+          "info": {
+            "name": "Get a stage by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/stages/:stage_id",
+            "params": [
+              {
+                "name": "stage_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the stage"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get a stage by ID"
+        },
+        {
+          "info": {
+            "name": "Update a Stage by id",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/workflows/v2/stages/:stage_id",
+            "params": [
+              {
+                "name": "stage_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the stage"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update a Stage by id"
+        },
+        {
+          "info": {
+            "name": "Delete a stage",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/workflows/v2/stages/:stage_id",
+            "params": [
+              {
+                "name": "stage_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the stage"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related objects to include."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete a stage"
+        },
+        {
+          "info": {
+            "name": "Get an Assignment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/assignments/:assignment_id",
+            "params": [
+              {
+                "name": "assignment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the assignment"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related resource objects on the assignment to include.\nNote that user resources are not available as includes on this endpoint; the client must make subsequent API requests `api/v1/users` to request additional information on related users.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get an Assignment"
+        },
+        {
+          "info": {
+            "name": "Update an assignment by id",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://login.ouropal.com/workflows/v2/assignments/:assignment_id",
+            "params": [
+              {
+                "name": "assignment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the assignment"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update an assignment by id"
+        },
+        {
+          "info": {
+            "name": "Delete an Assignment",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://login.ouropal.com/workflows/v2/assignments/:assignment_id",
+            "params": [
+              {
+                "name": "assignment_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the assignment"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete an Assignment"
+        },
+        {
+          "info": {
+            "name": "Get a collection of assignments",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/assignments",
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter the resulting assignments."
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related resource objects on the assignment to include.\nNote that user resources are not available as includes on this endpoint; the client must make subsequent API requests `api/v1/users` to request additional information on related users.\n"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the assignment. If no sort order is provided, resources will be default sorted by created_at, ascending.\n\nWhen specifying multiple values, each value in the sequence determines the ordering precedence. Lastly, each assignment in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus \"-\" sign, in which case each assignment will appear in descending order for the specified values.\n\nAssignment due date is based on the stage containing the assignment. See Stage resource metadata.\n"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Request a particular page using `offset` and `limit`. When not specified, the `offset` defaults to 0 and the `limit` defaults to 150.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Get assignments to which the authenticated user has access.\nThese are not necessarily assignments assigned to the requesting user; if you wish to get assignments that are assigned to the user making the API request, pass the `assigned_user_id` filter set to the current user's ID.\nIf you do not specify a pagination limit, a default page limit of 150 assignments will be used.\n"
+        },
+        {
+          "info": {
+            "name": "Create an assignment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/assignments",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create an assignment"
+        },
+        {
+          "info": {
+            "name": "Create a Response for an Assignment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/workflows/v2/responses",
+            "params": [
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related resource objects on the assignment to include.\nNote that user resources are not available as includes on this endpoint; the client must make subsequent API requests `api/v1/users` to request additional information on related users.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a Response for an Assignment"
+        },
+        {
+          "info": {
+            "name": "Fetch a Response for an Assignment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/workflows/v2/responses/:response_id",
+            "params": [
+              {
+                "name": "response_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the response"
+              },
+              {
+                "name": "include",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated value of related resource objects on the assignment to include.\nNote that user resources are not available as includes on this endpoint; the client must make subsequent API requests `api/v1/users` to request additional information on related users.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "authorization_code",
+              "authorizationUrl": "/oauth2/auth",
+              "accessTokenUrl": "/oauth2/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Fetch a Response for an Assignment"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

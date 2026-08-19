@@ -1,0 +1,37 @@
+generated: '2026-08-13'
+method: searched
+source: https://workwithopal.com/pricing/
+url: https://workwithopal.com/pricing/
+plan_count: 0
+currency: null
+billing_periods: []
+note: >-
+  Opal publishes a pricing page but no priced plans, no named tiers and no self-serve checkout.
+  The page states that "the best way for an Opal product expert to finalize a price and package for
+  you is to have a conversation" and routes every visitor to "Talk to an Expert" / "Get a Demo".
+  It does disclose the shape of the pricing model without any numbers: licensing is per user, the
+  platform fee is calculated from the number of users in a workspace, and software integrations are
+  priced as add-ons. There is no separate API price list — API access is not sold as a product; the
+  help center says access requires an active account or an NDA plus approval from Opal leadership.
+pricing_model:
+  basis: per-user license
+  components:
+  - name: Per-user license
+    description: Licensing is priced per user.
+  - name: Platform fee
+    description: Calculated by the number of users in a workspace.
+  - name: Integration add-ons
+    description: Software integrations are priced as add-ons.
+  published_amounts: false
+api_pricing:
+  published: false
+  gate: sales / account-manager
+  evidence: https://help.workwithopal.com/article/17imdltzi1-opal-api
+plans: []
+evidence:
+- url: https://workwithopal.com/pricing/
+  status: 200
+  finding: contact-sales only; no tier names, no prices
+- url: https://help.workwithopal.com/article/17imdltzi1-opal-api
+  status: 200
+  finding: API access requires an active account or NDA plus approval from Opal leadership

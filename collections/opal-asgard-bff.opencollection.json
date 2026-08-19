@@ -1,0 +1,330 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Asgard BFF API",
+    "version": "3.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Moments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Add multiple moments to multiple boards",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/asgard-bff/moments/add_to_boards",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Adds multiple moments to multiple boards by creating board_objects. Also\nsupports removing moments from boards, and associating moments with the\ndefault story of a board.\n\nInternally, this wraps a bulk operation request. A successful 200 response\nindicates that the overall bulk_operation has completed, while partial\nsuccess/failure for sub-operations may have occurred.\n\nA 202 response indicates that the bulk operation has been successfully\nstarted, and is being processed asynchronously.\n"
+        },
+        {
+          "info": {
+            "name": "Add multiple moments to a plan",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://login.ouropal.com/asgard-bff/moments/add_to_plan",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Adds multiple moments to a plan by creating a paired_moment block in the\nplan. Also supports associating the new blocks with a category, if\nprovided.\n\nInternally, this wraps a bulk operation request. A successful 200 response\nindicates that the overall bulk_operation has completed, while partial\nsuccess/failure for sub-operations may have occurred.\n\nA 202 response indicates that the bulk operation has been successfully\nstarted, and is being processed asynchronously.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Plans",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get multiple Plans.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/plans",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Plan's workspace."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              }
+            ]
+          },
+          "docs": "Get multiple Plans."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Experimental",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a Plan.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/experimental/plans/:plan_id",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block's workspace."
+              },
+              {
+                "name": "plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Plan."
+              }
+            ]
+          },
+          "docs": "Experimental endpoint to get a Plan, assuming block/plan rearchitecture."
+        },
+        {
+          "info": {
+            "name": "Get a Block.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/experimental/blocks/:block_id",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block's workspace."
+              },
+              {
+                "name": "block_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block."
+              }
+            ]
+          },
+          "docs": "Experimental endpoint to get a Block, assuming block/plan rearchitecture."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Blocks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a Block.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/blocks/:block_id",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block's workspace."
+              },
+              {
+                "name": "block_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block."
+              }
+            ]
+          },
+          "docs": "Get a Block."
+        },
+        {
+          "info": {
+            "name": "Get a collection of Blocks.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/blocks",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block's workspace."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              }
+            ]
+          },
+          "docs": "Get a collection of Blocks."
+        },
+        {
+          "info": {
+            "name": "Get a block's connector candidates.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/blocks/:block_id/connector_candidates",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block's workspace."
+              },
+              {
+                "name": "block_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the Block."
+              },
+              {
+                "name": "all_blocks",
+                "value": "",
+                "type": "query",
+                "description": "Returns all blocks instead of category type filtered blocks."
+              }
+            ]
+          },
+          "docs": "Get a block's connector candidates."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Smart Blocks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a collection of blocks.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/smart_blocks",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the current workspace to pull blocks from."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results.\n"
+              },
+              {
+                "name": "group_by",
+                "value": "",
+                "type": "query",
+                "description": "Controls the grouping of the returned blocks. One of the `group_by` parameters is required for this endpoint.\n"
+              }
+            ]
+          },
+          "docs": "Get a collection of blocks."
+        },
+        {
+          "info": {
+            "name": "Get a collection of blocks for a saved Smart Swimlane.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/smart_categories/:smart_category_id/smart_blocks",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the current workspace to pull blocks from."
+              },
+              {
+                "name": "smart_category_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the smart swimlane to pull the filtering and grouping configuration from. Note that this category must have configured filter_set and group_by fields to be valid.\n"
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query"
+              }
+            ]
+          },
+          "docs": "Get a collection of blocks for a saved Smart Swimlane."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "In Market",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get in-market calendar view.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://login.ouropal.com/:workspace_id/in_market/calendar",
+            "params": [
+              {
+                "name": "workspace_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the current workspace to pull content from."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filters for limiting the results. All filter parameters are optional except workspace_id (provided in path).\n"
+              }
+            ]
+          },
+          "docs": "Returns a collection of in-market Content items such that the content is currently live or scheduled to go live across a given set of filter criteria.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
