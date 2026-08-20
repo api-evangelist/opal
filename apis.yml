@@ -50,6 +50,23 @@ tags:
 - Marketing Calendar
 - Campaign Management
 - Collaboration
+- Software-as-a-Service
+- Content Marketing
+- Editorial Calendar
+- Workflows
+- Approvals
+- Digital Asset Management
+- JSON:API
+- Authentication
+- OpenAPI
+tags_raw:
+- Company
+- Consumer
+- Marketing
+- Content Planning
+- Marketing Calendar
+- Campaign Management
+- Collaboration
 - SaaS
 - Content Marketing
 - Editorial Calendar
@@ -73,6 +90,14 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - Marketing
+  - Content Planning
+  - Campaign Management
+  - Workflows
+  - Digital Asset Management
+  - JSON:API
+  - Authentication
+  tags_raw:
   - Marketing
   - Content Planning
   - Campaign Management
@@ -103,6 +128,14 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v3
   baseURL: https://login.ouropal.com
   tags:
+  - Marketing
+  - Content Planning
+  - Campaign Management
+  - Workflows
+  - Collaboration
+  - JSON:API
+  - Authentication
+  tags_raw:
   - Marketing
   - Content Planning
   - Campaign Management
