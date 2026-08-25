@@ -1,0 +1,21 @@
+{
+  "repo": "opal",
+  "feeds": [
+    {
+      "source": "https://help.workwithopal.com/",
+      "feed_url": "https://help.workwithopal.com/",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://workwithopal.com/about/blog/",
+      "feed_url": "https://workwithopal.com/feed/",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-08-22T20:20:02Z"
+}
