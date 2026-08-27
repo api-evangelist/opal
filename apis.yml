@@ -77,107 +77,2102 @@ tags_raw:
 - OAuth 2.0
 - OpenAPI
 apis:
-- name: Opal API v2
-  description: >-
-    The stable REST surface of the Opal marketing planning platform — 66 paths and 97 operations
-    across stories, moments, content, placements, assets, asset references, labels, label sets,
-    stamps, brands, brand settings, accounts, activities, annotations, messages, reactions,
-    budgets, rich text, workflows, workflow assignments/stages/responses and users. Endpoints in
-    the JSON:API, Unstable and Proposed categories are JSON:API-compliant and expect
-    `Accept: application/vnd.api+json`; "Other" endpoints are stable but plain `application/json`.
-    Authenticated with OAuth 2.0 authorization code; a `Session-Token` header is still accepted
-    but is documented as deprecated.
+- aid: opal:opal-accounts-api
+  name: Opal Accounts API
+  description: The Accounts API from Opal — 4 operation(s) for accounts.
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
-  - Marketing
-  - Content Planning
-  - Campaign Management
-  - Workflows
-  - Digital Asset Management
-  - JSON:API
-  - Authentication
-  tags_raw:
-  - Marketing
-  - Content Planning
-  - Campaign Management
-  - Workflow
-  - Digital Asset Management
-  - JSON:API
-  - OAuth 2.0
+  - Accounts
   properties:
   - type: OpenAPI
-    url: openapi/opal-v2-openapi.yml
+    url: openapi/opal-accounts-api-openapi.yml
   - type: Documentation
     url: https://login.ouropal.com/api/documentation/v2
   - type: APIReference
     url: https://login.ouropal.com/api/documentation/v2
-  - type: Overlay
-    url: overlays/opal-v2-overlay.yaml
-- name: Opal API v3
-  description: >-
-    The next-generation Opal REST surface, published as work in progress — 97 paths and 154
-    operations across boards, board objects and collections, board collaborators, blocks and block
-    connectors, categories and charts, custom fields, views and view columns, filter sets, key
-    dates, moments and moment schedules/assignees, content schedules, stories, rich text
-    documents, presentation themes, user groups, workspaces, bulk operations, workflow
-    assignments/stages/responses, channels and Gem chats/files. Resource identifiers are opaque
-    UUIDv4 strings with the v2 identifier carried in `attributes.legacy_id`. Adds an anonymous
-    OAuth 2.0 client-credentials flow scoped `write:onboarding` for trial provisioning, alongside
-    the authorization-code flow.
-  humanURL: https://login.ouropal.com/api/documentation/v3
-  baseURL: https://login.ouropal.com
-  tags:
-  - Marketing
-  - Content Planning
-  - Campaign Management
-  - Workflows
-  - Collaboration
-  - JSON:API
-  - Authentication
-  tags_raw:
-  - Marketing
-  - Content Planning
-  - Campaign Management
-  - Workflow
-  - Collaboration
-  - JSON:API
-  - OAuth 2.0
-  properties:
-  - type: OpenAPI
-    url: openapi/opal-v3-openapi.yml
   - type: Documentation
     url: https://login.ouropal.com/api/documentation/v3
   - type: APIReference
     url: https://login.ouropal.com/api/documentation/v3
-  - type: Overlay
-    url: overlays/opal-v3-overlay.yaml
-- name: Opal Asgard BFF API
-  description: >-
-    A backend-for-frontend service published in the same public documentation set — 11 paths
-    covering workspace-scoped blocks, smart blocks, smart categories, plans, in-market calendar
-    and experimental plan/block reads, plus two operations that add moments to boards and plans.
-    All operations are categorized Unstable, Proposed or Experimental, so Opal makes no stability
-    guarantee for them. Authenticated with the deprecated `Session-Token` header only.
-  humanURL: https://login.ouropal.com/api/documentation/asgard_bff
-  baseURL: https://login.ouropal.com
-  tags:
-  - Marketing
-  - Content Planning
-  - Collaboration
-  properties:
-  - type: OpenAPI
-    url: openapi/opal-asgard-bff-openapi.yml
   - type: Documentation
     url: https://login.ouropal.com/api/documentation/asgard_bff
-  - type: Overlay
-    url: overlays/opal-asgard-bff-overlay.yaml
+- aid: opal:opal-activities-api
+  name: Opal Activities API
+  description: >-
+    ## Activities Overview
+
+    In Opal, "activities" encompass both things like someone adding an asset to content and also someone
+    sending a chat message. In the user interface, these are called "Chat & Activity" but the underlying
+    resource is always an `activity` record.
+
+
+    This API currently supports _retrieving_ all types of activity (see the `activity_types` endpoint
+    to retrieve a list of supported types). It only supports _creating_ chat activity.
+
+
+    ## Checkpoints
+
+    The `checkpoints` endpoints are how activities get marked as read for users. The idea is that any
+    activity older than the most recent checkpoint has been seen by the user.
+
+
+    ## User @mentions
+
+    User mentions are represented in the plaintext body of activity messages. You can create them (or
+    interpret them) using the following syntax:
+
+    ```
+
+    @[{{user name}}](user:{{user_id}})
+
+    ```
+
+
+    The double-bracketed `{{user name}}` should be replaced with the user's full name (not their "username"
+    or email) and `{{user_id}}` should be replaced with the user's _integer_ id value (not a UUID). Do
+    not use quotation marks or spaces (except between the parts of a user's name). For example, `[John
+    Doe](user:1234)`.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Activities
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-activities-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-annotations-api
+  name: Opal Annotations API
+  description: The Annotations API from Opal — 4 operation(s) for annotations.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Annotations
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-annotations-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-asset-reference-options-api
+  name: Opal Asset Reference Options API
+  description: The Asset Reference Options API from Opal — 1 operation(s) for asset reference options.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Asset Reference Options
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-asset-reference-options-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-asset-reference-usage-rights-options-api
+  name: Opal Asset Reference Usage Rights Options API
+  description: >-
+    The Asset Reference Usage Rights Options API from Opal — 1 operation(s) for asset reference usage
+    rights options.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Asset Reference Usage Rights Options
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-asset-reference-usage-rights-options-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-asset-references-api
+  name: Opal Asset References API
+  description: >-
+    ## Asset References Overview
+
+    In Opal, you create `assets` to represent files uploaded to the platform and
+
+    `asset_references` to surface those assets for use in the Asset Library,
+
+    Moments, Content, and more.
+
+
+    Before reading into the Asset Reference endpoints, look over the [Assets
+
+    documentation](#tag/Assets).
+
+
+    Once you've created an Asset, use its `id` as the `asset_uuid` for a new Asset
+
+    Reference. You'll also likely also want to at least copy the Asset's `file_name`,
+
+    `bytes`, and `url` over to the new Asset Reference (into the `filename`,
+
+    `filesize`, and `full_url` fields, respectively).
+
+
+    The one relationship that you probably want to make sure all of your new Asset
+
+    References have is `brand`. The Brand (also known as the Workspace) must be
+
+    specified for an Asset Reference to be available for use within the workspace
+
+    you choose; it won't even show up in the Asset Library without a Workspace
+
+    association.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Asset References
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-asset-references-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-assets-api
+  name: Opal Assets API
+  description: >-
+    ## Assets Overview
+
+    Assets represent images, videos, PDFs, and any other file uploads. Any upload to
+
+    the Opal platform must start with an `asset`. Some resources like `boards` can be
+
+    directly related to an `asset` while other resources like `moments` require that
+
+    you also create an `asset_reference` that further describes your `asset`.
+
+
+    Assets can either be created by uploading data directly or by creating a Url
+
+    Upload that requests an asset from some other publicly available web address and
+
+    streams it to Opal. The former endpoint is described immediately below and the
+
+    latter option can be found under the [Url Uploads](#tag/Url-Uploads) tag.
+
+
+    Once you've created an Asset and you have its `id`, you'll likely want to create
+
+    an [Asset Reference](#tag/Asset-References) as well, unless you don't want your asset exposed in the
+
+    Asset Library or used with other resources you'll find to have asset reference
+
+    relationships.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Assets
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-assets-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-block-connectors-api
+  name: Opal Block Connectors API
+  description: >-
+    ## Block Connectors
+
+
+    Block connectors link blocks to views. A view can contain many blocks via block
+
+    connectors. A block can also belong to many views via block connectors.
+
+
+    In the current platform, blocks are expected to only be connected to one parent
+
+    view unless that block is "in support of" additional blocks. In the case that it
+
+    is "in support of" additional blocks, it should be connected (via block
+
+    connector) to those additional blocks' views in a very specific way: It should
+
+    belong to those views' "in support of" category. That category can be identified
+
+    by its `true` `is_supportive` attribute. There will only be one such category
+
+    per view (and all views have one automatically).
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Block Connectors
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-block-connectors-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-block-custom-field-values-api
+  name: Opal Block Custom Field Values API
+  description: >-
+    The Block Custom Field Values API from Opal — 2 operation(s) for block custom field values.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Block Custom Field Values
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-block-custom-field-values-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-block-duplication-api
+  name: Opal Block Duplication API
+  description: The Block Duplication API from Opal — 2 operation(s) for block duplication.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Block Duplication
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-block-duplication-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-blocks-api
+  name: Opal Blocks API
+  description: The Blocks API from Opal — 5 operation(s) for blocks.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Blocks
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-blocks-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-collaborators-api
+  name: Opal Board Collaborators API
+  description: >-
+    ## Board Collaborators Overview
+
+    Board Collaborators allow opal users to add other users as a collaborator on their **private** Boards.
+    This allows the Collaborators to view and edit the Board as if they were the owner.
+
+
+    Because **public** Boards are already available to any user in your Workspace, they do not require
+    Board Collaborators. The endpoints are not available for these public Boards and will return error
+    messages accordingly.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board Collaborators
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-collaborators-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-columns-api
+  name: Opal Board Columns API
+  description: The Board Columns API from Opal — 2 operation(s) for board columns.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board Columns
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-columns-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-duplication-api
+  name: Opal Board Duplication API
+  description: The Board Duplication API from Opal — 2 operation(s) for board duplication.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board Duplication
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-duplication-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-objects-api
+  name: Opal Board Objects API
+  description: "## Overview\n- **[Board](#tag/Boards/operation/CreateBoardV3)**: A board is the parent\
+    \ container and encapsulates its Board Objects and Board Object Collections\n- **[Board Object Collection](#tag/Boards/operation/CreateBoardObjectCollectionV3)**:\
+    \ A Board resource can have zero-or-many Board Object Collections. These allow for logically grouping\
+    \ Board Objects. \n- **[Board Object](#tag/Board-Objects/operation/CreateBoardObjectV3)**: Board Objects\
+    \ encapsulate an Opal resource in a way which allows that resource to exist on a Board or Board Object\
+    \ Collection. A board object can represent the following by specifying the corresponding ``relationship``\
+    \ when creating the Board Object:\n  - [Moment](#tag/Moments/operation/CreateMomentV3)\n  - [Rich\
+    \ Text Document](#tag/Rich-Text-Documents/operation/CreateRichTextDocumentV3)\n    - Note that Rich\
+    \ Text Documents included with Board Objects will not have an `assets` relationship. Instead, you\
+    \ should use the `asset_references` relationship."
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board Objects
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-objects-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-standard-columns-api
+  name: Opal Board Standard Columns API
+  description: The Board Standard Columns API from Opal — 1 operation(s) for board standard columns.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board Standard Columns
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-standard-columns-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-board-user-settings-api
+  name: Opal Board User Settings API
+  description: The Board User Settings API from Opal — 1 operation(s) for board user settings.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Board User Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-board-user-settings-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-boards-api
+  name: Opal Boards API
+  description: The Boards API from Opal — 5 operation(s) for boards.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Boards
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-boards-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-brand-settings-api
+  name: Opal Brand Settings API
+  description: The Brand Settings API from Opal — 2 operation(s) for brand settings.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Brand Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-brand-settings-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-brands-api
+  name: Opal Brands API
+  description: The Brands API from Opal — 1 operation(s) for brands.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Brands
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-brands-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-budgets-api
+  name: Opal Budgets API
+  description: The Budgets API from Opal — 2 operation(s) for budgets.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Budgets
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-budgets-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-bulk-operations-api
+  name: Opal Bulk Operations API
+  description: >-
+    ## Bulk Operations
+
+
+    A Bulk Operation represents a number of individual actions to be performed.
+
+
+    ### Terms
+
+    - **``Operation ID``**: A unique string identifier that corresponds to a
+      specific individual operation that can be made for a resource. If the request
+      is usable in the context of a bulk operation, the endpoint will have this
+      identifier documented as "Operation-ID".
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Bulk Operations
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-bulk-operations-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-categories-api
+  name: Opal Categories API
+  description: >-
+    ## Overview
+
+
+    Categories are in a tree: a given category has zero or more ancestors and zero or more descendants.
+    The tree is built by recursively following `parent_category` relationships. Currently our trees are
+    at most two nodes deep (that is, a root with zero or more leaves), but clients **MUST** be able to
+    handle trees of any depth.
+
+
+    ### Category type and custom fields
+
+
+    Categories can be associated with [Category Types](/api/documentation/v3#tag/Category-Types), determining
+    which [Custom Fields](/api/documentation/v3#tag/Custom-Fields) are available to [Blocks](/api/documentation/v3#tag/Blocks)
+    in the category. If the category has a relationship with a deactivated category type it is considered
+    to have no category type.
+
+
+    ### <q>Effective</q> category type
+
+
+    The <q>effective</q> category type allows the category to inherit a category type relationship.
+
+
+    *Note:* The following description of the algorithm is informational: clients that want the <q>effective</q>
+    category type **MUST** use the `effective_category_type_id` property in the category resource object’s
+    `meta` information, and **MUST NOT** manually compute the value using this algorithm, as the exact
+    behavior may change without warning.
+
+
+    If the given category has a relationship with an active (not deactivated, not deleted) category type
+    that is the <q>effective</q> category type.
+
+
+    If the given category does *not* have a relationship with an active category type, any ancestors that
+    have a relationship with an active category type are selected, and the nearest ancestor (the ancestor
+    with the largest `depth`) provides the <q>effective</q> category type.
+
+
+    If the given category has no ancestors, or none of its ancestors have a relationship with an active
+    category type, *and* the view *does* have a relationship to an active category type, the view’s category
+    type is the <q>effective</q> category type.
+
+
+    If none of the above conditions are met, the category does not have an <q>effective</q> category type.
+
+
+    *Note*: The behavior doesn’t change based on where the given category is in the tree — the logic is
+    the same for the root, leaves, and everything in-between. This is why the following table refers to
+    ‘parent’ and ‘grandparent’, rather than using tree terminology.
+
+
+    In the following
+
+    * ‘✓’ means the column’s entry is associated to an active category type
+
+    * the parent and grandparent demonstrate inheritance behavior if the given category has ancestors
+        with an associated active category type
+
+      | view | grandparent category | parent category | given category | <q>effective</q> category type
+    comes from… |
+      | :----: | :--------------------: | :---------------: | :--------------: | --------------------
+    |
+      |        |                        |                   | ✓                | given                 |
+      |        |                        | ✓                 | ✓                | given                 |
+      |        | ✓                      |                   | ✓                | given                 |
+      | ✓      |                        |                   | ✓                | given                 |
+      |        |                        | ✓                 |                  | parent               |
+      |        | ✓                      | ✓                 |                  | parent               |
+      |✓       |                        | ✓                 |                  | parent               |
+      |        | ✓                      |                   |                  | grandparent          |
+      | ✓      | ✓                      |                   |                  | grandparent          |
+      | ✓      |                        |                   |                  | view                 |
+      |        |                        |                   |                  | 🚫 (no category type)
+    |
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Categories
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-categories-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-category-types-api
+  name: Opal Category Types API
+  description: The Category Types API from Opal — 2 operation(s) for category types.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Category Types
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-category-types-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-channels-api
+  name: Opal Channels API
+  description: The Channels API from Opal — 1 operation(s) for channels.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Channels
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-channels-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-charts-api
+  name: Opal Charts API
+  description: The Charts API from Opal — 3 operation(s) for charts.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Charts
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-charts-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-checkpoints-api
+  name: Opal Checkpoints API
+  description: The Checkpoints API from Opal — 1 operation(s) for checkpoints.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Checkpoints
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-checkpoints-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-content-api
+  name: Opal Content API
+  description: The Content API from Opal — 6 operation(s) for content.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Content
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-content-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-content-schedules-api
+  name: Opal Content Schedules API
+  description: The Content Schedules API from Opal — 2 operation(s) for content schedules.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Content Schedules
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-content-schedules-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-custom-field-colors-api
+  name: Opal Custom Field Colors API
+  description: The Custom Field Colors API from Opal — 1 operation(s) for custom field colors.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Custom Field Colors
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-custom-field-colors-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-custom-field-options-api
+  name: Opal Custom Field Options API
+  description: The Custom Field Options API from Opal — 1 operation(s) for custom field options.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Custom Field Options
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-custom-field-options-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-custom-field-types-api
+  name: Opal Custom Field Types API
+  description: The Custom Field Types API from Opal — 1 operation(s) for custom field types.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Custom Field Types
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-custom-field-types-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-custom-fields-api
+  name: Opal Custom Fields API
+  description: >-
+    ## Custom Fields Overview
+
+
+    Custom Fields let you create custom inputs, the value of which can then be associated with a Moment,
+    and allow your users to track dimensions based on your specific needs.
+
+
+    - **[Custom Fields](#tag/Custom-Fields)**: An admin within a workspace can create a custom field to
+    store new attributes on a [Moment](#tag/Moments/operation/CreateMomentV3).
+
+    - **[Custom Field Types](#tag/Custom-Field-Types)**: The available types of custom fields which an
+    admin can create, such as a Date input.
+
+    - **[Moment Custom Fields](#tag/Moment-Custom-Fields)**: This resource lets one assign a ``value``
+    to the given Custom Field for the given Moment. Note that the expected attribute to use
+
+    on this resource is determined by the [Custom Field Type](#tag/Custom-Field-Types) that the [Custom
+    Fields](#tag/Custom-Fields) is based on.
+      - ``text_value``: A primitive string
+      - ``date_value``: An ISO8601 date-time
+      - ``hash_value``: A JSON object for [Custom Fields](#tag/Custom-Fields) which store complex data
+    structures
+
+    ### Pairing
+
+
+    Multiselect custom fields can be paired with [label sets](/api/documentation/v2#tag/Label-Sets) (`paired_label_set`),
+    with the field’s options paired to the label set’s labels (`paired_label`). Once this pairing is established,
+    the application will automatically do bidirectional syncing: choosing the multiselect’s options will
+    apply the corresponding labels to the moment, and vice versa.
+
+
+    Both systems are supported, and the syncing should behave seamlessly, but at some point we will sunset
+    the label system in favor of custom fields. We encourage using custom fields for new development.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Custom Fields
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-custom-fields-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-delivery-records-api
+  name: Opal Delivery Records API
+  description: The Delivery Records API from Opal — 1 operation(s) for delivery records.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Delivery Records
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-delivery-records-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-experimental-api
+  name: Opal Experimental API
+  description: The Experimental API from Opal — 2 operation(s) for experimental.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Experimental
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-experimental-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-filter-sets-api
+  name: Opal Filter Sets API
+  description: The Filter Sets API from Opal — 2 operation(s) for filter sets.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Filter Sets
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-filter-sets-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-gem-chats-api
+  name: Opal Gem Chats API
+  description: The Gem Chats API from Opal — 2 operation(s) for gem chats.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Gem Chats
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-gem-chats-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-gem-files-api
+  name: Opal Gem Files API
+  description: The Gem Files API from Opal — 2 operation(s) for gem files.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Gem Files
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-gem-files-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-in-market-api
+  name: Opal In Market API
+  description: The In Market API from Opal — 1 operation(s) for in market.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - In Market
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-in-market-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-key-dates-api
+  name: Opal Key Dates API
+  description: The Key Dates API from Opal — 2 operation(s) for key dates.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Key Dates
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-key-dates-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-label-sets-api
+  name: Opal Label Sets API
+  description: The Label Sets API from Opal — 1 operation(s) for label sets.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Label Sets
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-label-sets-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-labels-api
+  name: Opal Labels API
+  description: >-
+    ## Labels Overview
+
+    In Opal, Labels are a useful way of categorizing resources to be filtered or grouped.
+
+
+    ### Label Inheritance
+
+    Labels follow StoryFirst inheritance rules. This means that **Content** inherits labels from **Moment**
+    which inherits labels from **Story**. **Content** also inherits labels from the selected **Account**.
+    If a **Moment** belongs to more than one **Story**, labels are inherited from all related stories
+    (i.e. the labels inherited comprise the union of the labels for each story).
+
+
+    For example:
+
+
+    ![Label Inheritance](/api/documentation/static/svg/label_inheritance)
+
+
+    Inheritance is "broken" when one or more labels is explicitly set directly on a resource. For example,
+    if you set the labels _x_ and _y_ for a piece of **Content**, that content will then only be considered
+    to have exactly the labels _x_ and _y_ and no longer the labels of its parent **Moment** or **Story**
+    (or associated **Account**). The default behavior of the Opal Web frontend is actually such that when
+    **Content** gets explicit direct labels, it takes on all existing inherited labels _and_ the new direct
+    labels, but it does not gain new inherited labels going forward. This behavior is achieved by requesting
+    all of the current labels for that **Content** and then explicitly setting the new labels to all existing
+    inherited labels plus the new labels.
+
+
+    ![Broken Label Inheritance at Content](/api/documentation/static/svg/label_inheritance_broken)
+
+
+    Inheritance can also be broken by explicitly setting labels on a **Moment**. Using our _x_ and _y_
+    labels again:
+
+
+    ![Broken Label Inheritance at Moment](/api/documentation/static/svg/label_inheritance_broken_at_moment)
+
+
+    Notice that **Content** still inherits from **Moment** and **Account** even when **Moment** stops
+    inheriting from **Story**.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Labels
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-labels-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-messages-api
+  name: Opal Messages API
+  description: The Messages API from Opal — 2 operation(s) for messages.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Messages
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-messages-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-moment-assignees-api
+  name: Opal Moment Assignees API
+  description: The Moment Assignees API from Opal — 2 operation(s) for moment assignees.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Moment Assignees
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-moment-assignees-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-moment-custom-fields-api
+  name: Opal Moment Custom Fields API
+  description: The Moment Custom Fields API from Opal — 2 operation(s) for moment custom fields.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Moment Custom Fields
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-moment-custom-fields-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-moment-duplication-api
+  name: Opal Moment Duplication API
+  description: The Moment Duplication API from Opal — 2 operation(s) for moment duplication.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Moment Duplication
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-moment-duplication-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-moment-schedules-api
+  name: Opal Moment Schedules API
+  description: The Moment Schedules API from Opal — 2 operation(s) for moment schedules.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Moment Schedules
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-moment-schedules-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-moments-api
+  name: Opal Moments API
+  description: The Moments API from Opal — 6 operation(s) for moments.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Moments
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-moments-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-onboarding-api
+  name: Opal Onboarding API
+  description: >-
+    ## Onboarding Overview
+
+    Unlike many other Opal endpoints, the Onboarding endpoints are only accessible via a special OAuth
+    scope that is not currently offered to Opal customers (i.e. it is internal-use only).
+
+
+    The `trial_invites` `POST` endpoint is JSON:API compliant, but the `trial_invites/do/accept` endpoint
+    is capable of serving up either a JSON RPC response or redirecting to a user onboarding web page depending
+    on whether HTML or JSON is specified in the request's `Accept` header.
+
+
+    The process of requesting an invitation and accepting it is always two steps:
+
+    1. A `POST` request to `onboarding/v3/trial_invites` creates a trial invite and produces an `accept`
+    link that is included in the response body.
+
+    2. A user follows the `accept` link in a browser and is redirected into the user setup process OR
+    a client makes an RPC request to the `accept` link and receives a `user_setup` link a user can follow
+    to begin profile setup in a JSON response body.
+
+
+    There is optionally a third step. If the `user_setup` link in the `accept` request's response is not
+    used to get the user into their setup flow, a `GET` request to `onboarding/v3/trial_invites/status`
+    can be sent in order to retrieve a `trial_invite` record that surfaces the `user_setup` link as well.
+
+
+    ### Setting up a new integration
+
+    The internal-only process of creating a new onboarding integration starts with creating a new onboarding
+    client. From Opal's Hydra admin CLI, choose the "create onboarding client" option. Fill out the required
+    information and take note of the Client Secret produced near the end of the process. This is the only
+    time that client secret will be accessible. This secret should be saved in Opal's shared Engineering
+    vault in 1Password.
+
+
+    Next, a third party integration that creates new Opal trials can be set up with the newly created
+    Hydra client in one of two ways. Either it can make a Client Credentials OAuth 2.0 token request using
+    the client secret and then make authenticated requests with the token it receives in response, or
+    you can set the third party integration up to use Opal's `trial_invites` endpoint as a webhook (see
+    below).
+
+
+    #### Webhook usage
+
+    If you want to create a token and treat it like an API key while using the `trial_invites` endpoint
+    as a webhook, you should request an OAuth token by hand and use that token in the third party integration
+    as a long-lived API key.
+
+
+    From the Hydra admin CLI, select the onboarding client you created for the purposes of this integration.
+    Next choose the "Show sample auth URL and curl commands" option. You will get a CURL command like
+    the following:
+
+    ```shell
+
+    curl -X POST \
+      https://login.ouropal.com/oauth2/token \
+     -H 'Content-Type: application/x-www-form-urlencoded' \
+     -d "client_secret=<SECRET>&client_id=onboarding1--742d8aff84759a6c&grant_type=client_credentials&scope=write:onboarding"
+    ```
+
+
+    Replace `<SECRET>` with this client's secret, replace `https://login.ouropal.com` with whichever Opal
+    domain you are working against, and make the request from a shell on your laptop (just needs internet
+    access and `cURL` installed). This will produce JSON similar to the following:
+
+    ```json
+
+    {
+        "access_token": "dRGg4JW0F9QIHBnZpkLHWJ7j748AsALcL4_UfmjI0-4.VYbLrAiQzqgrmgXClQhmICP2_7BBEp9OMgKO9lpyUjU",
+        "expires_in": <a long time>,
+        "scope": "write:onboarding",
+        "token_type": "bearer"
+    }
+
+    ```
+
+
+    Now take your `access_token` and plug it into an Authorization header for whatever webhook request
+    to `onboarding/v3/trial_invites` your new integration is going to make:
+
+    ```
+
+    Content-Type: application/json
+
+    Accept: application/json
+
+    Authorization: Bearer dRGg4JW0F9QIHBnZpkLHWJ7j748AsALcL4_UfmjI0-4.VYbLrAiQzqgrmgXClQhmICP2_7BBEp9OMgKO9lpyUjU
+
+    ```
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Onboarding
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-onboarding-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-phase-items-api
+  name: Opal Phase Items API
+  description: The Phase Items API from Opal — 2 operation(s) for phase items.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Phase Items
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-phase-items-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-planning-status-api
+  name: Opal Planning Status API
+  description: The Planning Status API from Opal — 1 operation(s) for planning status.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Planning Status
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-planning-status-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-plans-api
+  name: Opal Plans API
+  description: The Plans API from Opal — 1 operation(s) for plans.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Plans
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-plans-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-post-types-api
+  name: Opal Post Types API
+  description: The Post Types API from Opal — 1 operation(s) for post types.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Post Types
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-post-types-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-presentation-themes-api
+  name: Opal Presentation Themes API
+  description: Workspace brand presentation themes
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Presentation Themes
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-presentation-themes-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-privacy-api
+  name: Opal Privacy API
+  description: The Privacy API from Opal — 1 operation(s) for privacy.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Privacy
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-privacy-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-reactions-api
+  name: Opal Reactions API
+  description: The Reactions API from Opal — 3 operation(s) for reactions.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Reactions
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-reactions-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-rich-text-documents-api
+  name: Opal Rich Text Documents API
+  description: >-
+    ## Overview
+
+
+    ### Client libraries and document formats
+
+
+    Rich Text Document endpoints can accept documents in arbitrary formats. The `client_library` attribute
+    identifies the framework or library that generated the document.
+
+
+    Currently, the following formats are recognized, though other formats are allowed. When creating or
+    updating documents in these formats, ensure that the `client_library` attribute is consistent with
+    the value provided here:
+
+
+    | Format                                  | Client Library ID  |
+
+    | --------------------------------------- | ------------------ |
+
+    | [Tiptap 2](https://tiptap.dev) JSON     | `tiptap/2.0`       |
+
+
+    ### Document assets
+
+
+    Some documents returned by these endpoints may have an `assets` relationship; these documents will
+    not also have an `asset_references` relationship.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Rich Text Documents
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-rich-text-documents-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-rich-texts-api
+  name: Opal Rich Texts API
+  description: The Rich Texts API from Opal — 2 operation(s) for rich texts.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Rich Texts
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-rich-texts-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-search-api
+  name: Opal Search API
+  description: The Search API from Opal — 1 operation(s) for search.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Search
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-search-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-services-api
+  name: Opal Services API
+  description: The Services API from Opal — 1 operation(s) for services.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Services
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-services-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-smart-blocks-api
+  name: Opal Smart Blocks API
+  description: The Smart Blocks API from Opal — 2 operation(s) for smart blocks.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Smart Blocks
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-smart-blocks-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-stamps-api
+  name: Opal Stamps API
+  description: >-
+    ## Stamps Overview
+
+
+    In Opal, a Stamp acts as a pre-configured template for creating `moment`s or `content`. The `stamp_type`
+    attribute specifies if the stamp is intended for moments or content.
+
+
+    ### Types of Stamps
+
+
+    - Moment Stamp: Incorporates all content, notes, and labels from a moment.
+
+    - Content Stamp: Consists of copy, assets, workflow, notes, and labels. (Note: "Content" and "Post"
+    are interchangeable terms.)
+
+
+    ### Stamp Operations
+
+
+    - Creating a Stamp: Use the Moment Shroud feature in the Opal application to establish a moment or
+    content as a templated stamp. Creating a stamp via the REST API is not currently supported.
+
+    - Managing Stamps: Opal admins can manage stamps via the Configure Workspace panel.
+
+    - Retrieving Stamps: Fetch a list of stamps with the GET request /stamps/v2?brand_id={{brand_id}}.
+
+
+    ### Using Stamps
+
+
+    - In the REST API: Specify the `stamp_id` attribute when creating a `moment` to apply a chosen stamp.
+    Note that applying a stamp via the REST API for `content` is not currently supported.
+
+    - In the Opal Application: Use the "Apply Stamp" option in the moment shroud to apply a stamp to a
+    newly-created moment or piece of content.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Stamps
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-stamps-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-stories-api
+  name: Opal Stories API
+  description: The Stories API from Opal — 6 operation(s) for stories.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Stories
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-stories-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-stories-v1-api
+  name: Opal Stories V1 API
+  description: The Stories V1 API from Opal — 1 operation(s) for stories v1.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Stories V1
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-stories-v1-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-url-previews-api
+  name: Opal URL Previews API
+  description: The URL Previews API from Opal — 1 operation(s) for url previews.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - URL Previews
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-url-previews-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-url-uploads-api
+  name: Opal Url Uploads API
+  description: The Url Uploads API from Opal — 2 operation(s) for url uploads.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Url Uploads
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-url-uploads-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-user-domain-views-api
+  name: Opal User Domain Views API
+  description: The User Domain Views API from Opal — 1 operation(s) for user domain views.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - User Domain Views
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-user-domain-views-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-user-groups-api
+  name: Opal User Groups API
+  description: The User Groups API from Opal — 5 operation(s) for user groups.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - User Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-user-groups-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-users-api
+  name: Opal Users API
+  description: The Users API from Opal — 6 operation(s) for users.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-users-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-view-colors-api
+  name: Opal View Colors API
+  description: The View Colors API from Opal — 1 operation(s) for view colors.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - View Colors
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-view-colors-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-view-columns-api
+  name: Opal View Columns API
+  description: The View Columns API from Opal — 2 operation(s) for view columns.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - View Columns
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-view-columns-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-view-standard-columns-api
+  name: Opal View Standard Columns API
+  description: The View Standard Columns API from Opal — 1 operation(s) for view standard columns.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - View Standard Columns
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-view-standard-columns-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-views-api
+  name: Opal Views API
+  description: The Views API from Opal — 3 operation(s) for views.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Views
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-views-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workflow-assignments-api
+  name: Opal Workflow Assignments API
+  description: The Workflow Assignments API from Opal — 2 operation(s) for workflow assignments.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workflow Assignments
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workflow-assignments-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workflow-contexts-api
+  name: Opal Workflow Contexts API
+  description: The Workflow Contexts API from Opal — 1 operation(s) for workflow contexts.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workflow Contexts
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workflow-contexts-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workflow-responses-api
+  name: Opal Workflow Responses API
+  description: The Workflow Responses API from Opal — 2 operation(s) for workflow responses.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workflow Responses
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workflow-responses-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workflow-stages-api
+  name: Opal Workflow Stages API
+  description: The Workflow Stages API from Opal — 2 operation(s) for workflow stages.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workflow Stages
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workflow-stages-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workflows-api
+  name: Opal Workflows API
+  description: "## Workflows Overview\nIn Opal, a workflow is an arrangement of tasks and approvals required\
+    \ to progress through the lifecycle of a \nStoryFirst resource. \n\n**Historical Note:**\n*The v2\
+    \ Workflows API will supersede the v2 [Phase Items](#tag/Phase-Items) API, although initial rollout\
+    \ will only include support for\nWorkflow on Moments which means there will be a period of time during\
+    \ which the Phase Items API remains the API\nfor Content Workflows.*\n\n### Workflow / Phase Items\
+    \ Translations\nThe following resources described below for the v2 Workflows API have fairly direct\
+    \ translations to the older Phase Items API.\n\n- A _workflow_ was known as a _phase group_.\n- A\
+    \ _stage_ was known as a _phase_.\n- An _assignment_ was known as a _phase item_.\n\n### Context\n\
+    Workflows from the v2 Workflow API have an optional `context` relationship. These contexts tie workflows\
+    \ to the resources against\nwhich the workflow is being performed. Currently only the **Moment** context\
+    \ is supported.\n\nA workflow without a `context` is a reasonable thing to think about: Such a workflow\
+    \ might have common stages that apply broadly\nin more than one context. Although a workflow can conceptually\
+    \ be created without a context, it must be given a context before it can\nbe started.\n\nCurrently,\
+    \ the capabilities supported by contextless workflows are not built out in the Opal Platform. API\
+    \ requests should be made to\ncreate contexts for all workflows before building them out or starting\
+    \ them.\n\n**Important:** Contexts tie workflows to resources from neighboring services; although\
+    \ Opal has one coherent v2 API, a client must\nrequest StoryFirst resources (like `moment`s) from\
+    \ other services rather than `including` them on Workflow requests. For example,\na Workflow might\
+    \ have a `context` with a `moment_id` of `'3432'`; the client would make a request to `moments/v2/3432`\
+    \ to retrieve\ndetails for that Moment.\n\nSee the documentation on [`POST` **Create a Context**](#tag/Workflows/operation/CreateContextV2)\
+    \ for more information.\n\n### Resources\nA `workflow` is arranged into `stage`s, each of which is\
+    \ a `circuit_breaker`, an `approval` stage, or a `task` stage.\nAll stages can optionally specify\
+    \ a `due_date`, but if `null` then the due date is left up to interpretation of the user\nof the workflow\
+    \ -- For a Moment Workflow, perhaps the due date is the `scheduled_date` of the Moment, or perhaps\n\
+    the exact date is not important.\n\nAssignments are completed by `POST`ing `response`s. Circuit breakers\
+    \ and tasks can be completed and approvals can be\napproved or declined. An approved response can\
+    \ be superseded by a following declined response on the same assignment.\nSimilarly, tasks can be\
+    \ \"undone\" after being marked complete by sending a follow-up response. Responses are a ledger with\n\
+    the most recent response representing the current state of the assignment.\n\n#### Circuit Breaker\n\
+    Circuit breakers generally just contain one assignment. When the assignment is completed, the circuit\
+    \ breaker is completed\nand the following stage becomes active. Circuit breakers allow workflows to\
+    \ pause between any two stages and they are used\nto create the initial pause before a workflow is\
+    \ started (giving users time to build a workflow out before beginning work\nagainst it).\n\n#### Approval\n\
+    Approval stages can contain any number of approval `assignment`s. They can be configured such that\
+    \ all of those approvals\nmust be given for the workflow to progress (`metadata.completion_rules.all`)\
+    \ or they can be configured such that the workflow\nprogresses after any one of the approvals is given\
+    \ (`metadata.completion_rules.one`).\n\n##### Approval Response\nEach approval `response` can be either\
+    \ `approved` or `declined` and it can optionally contain a message from the approver.\n\nAs noted\
+    \ above, any number of responses can be given on a single assignment; the most recent response represents\
+    \ the state\nof the approval: approved, declined, or in the absence of a response, simply incomplete.\n\
+    \n#### Task\nTask stages can contain any number of task `assignment`s. A task stage is complete after\
+    \ all assignments within it have been\ncompleted.\n\n##### Task Response\nEach task `response` can\
+    \ be either _complete_ (`complete: true`) or _incomplete_ (`complete: false`).\n\nAs noted above,\
+    \ any number of responses can be given on a single task; the most recent response represents the state\
+    \ of the\ntask: complete or incomplete.\n\n### Templates\nCreation of a new workflow often involves\
+    \ creating a handful of the same resources every time. For this reason, there are templates\nthe allow\
+    \ you to create one of two types of workflows more easily. You always get a `circuit_breaker` with\
+    \ one assignment at the start\nand then you get either an `approval` or a `task` `stage` next, again\
+    \ with one assignment. All assignments start out unassigned.\n\nSee the documentation on [`POST` **Create\
+    \ a Workflow**](#tag/Workflows/operation/CreateWorkflowsV2) for more information.\n\n### Rewinding\n\
+    Workflows can be \"rewound\" to undo some portion of them. \n\n**The big caveat being:** You are not\
+    \ allowed to rewind back to the start of (or before) a completed final approvel stage. Final approval\n\
+    stages (i.e. the last approval stage in a workflow) are special because they can have side effects\
+    \ that cannot be taken back --\nif workflow completion resulted in publishing to a third party platform,\
+    \ for example, then rewinding back to an unapproved state for the\nworkflow would leave the workflow\
+    \ unrepresentative of the fact that something had already been published.\n\nSee the documentation\
+    \ on [`PATCH` **Rewind a Workflow**](#tag/Workflows/operation/RewindWorkflowV2) for more information."
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workflows
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workflows-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
+- aid: opal:opal-workspaces-api
+  name: Opal Workspaces API
+  description: The Workspaces API from Opal — 3 operation(s) for workspaces.
+  humanURL: https://login.ouropal.com/api/documentation/v2
+  baseURL: https://login.ouropal.com
+  tags:
+  - Workspaces
+  properties:
+  - type: OpenAPI
+    url: openapi/opal-workspaces-api-openapi.yml
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v2
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: APIReference
+    url: https://login.ouropal.com/api/documentation/v3
+  - type: Documentation
+    url: https://login.ouropal.com/api/documentation/asgard_bff
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/opal-v2-overlay.yaml
+- type: Overlay
+  url: overlays/opal-v3-overlay.yaml
+- type: Overlay
+  url: overlays/opal-asgard-bff-overlay.yaml
 - type: OAuthScopes
   url: scopes/opal-scopes.yml
 - type: Authentication
