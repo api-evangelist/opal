@@ -1,0 +1,1804 @@
+openapi: 3.2.0
+info:
+  version: 3.0.0
+  title: Opal API (⚠️ WIP) Workspaces API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v2 API](/api/documentation/v2) is more complete than the v3 API. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n*Note:* Endpoints will be added to the v3 API as needed, and we will continue to support all v2 API endpoints in the  “JSON:API” and “Other” categories, even if we add an equivalent v3 API endpoint.\n\n# Key differences between v2 and v3 APIs\n\n## Resource Identifiers\n\nThe v3 API uses a different format for primary resource identifiers than the v2 API. Responses from v3 API endpoints include the resource’s v2 API id in the `attributes.legacy_id` field, in case you need to use both API versions. (v2 API resource identifiers are generally integers, but v2 API endpoints **MAY** use a different format.)\n\n*Note:* These are opaque strings, and you **MUST NOT** rely on the structure. Currently newly-created resources have a UUIDv4 identifier, but this behavior **MAY** change at any time. Existing identifiers will not be affected.\n\n# Documentation Organization\n\nv3 API endpoints are categorized by stability:\n\n1. Stable\n2. Unstable\n3. Proposed\n4. Experimental\n\nAll v3 API endpoints are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\nYour requests **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “Stable” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable,” \"Experimental,\" or “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Workspaces
+paths:
+  /workspaces/v3:
+    get:
+      tags:
+      - Workspaces
+      operationId: ReadWorkspacesV3
+      summary: '[UNSTABLE] Get Workspaces available to the authenticated user.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: expose
+        in: query
+        required: false
+        description: Expose response data that is only provided by request.
+        schema:
+          type: object
+          properties:
+            workspace:
+              type: object
+              properties:
+                meta:
+                  type: object
+                  description: 'Expose the requesting user''s membership metadata on each workspace resource.
+
+
+                    Use this parameter as: `?expose[workspace][meta]`
+
+                    '
+      - name: fields
+        in: query
+        description: An object keyed by resource type, i.e. \"workspace\" or a workspace relationship, where each value is a CSV of attributes to include in the response.
+        required: false
+        schema:
+          type: object
+          properties:
+            asset_reference:
+              type: string
+            workspace:
+              type: string
+            workspace_defaults:
+              type: string
+        style: deepObject
+        explode: true
+      - name: include
+        in: query
+        required: false
+        description: A comma separated list of related objects to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - logo
+            - workspace_defaults
+        style: form
+        explode: false
+      - name: page
+        description: Specify an offset and limit for pagination
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            limit:
+              type: integer
+              default: 50
+            offset:
+              type: integer
+        style: deepObject
+        explode: true
+      responses:
+        '200':
+          description: The requested Workspaces.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      title: workspace
+                      type: object
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      - relationships
+                      - links
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        type:
+                          type: string
+                          enum:
+                          - workspace
+                        meta:
+                          type:
+                          - object
+                          - 'null'
+                          description: Metadata around the Workspace object
+                          properties:
+                            user_is_member:
+                              type: boolean
+                              description: Boolean that represents whether the requesting user is a member of the workspace.
+                        attributes:
+                          type: object
+                          required:
+                          - created_at
+                          - name
+                          - slug
+                          - updated_at
+                          - start_of_week
+                          - timezone
+                          - legacy_id
+                          additionalProperties: false
+                          properties:
+                            created_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time.
+                              readOnly: true
+                            legacy_id:
+                              type: string
+                              description: A legacy ID that can be used with `v2` API endpoints.
+                            name:
+                              type: string
+                              description: The name of the workspace.
+                            slug:
+                              type:
+                              - string
+                              - 'null'
+                              description: The slug for the Workspace. This is a url-safe name for the Workspace.
+                            start_of_week:
+                              type: number
+                              enum:
+                              - 0
+                              - 1
+                              - 2
+                              - 3
+                              - 4
+                              - 5
+                              - 6
+                              description: 'The default start weekday index for the week view Calendar and for Plans. Specifies the days in a week, 0 to 6 (Sunday to Saturday). 0 (Sunday) is the default.
+
+                                With regards to the week view Calendar, values greater than 1 will be considered the same as 1.'
+                            timezone:
+                              type: string
+                              description: The IANA time zone identifier for the default time zone used when creating resources in the workspace (e.g. America/New_York).
+                            updated_at:
+                              type:
+                              - string
+                              - 'null'
+                              format: date-time
+                              description: An ISO8601 date-time.
+                              readOnly: true
+                        relationships:
+                          type: object
+                          required:
+                          - logo
+                          - workspace_defaults
+                          additionalProperties: false
+                          properties:
+                            logo:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - asset_reference
+                            workspace_defaults:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                      format: uuid
+                                    type:
+                                      type: string
+                                      enum:
+                                      - workspace_defaults
+                        links:
+                          type: object
+                          additionalProperties: false
+                          required:
+                          - v2_request
+                          properties:
+                            v2_request:
+                              type: string
+                              format: uri
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset_reference
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset_reference
+                          attributes:
+                            type: object
+                            required:
+                            - asset_type
+                            - content_type
+                            - created_at
+                            - description
+                            - escaped_filename
+                            - filename
+                            - filesize
+                            - format
+                            - full_url
+                            - height
+                            - legacy_id
+                            - meta_data
+                            - original_url
+                            - preview_url
+                            - public_id
+                            - updated_at
+                            - width
+                            additionalProperties: false
+                            properties:
+                              asset_type:
+                                type:
+                                - string
+                                - 'null'
+                              content_type:
+                                type:
+                                - string
+                                - 'null'
+                              created_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              description:
+                                type:
+                                - string
+                                - 'null'
+                              escaped_filename:
+                                type: string
+                              filename:
+                                type:
+                                - string
+                                - 'null'
+                              filesize:
+                                type:
+                                - integer
+                                - 'null'
+                                description: Size of file in bytes.
+                              format:
+                                type:
+                                - string
+                                - 'null'
+                              full_url:
+                                type:
+                                - string
+                                - 'null'
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                              legacy_id:
+                                type: string
+                                description: A legacy ID that can be used with `v2` API endpoints.
+                              meta_data:
+                                type:
+                                - object
+                                - 'null'
+                              original_url:
+                                type:
+                                - string
+                                - 'null'
+                              preview_url:
+                                type:
+                                - string
+                                - 'null'
+                              public_id:
+                                type:
+                                - string
+                                - 'null'
+                                x-not-relationship: true
+                              updated_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              asset:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                              cover_asset_reference:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                      - title: workspace_defaults
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - workspace_defaults
+                          attributes:
+                            type: object
+                            required:
+                            - new_boards_inherit_workspace
+                            - new_plans_inherit_workspace
+                            - new_stories_inherit_workspace
+                            - restrict_content_email_notifications
+                            - disable_permission_notifications
+                            additionalProperties: false
+                            properties:
+                              new_boards_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new boards created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the board.
+
+                                  '
+                              new_plans_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new plans created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the plan.
+
+                                  '
+                              new_stories_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new stories created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the story.
+
+                                  '
+                              restrict_content_email_notifications:
+                                type: boolean
+                                description: 'When true, post-related email notifications for content in this workspace are reduced to the content name and a link to view in Opal — no snapshot preview, asset attachments, post options, or content summary.
+
+                                  '
+                              disable_permission_notifications:
+                                type: boolean
+                                description: 'When true, suppresses "added to content" notifications (both email and in-app) for everyone in the workspace whenever a user gains access to a post, moment, board, or story. Use for high-volume workspaces where these notifications are noisy. Existing per-user `NotificationPreference` settings are ignored when this is enabled.
+
+                                  '
+                          relationships:
+                            type: object
+                            required:
+                            - workspace
+                            additionalProperties: false
+                            properties:
+                              workspace:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - workspace
+                  meta:
+                    type: object
+                    required:
+                    - total
+                    - page
+                    - resource_type
+                    properties:
+                      resource_type:
+                        type: string
+                      total:
+                        type: integer
+                      page:
+                        type: object
+                        required:
+                        - limit
+                        - offset
+                        properties:
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+              example:
+                data:
+                - id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: workspace
+                  attributes:
+                    name: Labs
+                    legacy_id: '1'
+                    slug: labs
+                    start_of_week: 0
+                    timezone: America/Los_Angeles
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    logo:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: asset_reference
+                    workspace_defaults:
+                      data:
+                        id: e4165f89-6333-4e08-bd7d-a2a8daa10d91
+                        type: workspace_defaults
+                  links:
+                    v2_request: https://labs.opaltesting.com/brands/v2/1
+                  meta: null
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /workspaces/v3/{workspace_id}:
+    get:
+      tags:
+      - Workspaces
+      operationId: ReadWorkspaceV3
+      summary: '[UNSTABLE] Get a Workspace available to the authenticated user.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: expose
+        in: query
+        required: false
+        description: Expose response data that is only provided by request.
+        schema:
+          type: object
+          properties:
+            workspace:
+              type: object
+              properties:
+                meta:
+                  type: object
+                  description: 'Expose the requesting user''s membership metadata on each workspace resource.
+
+
+                    Use this parameter as: `?expose[workspace][meta]`
+
+                    '
+      - name: fields
+        in: query
+        description: An object keyed by resource type, i.e. \"workspace\" or a workspace relationship, where each value is a CSV of attributes to include in the response.
+        required: false
+        schema:
+          type: object
+          properties:
+            asset_reference:
+              type: string
+            workspace:
+              type: string
+            workspace_defaults:
+              type: string
+        style: deepObject
+        explode: true
+      - name: include
+        in: query
+        required: false
+        description: A comma separated list of related objects to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - logo
+            - workspace_defaults
+        style: form
+        explode: false
+      - name: workspace_id
+        in: path
+        required: true
+        description: The ID of the Workspace.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The requested Workspace.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: workspace
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    - links
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - workspace
+                      meta:
+                        type:
+                        - object
+                        - 'null'
+                        description: Metadata around the Workspace object
+                        properties:
+                          user_is_member:
+                            type: boolean
+                            description: Boolean that represents whether the requesting user is a member of the workspace.
+                      attributes:
+                        type: object
+                        required:
+                        - created_at
+                        - name
+                        - slug
+                        - updated_at
+                        - start_of_week
+                        - timezone
+                        - legacy_id
+                        additionalProperties: false
+                        properties:
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                          legacy_id:
+                            type: string
+                            description: A legacy ID that can be used with `v2` API endpoints.
+                          name:
+                            type: string
+                            description: The name of the workspace.
+                          slug:
+                            type:
+                            - string
+                            - 'null'
+                            description: The slug for the Workspace. This is a url-safe name for the Workspace.
+                          start_of_week:
+                            type: number
+                            enum:
+                            - 0
+                            - 1
+                            - 2
+                            - 3
+                            - 4
+                            - 5
+                            - 6
+                            description: 'The default start weekday index for the week view Calendar and for Plans. Specifies the days in a week, 0 to 6 (Sunday to Saturday). 0 (Sunday) is the default.
+
+                              With regards to the week view Calendar, values greater than 1 will be considered the same as 1.'
+                          timezone:
+                            type: string
+                            description: The IANA time zone identifier for the default time zone used when creating resources in the workspace (e.g. America/New_York).
+                          updated_at:
+                            type:
+                            - string
+                            - 'null'
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        required:
+                        - logo
+                        - workspace_defaults
+                        additionalProperties: false
+                        properties:
+                          logo:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type:
+                                - object
+                                - 'null'
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - asset_reference
+                          workspace_defaults:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type:
+                                - object
+                                - 'null'
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - workspace_defaults
+                      links:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - v2_request
+                        properties:
+                          v2_request:
+                            type: string
+                            format: uri
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset_reference
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset_reference
+                          attributes:
+                            type: object
+                            required:
+                            - asset_type
+                            - content_type
+                            - created_at
+                            - description
+                            - escaped_filename
+                            - filename
+                            - filesize
+                            - format
+                            - full_url
+                            - height
+                            - legacy_id
+                            - meta_data
+                            - original_url
+                            - preview_url
+                            - public_id
+                            - updated_at
+                            - width
+                            additionalProperties: false
+                            properties:
+                              asset_type:
+                                type:
+                                - string
+                                - 'null'
+                              content_type:
+                                type:
+                                - string
+                                - 'null'
+                              created_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              description:
+                                type:
+                                - string
+                                - 'null'
+                              escaped_filename:
+                                type: string
+                              filename:
+                                type:
+                                - string
+                                - 'null'
+                              filesize:
+                                type:
+                                - integer
+                                - 'null'
+                                description: Size of file in bytes.
+                              format:
+                                type:
+                                - string
+                                - 'null'
+                              full_url:
+                                type:
+                                - string
+                                - 'null'
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                              legacy_id:
+                                type: string
+                                description: A legacy ID that can be used with `v2` API endpoints.
+                              meta_data:
+                                type:
+                                - object
+                                - 'null'
+                              original_url:
+                                type:
+                                - string
+                                - 'null'
+                              preview_url:
+                                type:
+                                - string
+                                - 'null'
+                              public_id:
+                                type:
+                                - string
+                                - 'null'
+                                x-not-relationship: true
+                              updated_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              asset:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                              cover_asset_reference:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                      - title: workspace_defaults
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - workspace_defaults
+                          attributes:
+                            type: object
+                            required:
+                            - new_boards_inherit_workspace
+                            - new_plans_inherit_workspace
+                            - new_stories_inherit_workspace
+                            - restrict_content_email_notifications
+                            - disable_permission_notifications
+                            additionalProperties: false
+                            properties:
+                              new_boards_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new boards created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the board.
+
+                                  '
+                              new_plans_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new plans created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the plan.
+
+                                  '
+                              new_stories_inherit_workspace:
+                                type: boolean
+                                description: 'Boolean indicating whether or not new stories created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the story.
+
+                                  '
+                              restrict_content_email_notifications:
+                                type: boolean
+                                description: 'When true, post-related email notifications for content in this workspace are reduced to the content name and a link to view in Opal — no snapshot preview, asset attachments, post options, or content summary.
+
+                                  '
+                              disable_permission_notifications:
+                                type: boolean
+                                description: 'When true, suppresses "added to content" notifications (both email and in-app) for everyone in the workspace whenever a user gains access to a post, moment, board, or story. Use for high-volume workspaces where these notifications are noisy. Existing per-user `NotificationPreference` settings are ignored when this is enabled.
+
+                                  '
+                          relationships:
+                            type: object
+                            required:
+                            - workspace
+                            additionalProperties: false
+                            properties:
+                              workspace:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - workspace
+              example:
+                data:
+                  id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: workspace
+                  attributes:
+                    name: Labs
+                    legacy_id: '1'
+                    slug: labs
+                    start_of_week: 0
+                    timezone: America/Los_Angeles
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    logo:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: asset_reference
+                    workspace_defaults:
+                      data:
+                        id: e4165f89-6333-4e08-bd7d-a2a8daa10d91
+                        type: workspace_defaults
+                  links:
+                    v2_request: https://labs.opaltesting.com/brands/v2/1
+                  meta: null
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /workspaces/v3/workspace_defaults/{workspace_defaults_id}:
+    get:
+      tags:
+      - Workspaces
+      operationId: GetWorkspaceDefaultsV3
+      summary: '[UNSTABLE] Get a workspace_defaults resource for a workspace.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: workspace_defaults_id
+        in: path
+        required: true
+        description: The ID of the Workspace Defaults.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: A single workspace_defaults resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: workspace_defaults
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - workspace_defaults
+                      attributes:
+                        type: object
+                        required:
+                        - new_boards_inherit_workspace
+                        - new_plans_inherit_workspace
+                        - new_stories_inherit_workspace
+                        - restrict_content_email_notifications
+                        - disable_permission_notifications
+                        additionalProperties: false
+                        properties:
+                          new_boards_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new boards created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the board.
+
+                              '
+                          new_plans_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new plans created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the plan.
+
+                              '
+                          new_stories_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new stories created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the story.
+
+                              '
+                          restrict_content_email_notifications:
+                            type: boolean
+                            description: 'When true, post-related email notifications for content in this workspace are reduced to the content name and a link to view in Opal — no snapshot preview, asset attachments, post options, or content summary.
+
+                              '
+                          disable_permission_notifications:
+                            type: boolean
+                            description: 'When true, suppresses "added to content" notifications (both email and in-app) for everyone in the workspace whenever a user gains access to a post, moment, board, or story. Use for high-volume workspaces where these notifications are noisy. Existing per-user `NotificationPreference` settings are ignored when this is enabled.
+
+                              '
+                      relationships:
+                        type: object
+                        required:
+                        - workspace
+                        additionalProperties: false
+                        properties:
+                          workspace:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - workspace
+              example:
+                data:
+                  id: e3eb630a-4e04-4f1b-b0b0-3f7695766913
+                  type: workspace_defaults
+                  attributes:
+                    new_boards_inherit_workspace: true
+                    new_plans_inherit_workspace: false
+                    new_stories_inherit_workspace: false
+                    restrict_content_email_notifications: false
+                    disable_permission_notifications: false
+                  relationships:
+                    workspace:
+                      data:
+                        id: c3f80757-c0ea-422c-aa51-3c9ef8e11a76
+                        type: workspace
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+    patch:
+      tags:
+      - Workspaces
+      operationId: UpdateWorkspaceDefaultsV3
+      summary: '[UNSTABLE] Update an existing workspace defaults resource.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: workspace_defaults_id
+        in: path
+        required: true
+        description: The ID of the Workspace Defaults.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - id
+                  - type
+                  - attributes
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    type:
+                      type: string
+                      enum:
+                      - workspace_defaults
+                    attributes:
+                      type: object
+                      properties:
+                        new_boards_inherit_workspace:
+                          type: boolean
+                          description: 'Boolean indicating whether or not new boards created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the board.
+
+                            '
+                        new_plans_inherit_workspace:
+                          type: boolean
+                          description: 'Boolean indicating whether or not new plans created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the plan.
+
+                            '
+                        new_stories_inherit_workspace:
+                          type: boolean
+                          description: 'Boolean indicating whether or not new stories created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the story.
+
+                            '
+                        restrict_content_email_notifications:
+                          type: boolean
+                          description: 'When true, post-related email notifications for content in this workspace are reduced to the content name and a link to view in Opal — no snapshot preview, asset attachments, post options, or content summary.
+
+                            '
+                        disable_permission_notifications:
+                          type: boolean
+                          description: 'When true, suppresses "added to content" notifications (both email and in-app) for everyone in the workspace whenever a user gains access to a post, moment, board, or story.
+
+                            '
+      responses:
+        '200':
+          description: An updated workspace_defaults resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: workspace_defaults
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - workspace_defaults
+                      attributes:
+                        type: object
+                        required:
+                        - new_boards_inherit_workspace
+                        - new_plans_inherit_workspace
+                        - new_stories_inherit_workspace
+                        - restrict_content_email_notifications
+                        - disable_permission_notifications
+                        additionalProperties: false
+                        properties:
+                          new_boards_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new boards created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the board.
+
+                              '
+                          new_plans_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new plans created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the plan.
+
+                              '
+                          new_stories_inherit_workspace:
+                            type: boolean
+                            description: 'Boolean indicating whether or not new stories created in the workspace will inherit permissions from workspace, or will have access restricted to just the owner of the story.
+
+                              '
+                          restrict_content_email_notifications:
+                            type: boolean
+                            description: 'When true, post-related email notifications for content in this workspace are reduced to the content name and a link to view in Opal — no snapshot preview, asset attachments, post options, or content summary.
+
+                              '
+                          disable_permission_notifications:
+                            type: boolean
+                            description: 'When true, suppresses "added to content" notifications (both email and in-app) for everyone in the workspace whenever a user gains access to a post, moment, board, or story. Use for high-volume workspaces where these notifications are noisy. Existing per-user `NotificationPreference` settings are ignored when this is enabled.
+
+                              '
+                      relationships:
+                        type: object
+                        required:
+                        - workspace
+                        additionalProperties: false
+                        properties:
+                          workspace:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - workspace
+              example:
+                data:
+                  id: e3eb630a-4e04-4f1b-b0b0-3f7695766913
+                  type: workspace_defaults
+                  attributes:
+                    new_boards_inherit_workspace: true
+                    new_plans_inherit_workspace: false
+                    new_stories_inherit_workspace: false
+                    restrict_content_email_notifications: false
+                    disable_permission_notifications: false
+                  relationships:
+                    workspace:
+                      data:
+                        id: c3f80757-c0ea-422c-aa51-3c9ef8e11a76
+                        type: workspace
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'This API uses OAuth 2.0 with the authorization code grant flow. You can
+
+        find more detailed authentication instructions in the [Authentication
+
+        Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+
+        section.
+
+        '
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    anonymous_oauth:
+      type: oauth2
+      description: 'The OAuth 2.0 client credentials flow is used for secure server-server
+
+        requests when Opal does not need to associate a request with a particular
+
+        Opal user. These anonymous requests are instead authorized based on the
+
+        OAuth scope.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            write:onboarding: Include this scope if you wish to make API requests to onboard new Opals.
+    api_key:
+      type: apiKey
+      description: '(Deprecated) This API also supports authentication via an API or session
+
+        token set in the request headers.
+
+        '
+      in: header
+      name: Session-Token
+    presentation_share_cookie:
+      type: apiKey
+      description: 'A cookie set and read by the Monolith service that authorizes a non-opal
+
+        user to view a presentation and the resources within it. Other services
+
+        can rely on this cookie by asking Monolith to authenticate it.
+
+        '
+      in: cookie
+      name: share_token
+x-tagGroups:
+- name: Stable
+  tags:
+  - Board Collaborators
+  - Board Objects
+  - Boards
+  - Content Schedules
+  - Moment Schedules
+  - Moments
+  - Onboarding
+- name: ⚠️  Unstable
+  tags:
+  - Block Connectors
+  - Board Columns
+  - Board Duplication
+  - Board Standard Columns
+  - Channels
+  - Custom Field Options
+  - Custom Field Types
+  - Custom Fields
+  - Moment Assignees
+  - Moment Custom Fields
+  - Planning Status
+  - Rich Text Documents
+  - User Groups
+  - Users
+  - Workspaces
+- name: ℹ️ Proposed
+  tags:
+  - Bulk Operations
+  - Gem Chats
+  - Gem Files
+  - Moment Duplication
+  - Presentation Themes
+  - Workflows
+  - Workflow Contexts
+  - Workflow Stages
+  - Workflow Assignments
+  - Workflow Responses
+- name: ⚛️ Experimental
+  tags:
+  - Blocks
+  - Block Custom Field Values
+  - Block Duplication
+  - Board User Settings
+  - Categories
+  - Category Types
+  - Charts
+  - Content
+  - Custom Field Colors
+  - Filter Sets
+  - Key Dates
+  - View Columns
+  - View Standard Columns
+  - Views
+  - View Colors
+  - Stories
+- name: Additional Resources
+  tags:
+  - secondary_resources

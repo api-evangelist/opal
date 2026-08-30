@@ -1,0 +1,3064 @@
+openapi: 3.2.0
+info:
+  version: 3.0.0
+  title: Opal API (⚠️ WIP) Rich Text Documents API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v2 API](/api/documentation/v2) is more complete than the v3 API. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n*Note:* Endpoints will be added to the v3 API as needed, and we will continue to support all v2 API endpoints in the  “JSON:API” and “Other” categories, even if we add an equivalent v3 API endpoint.\n\n# Key differences between v2 and v3 APIs\n\n## Resource Identifiers\n\nThe v3 API uses a different format for primary resource identifiers than the v2 API. Responses from v3 API endpoints include the resource’s v2 API id in the `attributes.legacy_id` field, in case you need to use both API versions. (v2 API resource identifiers are generally integers, but v2 API endpoints **MAY** use a different format.)\n\n*Note:* These are opaque strings, and you **MUST NOT** rely on the structure. Currently newly-created resources have a UUIDv4 identifier, but this behavior **MAY** change at any time. Existing identifiers will not be affected.\n\n# Documentation Organization\n\nv3 API endpoints are categorized by stability:\n\n1. Stable\n2. Unstable\n3. Proposed\n4. Experimental\n\nAll v3 API endpoints are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\nYour requests **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “Stable” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable,” \"Experimental,\" or “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Rich Text Documents
+  description: '## Overview
+
+
+    ### Client libraries and document formats
+
+
+    Rich Text Document endpoints can accept documents in arbitrary formats. The `client_library` attribute identifies the framework or library that generated the document.
+
+
+    Currently, the following formats are recognized, though other formats are allowed. When creating or updating documents in these formats, ensure that the `client_library` attribute is consistent with the value provided here:
+
+
+    | Format                                  | Client Library ID  |
+
+    | --------------------------------------- | ------------------ |
+
+    | [Tiptap 2](https://tiptap.dev) JSON     | `tiptap/2.0`       |
+
+
+    ### Document assets
+
+
+    Some documents returned by these endpoints may have an `assets` relationship; these documents will not also have an `asset_references` relationship.'
+paths:
+  /rich_texts/v3/documents:
+    get:
+      tags:
+      - Rich Text Documents
+      operationId: ReadRichTextDocumentsV3
+      summary: Get Rich Text Documents available to the authenticated user.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: filter
+        in: query
+        description: Filters for limiting the results.
+        required: false
+        schema:
+          type: object
+          properties:
+            id:
+              description: Retrieve Rich Text Documents having the given ID.
+              type: array
+              items:
+                type: string
+                format: uuid
+        style: deepObject
+        explode: true
+      - name: page
+        description: Specify an offset and limit for pagination
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            limit:
+              type: integer
+              default: 50
+            offset:
+              type: integer
+        style: deepObject
+        explode: true
+      responses:
+        '200':
+          description: A collection of Rich Text Documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      title: rich_text_document
+                      type: object
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      - relationships
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        type:
+                          type: string
+                          enum:
+                          - rich_text_document
+                        attributes:
+                          type: object
+                          required:
+                          - body
+                          - client_library
+                          - created_at
+                          - updated_at
+                          additionalProperties: false
+                          properties:
+                            body:
+                              type:
+                              - object
+                              - 'null'
+                              description: 'The JSON representation of the rich text document. There is not a strict
+
+                                requirement on the shape of the data structure beyond the requirement
+
+                                of it being a JSON object. Note that keys within the JSON object will be
+
+                                preserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).
+
+                                '
+                            client_library:
+                              type: string
+                              description: 'The library or framework that generated the content. One could, for
+
+                                example, set this to the NPM package version which generated the
+
+                                rich text document for letting the caller know how to parse the response
+
+                                or handle upgrade situations.
+
+                                '
+                            created_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time representing the entity's creation date-time.
+                              readOnly: true
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time representing the entity's most recent updated date-time.
+                              readOnly: true
+                        relationships:
+                          type: object
+                          additionalProperties: false
+                          required:
+                          - created_by_user
+                          properties:
+                            created_by_user:
+                              title: User
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                      format: uuid
+                                    type:
+                                      type: string
+                                      enum:
+                                      - user
+                            assets:
+                              allOf:
+                              - type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                          format: uuid
+                                        type:
+                                          type: string
+                                          enum:
+                                          - asset
+                              - description: 'This relationship is only populated in documents returned by /rich_texts endpoints.
+
+                                  '
+                            asset_references:
+                              allOf:
+                              - type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - asset_reference
+                              - description: 'This relationship is only populated in documents returned by /board_objects endpoints.
+
+                                  '
+                            embedded_resources:
+                              allOf:
+                              - type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - embedded_resource
+                              - description: This relationship represents embedded resources within the document.
+                  meta:
+                    type: object
+                    required:
+                    - total
+                    - page
+                    - resource_type
+                    properties:
+                      resource_type:
+                        type: string
+                      total:
+                        type: integer
+                      page:
+                        type: object
+                        required:
+                        - limit
+                        - offset
+                        properties:
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+              example:
+                data:
+                - id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: rich_text_document
+                  attributes:
+                    client_library: foo
+                    body: "{\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Example paragraph text.\"\n        }\n      ]\n    }\n  ]\n}\n"
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    created_by_user:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: user
+                    assets:
+                      data:
+                      - id: 31d040a3-c4e1-4580-ba28-1251167ee95a
+                        type: asset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+    post:
+      tags:
+      - Rich Text Documents
+      operationId: CreateRichTextDocumentV3
+      summary: Create a new Rich Text Document.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - type
+                  - attributes
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - rich_text_document
+                    attributes:
+                      type: object
+                      required:
+                      - body
+                      - client_library
+                      properties:
+                        body:
+                          type:
+                          - object
+                          - 'null'
+                          description: "The JSON representation of the rich text document. There is not a strict\nrequirement on the shape of the data structure beyond the requirement \nof it being a JSON object. Note that keys within the JSON object will be\npreserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).\n"
+                        client_library:
+                          type: string
+                          description: "The library or framework that generated the content. One could, for\nexample, set this to the NPM package version which generated the \nrich text document for letting the caller know how to parse the response\nor handle upgrade situations.\n"
+                    relationships:
+                      type: object
+                      properties:
+                        created_by_user:
+                          description: 'For internal use only; attempting to set this relationship will result in a `forbidden` error.
+
+                            '
+                          title: User
+                          type: object
+                          required:
+                          - data
+                          additionalProperties: false
+                          properties:
+                            data:
+                              type: object
+                              required:
+                              - id
+                              - type
+                              additionalProperties: false
+                              properties:
+                                id:
+                                  type: string
+                                  format: uuid
+                                type:
+                                  type: string
+                                  enum:
+                                  - user
+                        opal:
+                          description: 'For internal use only; attempting to set this relationship will result in a `forbidden` error.
+
+                            '
+                          type: object
+                          required:
+                          - data
+                          additionalProperties: false
+                          properties:
+                            data:
+                              type: object
+                              required:
+                              - id
+                              - type
+                              additionalProperties: false
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  enum:
+                                  - opal
+      responses:
+        '201':
+          description: A newly created rich text document resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: rich_text_document
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - rich_text_document
+                      attributes:
+                        type: object
+                        required:
+                        - body
+                        - client_library
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          body:
+                            type:
+                            - object
+                            - 'null'
+                            description: 'The JSON representation of the rich text document. There is not a strict
+
+                              requirement on the shape of the data structure beyond the requirement
+
+                              of it being a JSON object. Note that keys within the JSON object will be
+
+                              preserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).
+
+                              '
+                          client_library:
+                            type: string
+                            description: 'The library or framework that generated the content. One could, for
+
+                              example, set this to the NPM package version which generated the
+
+                              rich text document for letting the caller know how to parse the response
+
+                              or handle upgrade situations.
+
+                              '
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's creation date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's most recent updated date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - created_by_user
+                        properties:
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          assets:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                            - description: 'This relationship is only populated in documents returned by /rich_texts endpoints.
+
+                                '
+                          asset_references:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                            - description: 'This relationship is only populated in documents returned by /board_objects endpoints.
+
+                                '
+                          embedded_resources:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - embedded_resource
+                            - description: This relationship represents embedded resources within the document.
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - links
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset
+                          attributes:
+                            type: object
+                            required:
+                            - bytes
+                            - created_at
+                            - download_url_override
+                            - duration
+                            - file_extension
+                            - file_name
+                            - height
+                            - mime_type
+                            - updated_at
+                            - url
+                            - width
+                            additionalProperties: false
+                            properties:
+                              url:
+                                type: string
+                              download_url_override:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'An alternative download URL for the file. If set, downloading the
+
+                                  asset will result in a redirect to the overridden location instead of
+
+                                  downloading the asset data directly. When not present, `url` should
+
+                                  be used.
+
+                                  '
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the width in pixels of an image or video.
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the height in pixels of an image or video.
+                              duration:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the play time of a video in seconds.
+                              pages:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the number of pages in a PDF document.
+                              mime_type:
+                                type: string
+                                description: The [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) that corresponds to the uploaded file.
+                              file_name:
+                                type: string
+                              file_extension:
+                                type: string
+                              bytes:
+                                type: integer
+                                description: The size of the file in bytes.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                          links:
+                            type: object
+                            additionalProperties: false
+                            required:
+                            - v2_request
+                            properties:
+                              v2_request:
+                                type: string
+                                format: uri
+                          relationships:
+                            required:
+                            - opal
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              opal:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - opal
+                      - title: embedded_resource
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - embedded_resource
+                          attributes:
+                            type: object
+                            required:
+                            - color
+                            - default_snapshot_url
+                            - kind
+                            - title
+                            additionalProperties: false
+                            properties:
+                              color:
+                                type:
+                                - string
+                                - 'null'
+                                description: The color for the resource (if one exists).
+                              default_snapshot_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: The URL to the resource's snapshot (if one exists).
+                              kind:
+                                type: string
+                                enum:
+                                - board
+                                - content
+                                - moment
+                                - story
+                                description: Reference to the resource's original type.
+                              title:
+                                type: string
+                                description: The title of the referenced resource.
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties: {}
+              example:
+                data:
+                  id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: rich_text_document
+                  attributes:
+                    client_library: foo
+                    body: "{\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Example paragraph text.\"\n        }\n      ]\n    }\n  ]\n}\n"
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    created_by_user:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: user
+                    assets:
+                      data:
+                      - id: 31d040a3-c4e1-4580-ba28-1251167ee95a
+                        type: asset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /rich_texts/v3/documents/{rich_text_document_id}:
+    get:
+      tags:
+      - Rich Text Documents
+      operationId: ReadRichTextDocumentV3
+      summary: Get a Rich Text Document.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      - presentation_share_cookie: []
+      description: 'Returns a rich text document with its metadata and embedded resources.
+
+        '
+      parameters:
+      - name: rich_text_document_id
+        in: path
+        required: true
+        description: The ID of the Rich Text Document.
+        schema:
+          type: string
+          format: uuid
+      - name: include
+        in: query
+        required: false
+        description: A comma separated value of related objects to include.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - assets
+            - embedded_resources
+        style: form
+        explode: false
+      responses:
+        '200':
+          description: The requested Rich Text Document
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: rich_text_document
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - rich_text_document
+                      attributes:
+                        type: object
+                        required:
+                        - body
+                        - client_library
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          body:
+                            type:
+                            - object
+                            - 'null'
+                            description: 'The JSON representation of the rich text document. There is not a strict
+
+                              requirement on the shape of the data structure beyond the requirement
+
+                              of it being a JSON object. Note that keys within the JSON object will be
+
+                              preserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).
+
+                              '
+                          client_library:
+                            type: string
+                            description: 'The library or framework that generated the content. One could, for
+
+                              example, set this to the NPM package version which generated the
+
+                              rich text document for letting the caller know how to parse the response
+
+                              or handle upgrade situations.
+
+                              '
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's creation date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's most recent updated date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - created_by_user
+                        properties:
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          assets:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                            - description: 'This relationship is only populated in documents returned by /rich_texts endpoints.
+
+                                '
+                          asset_references:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                            - description: 'This relationship is only populated in documents returned by /board_objects endpoints.
+
+                                '
+                          embedded_resources:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - embedded_resource
+                            - description: This relationship represents embedded resources within the document.
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - links
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset
+                          attributes:
+                            type: object
+                            required:
+                            - bytes
+                            - created_at
+                            - download_url_override
+                            - duration
+                            - file_extension
+                            - file_name
+                            - height
+                            - mime_type
+                            - updated_at
+                            - url
+                            - width
+                            additionalProperties: false
+                            properties:
+                              url:
+                                type: string
+                              download_url_override:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'An alternative download URL for the file. If set, downloading the
+
+                                  asset will result in a redirect to the overridden location instead of
+
+                                  downloading the asset data directly. When not present, `url` should
+
+                                  be used.
+
+                                  '
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the width in pixels of an image or video.
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the height in pixels of an image or video.
+                              duration:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the play time of a video in seconds.
+                              pages:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the number of pages in a PDF document.
+                              mime_type:
+                                type: string
+                                description: The [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) that corresponds to the uploaded file.
+                              file_name:
+                                type: string
+                              file_extension:
+                                type: string
+                              bytes:
+                                type: integer
+                                description: The size of the file in bytes.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                          links:
+                            type: object
+                            additionalProperties: false
+                            required:
+                            - v2_request
+                            properties:
+                              v2_request:
+                                type: string
+                                format: uri
+                          relationships:
+                            required:
+                            - opal
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              opal:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - opal
+                      - title: embedded_resource
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - embedded_resource
+                          attributes:
+                            type: object
+                            required:
+                            - color
+                            - default_snapshot_url
+                            - kind
+                            - title
+                            additionalProperties: false
+                            properties:
+                              color:
+                                type:
+                                - string
+                                - 'null'
+                                description: The color for the resource (if one exists).
+                              default_snapshot_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: The URL to the resource's snapshot (if one exists).
+                              kind:
+                                type: string
+                                enum:
+                                - board
+                                - content
+                                - moment
+                                - story
+                                description: Reference to the resource's original type.
+                              title:
+                                type: string
+                                description: The title of the referenced resource.
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties: {}
+              example:
+                data:
+                  id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: rich_text_document
+                  attributes:
+                    client_library: foo
+                    body: "{\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Example paragraph text.\"\n        }\n      ]\n    }\n  ]\n}\n"
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    created_by_user:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: user
+                    assets:
+                      data:
+                      - id: 31d040a3-c4e1-4580-ba28-1251167ee95a
+                        type: asset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+    patch:
+      tags:
+      - Rich Text Documents
+      operationId: UpdateRichTextDocumentV3
+      summary: Update an existing Rich Text Document.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: rich_text_document_id
+        in: path
+        required: true
+        description: The ID of the Rich Text Document.
+        schema:
+          type: string
+          format: uuid
+      - name: if-unmodified-since
+        in: header
+        description: 'A date-time representing the entity''s most recently updated date-time. The date-time is to be provided in form of: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT'
+        required: false
+        schema:
+          type: string
+          format: http-date
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - id
+                  - type
+                  - attributes
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    type:
+                      type: string
+                      enum:
+                      - rich_text_document
+                    attributes:
+                      type: object
+                      properties:
+                        body:
+                          type:
+                          - object
+                          - 'null'
+                          description: "The JSON representation of the rich text document. There is not a strict\nrequirement on the shape of the data structure beyond the requirement \nof it being a JSON object. Note that keys within the JSON object will be\npreserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).\n"
+                        client_library:
+                          type: string
+                          description: "The library or framework that generated the content. One could, for\nexample, set this to the NPM package version which generated the \nrich text document for letting the caller know how to parse the response\nor handle upgrade situations.\n"
+      responses:
+        '200':
+          description: An updated rich text document resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: rich_text_document
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - rich_text_document
+                      attributes:
+                        type: object
+                        required:
+                        - body
+                        - client_library
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          body:
+                            type:
+                            - object
+                            - 'null'
+                            description: 'The JSON representation of the rich text document. There is not a strict
+
+                              requirement on the shape of the data structure beyond the requirement
+
+                              of it being a JSON object. Note that keys within the JSON object will be
+
+                              preserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).
+
+                              '
+                          client_library:
+                            type: string
+                            description: 'The library or framework that generated the content. One could, for
+
+                              example, set this to the NPM package version which generated the
+
+                              rich text document for letting the caller know how to parse the response
+
+                              or handle upgrade situations.
+
+                              '
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's creation date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's most recent updated date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - created_by_user
+                        properties:
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          assets:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                            - description: 'This relationship is only populated in documents returned by /rich_texts endpoints.
+
+                                '
+                          asset_references:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                            - description: 'This relationship is only populated in documents returned by /board_objects endpoints.
+
+                                '
+                          embedded_resources:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - embedded_resource
+                            - description: This relationship represents embedded resources within the document.
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - links
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset
+                          attributes:
+                            type: object
+                            required:
+                            - bytes
+                            - created_at
+                            - download_url_override
+                            - duration
+                            - file_extension
+                            - file_name
+                            - height
+                            - mime_type
+                            - updated_at
+                            - url
+                            - width
+                            additionalProperties: false
+                            properties:
+                              url:
+                                type: string
+                              download_url_override:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'An alternative download URL for the file. If set, downloading the
+
+                                  asset will result in a redirect to the overridden location instead of
+
+                                  downloading the asset data directly. When not present, `url` should
+
+                                  be used.
+
+                                  '
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the width in pixels of an image or video.
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the height in pixels of an image or video.
+                              duration:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the play time of a video in seconds.
+                              pages:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the number of pages in a PDF document.
+                              mime_type:
+                                type: string
+                                description: The [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) that corresponds to the uploaded file.
+                              file_name:
+                                type: string
+                              file_extension:
+                                type: string
+                              bytes:
+                                type: integer
+                                description: The size of the file in bytes.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                          links:
+                            type: object
+                            additionalProperties: false
+                            required:
+                            - v2_request
+                            properties:
+                              v2_request:
+                                type: string
+                                format: uri
+                          relationships:
+                            required:
+                            - opal
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              opal:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - opal
+                      - title: embedded_resource
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - embedded_resource
+                          attributes:
+                            type: object
+                            required:
+                            - color
+                            - default_snapshot_url
+                            - kind
+                            - title
+                            additionalProperties: false
+                            properties:
+                              color:
+                                type:
+                                - string
+                                - 'null'
+                                description: The color for the resource (if one exists).
+                              default_snapshot_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: The URL to the resource's snapshot (if one exists).
+                              kind:
+                                type: string
+                                enum:
+                                - board
+                                - content
+                                - moment
+                                - story
+                                description: Reference to the resource's original type.
+                              title:
+                                type: string
+                                description: The title of the referenced resource.
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties: {}
+              example:
+                data:
+                  id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: rich_text_document
+                  attributes:
+                    client_library: foo
+                    body: "{\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Example paragraph text.\"\n        }\n      ]\n    }\n  ]\n}\n"
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    created_by_user:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: user
+                    assets:
+                      data:
+                      - id: 31d040a3-c4e1-4580-ba28-1251167ee95a
+                        type: asset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '412':
+          description: Precondition Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+    delete:
+      tags:
+      - Rich Text Documents
+      operationId: DeleteRichTextDocumentV3
+      summary: Delete a Rich Text Document.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: rich_text_document_id
+        in: path
+        required: true
+        description: The ID of the Rich Text Document.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The Rich Text Document was successfully deleted.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /rich_texts/v3/documents/{rich_text_document_id}/duplicate:
+    post:
+      tags:
+      - Rich Text Documents
+      operationId: DuplicateRichTextDocumentV3
+      summary: Duplicate a Rich Text Document
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: rich_text_document_id
+        in: path
+        required: true
+        description: The ID of the Rich Text Document.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - type
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - rich_text_document
+            example:
+              data:
+                type: rich_text_document
+      responses:
+        '201':
+          description: 'A newly created rich text document resource, which is a duplicate of
+
+            the original Document having the given ID.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: rich_text_document
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - rich_text_document
+                      attributes:
+                        type: object
+                        required:
+                        - body
+                        - client_library
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          body:
+                            type:
+                            - object
+                            - 'null'
+                            description: 'The JSON representation of the rich text document. There is not a strict
+
+                              requirement on the shape of the data structure beyond the requirement
+
+                              of it being a JSON object. Note that keys within the JSON object will be
+
+                              preserved as-is (i.e., camelCase, PascalCase, under_score, dasher-ized).
+
+                              '
+                          client_library:
+                            type: string
+                            description: 'The library or framework that generated the content. One could, for
+
+                              example, set this to the NPM package version which generated the
+
+                              rich text document for letting the caller know how to parse the response
+
+                              or handle upgrade situations.
+
+                              '
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's creation date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time representing the entity's most recent updated date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - created_by_user
+                        properties:
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          assets:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                            - description: 'This relationship is only populated in documents returned by /rich_texts endpoints.
+
+                                '
+                          asset_references:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                            - description: 'This relationship is only populated in documents returned by /board_objects endpoints.
+
+                                '
+                          embedded_resources:
+                            allOf:
+                            - type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - embedded_resource
+                            - description: This relationship represents embedded resources within the document.
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - links
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset
+                          attributes:
+                            type: object
+                            required:
+                            - bytes
+                            - created_at
+                            - download_url_override
+                            - duration
+                            - file_extension
+                            - file_name
+                            - height
+                            - mime_type
+                            - updated_at
+                            - url
+                            - width
+                            additionalProperties: false
+                            properties:
+                              url:
+                                type: string
+                              download_url_override:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'An alternative download URL for the file. If set, downloading the
+
+                                  asset will result in a redirect to the overridden location instead of
+
+                                  downloading the asset data directly. When not present, `url` should
+
+                                  be used.
+
+                                  '
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the width in pixels of an image or video.
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the height in pixels of an image or video.
+                              duration:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the play time of a video in seconds.
+                              pages:
+                                type:
+                                - integer
+                                - 'null'
+                                description: When applicable, the number of pages in a PDF document.
+                              mime_type:
+                                type: string
+                                description: The [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) that corresponds to the uploaded file.
+                              file_name:
+                                type: string
+                              file_extension:
+                                type: string
+                              bytes:
+                                type: integer
+                                description: The size of the file in bytes.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                          links:
+                            type: object
+                            additionalProperties: false
+                            required:
+                            - v2_request
+                            properties:
+                              v2_request:
+                                type: string
+                                format: uri
+                          relationships:
+                            required:
+                            - opal
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              opal:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - opal
+                      - title: embedded_resource
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - embedded_resource
+                          attributes:
+                            type: object
+                            required:
+                            - color
+                            - default_snapshot_url
+                            - kind
+                            - title
+                            additionalProperties: false
+                            properties:
+                              color:
+                                type:
+                                - string
+                                - 'null'
+                                description: The color for the resource (if one exists).
+                              default_snapshot_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: The URL to the resource's snapshot (if one exists).
+                              kind:
+                                type: string
+                                enum:
+                                - board
+                                - content
+                                - moment
+                                - story
+                                description: Reference to the resource's original type.
+                              title:
+                                type: string
+                                description: The title of the referenced resource.
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties: {}
+              example:
+                data:
+                  id: d76701b0-8e7f-4d71-aede-13b486468ff4
+                  type: rich_text_document
+                  attributes:
+                    client_library: foo
+                    body: "{\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Example paragraph text.\"\n        }\n      ]\n    }\n  ]\n}\n"
+                    created_at: '2020-09-11T15:27:01.881-08:00'
+                    updated_at: '2020-09-11T15:27:01.881-08:00'
+                  relationships:
+                    created_by_user:
+                      data:
+                        id: e0b0028d-e4ee-438d-800f-31f8d4048293
+                        type: user
+                    assets:
+                      data:
+                      - id: 31d040a3-c4e1-4580-ba28-1251167ee95a
+                        type: asset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /rich_texts/v3/get_collaboration_token:
+    get:
+      tags:
+      - Rich Text Documents
+      operationId: GetCollaborationTokenV3
+      summary: Get a JWT for use with the TipTap Collaboration server.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      - presentation_share_cookie: []
+      description: 'Returns a JWT token for accessing rich text documents via the TipTap Collaboration server with support for identified requests (Session Token or OAuth) and anonymous requests (presentation share cookies for readonly access).
+
+        '
+      parameters:
+      - name: document_id
+        in: query
+        required: true
+        description: 'The ID of one or more Rich Text Documents for which to request access.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: permission
+        in: query
+        required: false
+        description: 'The permission level for the token. Defaults to ''write'' if not specified.
+
+          - write: Full edit access (requires identification via Session Token or OAuth)
+
+          - readonly: Read-only access
+
+          '
+        schema:
+          type: string
+          enum:
+          - readonly
+          - write
+          default: write
+      responses:
+        '200':
+          description: A JWT for use with the TipTap Collaboration server.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - access_token
+                - expires_at
+                properties:
+                  access_token:
+                    type: string
+                  expires_at:
+                    type: integer
+              example:
+                access_token: valid_token
+                expires_at: 1708474691
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'This API uses OAuth 2.0 with the authorization code grant flow. You can
+
+        find more detailed authentication instructions in the [Authentication
+
+        Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+
+        section.
+
+        '
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    anonymous_oauth:
+      type: oauth2
+      description: 'The OAuth 2.0 client credentials flow is used for secure server-server
+
+        requests when Opal does not need to associate a request with a particular
+
+        Opal user. These anonymous requests are instead authorized based on the
+
+        OAuth scope.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            write:onboarding: Include this scope if you wish to make API requests to onboard new Opals.
+    api_key:
+      type: apiKey
+      description: '(Deprecated) This API also supports authentication via an API or session
+
+        token set in the request headers.
+
+        '
+      in: header
+      name: Session-Token
+    presentation_share_cookie:
+      type: apiKey
+      description: 'A cookie set and read by the Monolith service that authorizes a non-opal
+
+        user to view a presentation and the resources within it. Other services
+
+        can rely on this cookie by asking Monolith to authenticate it.
+
+        '
+      in: cookie
+      name: share_token
+x-tagGroups:
+- name: Stable
+  tags:
+  - Board Collaborators
+  - Board Objects
+  - Boards
+  - Content Schedules
+  - Moment Schedules
+  - Moments
+  - Onboarding
+- name: ⚠️  Unstable
+  tags:
+  - Block Connectors
+  - Board Columns
+  - Board Duplication
+  - Board Standard Columns
+  - Channels
+  - Custom Field Options
+  - Custom Field Types
+  - Custom Fields
+  - Moment Assignees
+  - Moment Custom Fields
+  - Planning Status
+  - Rich Text Documents
+  - User Groups
+  - Users
+  - Workspaces
+- name: ℹ️ Proposed
+  tags:
+  - Bulk Operations
+  - Gem Chats
+  - Gem Files
+  - Moment Duplication
+  - Presentation Themes
+  - Workflows
+  - Workflow Contexts
+  - Workflow Stages
+  - Workflow Assignments
+  - Workflow Responses
+- name: ⚛️ Experimental
+  tags:
+  - Blocks
+  - Block Custom Field Values
+  - Block Duplication
+  - Board User Settings
+  - Categories
+  - Category Types
+  - Charts
+  - Content
+  - Custom Field Colors
+  - Filter Sets
+  - Key Dates
+  - View Columns
+  - View Standard Columns
+  - Views
+  - View Colors
+  - Stories
+- name: Additional Resources
+  tags:
+  - secondary_resources

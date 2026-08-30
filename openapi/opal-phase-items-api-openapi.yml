@@ -1,0 +1,3107 @@
+openapi: 3.2.0
+info:
+  version: 2.0.0
+  title: Opal Phase Items API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v3 API](/api/documentation/v3) is less complete than the v2 API, and is still a work in progress. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n# Documentation Organization\n\nv2 API endpoints are categorized by stability:\n\n1. JSON:API\n2. Other\n3. Unstable\n4. Proposed\n\nv2 API endpoints in the “JSON:API”, “Unstable”, and “Proposed” categories are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\n<aside>\n\nTo strictly comply with the JSON:API specification your requests for endpoints in the “JSON:API”, “Unstable”, and “Proposed” categories **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\nYou **SHOULD** use `application/vnd.api+json` for maximum stability, but v2 API endpoints **MAY** allow the `Accept` HTTP header to be `application/json`; if so, the response’s `Content-Type` HTTP header will be `application/json`. This support for `application/json` **MAY** disappear from a given endpoint at any time, and is not available on all endpoints.\n</aside>\n\n“Other” endpoints are stable, but do not follow the JSON:API specification. (Some “Other” endpoints have data that resembles the JSON:API structure, but **MUST** be parsed as generic JSON.) Your requests **MUST** set the `Accept` HTTP header to `application/json`, and the response’s `Content-Type` HTTP header will be `application/json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “JSON:API” and “Other” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable” and “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Phase Items
+paths:
+  /phase_items/v2:
+    get:
+      tags:
+      - Phase Items
+      operationId: ReadPhaseItemsV2
+      summary: Return all phase items available to the authenticated user.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key:
+        - Session-Token
+      parameters:
+      - name: fields
+        in: query
+        description: 'An object where each key is a CSV of phase item attributes to include in the response.
+
+          Omit this parameter entirely to retrieve all available fields.
+
+          '
+        required: false
+        schema:
+          type: object
+          properties:
+            approvable:
+              type: string
+            created_at:
+              type: string
+            from_user:
+              type: string
+            is_starred:
+              type: string
+            phase:
+              type: string
+            proxy_user:
+              type: string
+            response:
+              type: string
+            request:
+              type: string
+            to_user:
+              type: string
+            type:
+              type: string
+            updated_at:
+              type: string
+        style: deepObject
+        explode: true
+      - name: filter
+        in: query
+        description: Filters for limiting the results.
+        required: false
+        schema:
+          type: object
+          properties:
+            active:
+              type: boolean
+              description: 'Boolean true returns phase items where an action may be taken while boolean false returns phase items where no action may be taken.
+
+                '
+            brand_id:
+              type: array
+              description: 'The IDs of the workspaces to which results should be filtered.
+
+                "Workspace ID" and "Brand ID" are synonymous.
+
+                Comma separated list of IDs. If included, will only fetch resources associated with these brands. If not included, will return resources associated with all brands that the user belongs to. For example, `filter[brand_id]=1` will fetch all resources associated with brand 1, while `filter[brand_id]=1,2,3` will fetch any resources associated with brands 1, 2, or 3.
+
+                '
+              items:
+                type: integer
+            content_id:
+              type: array
+              description: Retrieve phase items associated with one or more content IDs.
+              items:
+                type: integer
+            created_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter phase items by created_at time. Uses syntax `filter[created_at][gt]=2020-01-01` Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. If no operator is specified, `eq` will be assumed. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][eq]=2020-01-01`
+
+                  '
+            current:
+              type: boolean
+              description: 'Boolean true returns phase items in the current phase while boolean false excludes phase items in the current phase.
+
+                '
+            due_date:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter by the due date of the phase. Uses syntax `filter[due_date][gt]=2020-01-01` Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. If no operator is specified, `eq` will be assumed. For example, `filter[due_date]=2020-01-01` is equivalent to `filter[due_date][eq]=2020-01-01`
+
+                  '
+            from_days_prior:
+              type: integer
+              description: 'Limit the number of past-due items up to a number of days. Note that using this in conjunction with the overdue filter will result in an error.
+
+                '
+            overdue:
+              type: boolean
+              description: 'Boolean true to get overdue phase items only, false to get current and future phase items, or unspecified to get both. Note that using this in conjunction with the from_days_prior filter will result in an error.
+
+                '
+            pending:
+              type: boolean
+              description: 'Boolean true returns tasks that are not yet complete and approvals that are not yet approved. Boolean false return completed tasks and approvals that are approved.
+
+                '
+            scheduled_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter by the content scheduled time. Uses syntax `filter[scheduled_at][gt]=2020-01-01` Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. If no operator is specified, `eq` will be assumed. For example, `filter[scheduled_at]=2020-01-01` is equivalent to `filter[scheduled_at][eq]=2020-01-01`
+
+                  '
+            to_me:
+              type: boolean
+              description: 'Boolean true to get phase items assigned to the current user and boolean false to exclude phase items assigned to the current user. Note that using this filter in conjunction with the to_user_ids filter will result in an error.
+
+                '
+            to_user_ids:
+              deprecated: true
+              description: 'See the `to_user_id` parameter which offers the same functionality (filtering to one or more comma-separated ids _or_ `null`).
+
+                '
+              oneOf:
+              - type: string
+                description: Retrieve unassigned items.
+                enum:
+                - 'null'
+              - type: array
+                description: Retrieve assigned items by user IDs.
+                items:
+                  type: integer
+            to_user_id:
+              description: A CSV of user IDs, or null to retrieve unassigned items.
+              oneOf:
+              - type: string
+                description: Retrieve unassigned items.
+                enum:
+                - 'null'
+              - type: array
+                description: Retrieve assigned items by user IDs.
+                items:
+                  type: integer
+              example: filter[to_user_id]=1,50,22
+            type:
+              type: string
+              description: 'Filtering by task will return phase items of type task, filtering by approval will return phase items of type approval.
+
+                '
+              enum:
+              - task
+              - approval
+            updated_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter by the phase item updated_at time. Uses syntax `filter[updated_at][gt]=2020-01-01`. Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. If no operator is specified, `eq` will be assumed. For example, `filter[updated_at]=2020-01-01` is equivalent to `filter[updated_at][eq]=2020-01-01`
+
+                  '
+        style: deepObject
+        explode: true
+      - name: include
+        in: query
+        required: false
+        description: 'A comma separated value of related resource objects on the phase item to include. These need to be specified when attributes on a relationship are required by the client.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - approvable
+            - brand
+            - from_user
+            - phase
+            - proxy_user
+            - to_user
+        style: form
+        explode: false
+      - name: sort
+        in: query
+        required: false
+        description: 'A comma separated value specifying how a collection in the response body should be sorted, where each value is an attribute of the phase item. When specifying multiple values, each value in the sequence determines the ordering precedence. Lastly, each phase item in the collection will appear in ascending order, unless any of the enumerated values are prefixed with a minus "-" sign, in which case each phase item will appear in descending order for the specified values.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - created_at
+            - due_date
+            - full_name
+            - request
+            - scheduled_at
+            - updated_at
+      - name: expose
+        in: query
+        required: false
+        description: Expose response data that is only provided by request.
+        schema:
+          type: object
+          properties:
+            unscheduled_posts:
+              type: boolean
+              description: '**[INTERNAL-ONLY] [Unstable]** 🏴‍☠️👻🚷💣 This parameter can be used to expose Unscheduled Posts to the V2 Phase Items GET API. Opal developers are using this parameter as a migration tool. If you need Phase Items for content that is Unscheduled, please see the V3 APIs that offer native support.
+
+                This parameter should be considered [Unstable] and may be removed at any time without notice of deprecation. Using this parameter will also cause the Phase Items V2 GET response to deviate from the documented schema.
+
+                '
+      responses:
+        '200':
+          description: An array of phase items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      title: phase item
+                      type: object
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          pattern: ^[0-9]+$
+                        type:
+                          type: string
+                          enum:
+                          - phase_item
+                        attributes:
+                          type: object
+                          required:
+                          - created_at
+                          - request
+                          - status
+                          - phase_item_type
+                          - updated_at
+                          additionalProperties: false
+                          properties:
+                            created_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time.
+                              readOnly: true
+                            is_starred:
+                              type: boolean
+                              description: Indicates the phase item is starred/pinned.
+                            request:
+                              type:
+                              - string
+                              - 'null'
+                              description: A description of the request being made.
+                            response:
+                              type:
+                              - string
+                              - 'null'
+                              description: A comment to be left by the approver.
+                            status:
+                              type: string
+                              description: The status of the phase item.
+                              enum:
+                              - complete
+                              - incomplete
+                              - rejected
+                            type:
+                              type: string
+                              deprecated: true
+                              description: Deprecated. See `phase_item_type`.
+                              enum:
+                              - Moments::Approval
+                              - Moments::Task
+                            phase_item_type:
+                              type: string
+                              description: The specific type of phase item.
+                              enum:
+                              - Moments::Approval
+                              - Moments::Task
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time.
+                              readOnly: true
+                        relationships:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            approvable:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - content
+                            brand:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - brand
+                            from_user:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - user
+                            phase:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - phase
+                            proxy_user:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - user
+                            to_user:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - user
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: brand
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - brand
+                          meta:
+                            type:
+                            - object
+                            - 'null'
+                            description: Metadata around the Brand object
+                            properties:
+                              user_is_member:
+                                type: boolean
+                                description: Boolean that represents whether the requesting user is a member of the brand.
+                          attributes:
+                            type: object
+                            required:
+                            - slug
+                            - name
+                            - uuid
+                            - start_of_week
+                            - timezone
+                            additionalProperties: false
+                            properties:
+                              uuid:
+                                type: string
+                                format: uuid
+                                description: A unique identifier for the workspace.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time indicating when the user was last updated.
+                                readOnly: true
+                              slug:
+                                type: string
+                                description: The slug for the Brand/Workspace. This is a url-safe name for the Workspace.
+                              name:
+                                type: string
+                                description: The name of the Workspace.
+                              start_of_week:
+                                type: number
+                                enum:
+                                - 0
+                                - 1
+                                - 2
+                                - 3
+                                - 4
+                                - 5
+                                - 6
+                                description: 'The default start weekday index for the week view Calendar and for Plans. Specifies the days in a week, 0 to 6 (Sunday to Saturday). 0 (Sunday) is the default.
+
+                                  With regards to the week view Calendar, values greater than 1 will be considered the same as 1.'
+                              timezone:
+                                type: string
+                                description: The IANA time zone identifier for the default time zone used when creating resources in the Brand/Workspace (e.g. America/New_York).
+                          relationships:
+                            type: object
+                            required:
+                            - primary_label_set
+                            - accounts
+                            - logo
+                            - dispatch_providers
+                            additionalProperties: false
+                            properties:
+                              primary_label_set:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - label_set
+                              accounts:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - account
+                              logo:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                              dispatch_providers:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - dispatch_provider
+                      - title: content
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        - links
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - content
+                          attributes:
+                            type: object
+                            required:
+                            - position
+                            - status
+                            - is_published
+                            - was_manually_published
+                            - is_ghost
+                            - is_private
+                            - default_snapshot_url
+                            - live_url
+                            - takedown_scheduled_at
+                            - scheduled_at
+                            - name
+                            - content
+                            - show_code_name
+                            - publishing_mode
+                            - created_at
+                            - updated_at
+                            additionalProperties: false
+                            properties:
+                              name:
+                                type: string
+                                description: The name of the Content.
+                              position:
+                                type:
+                                - integer
+                                - 'null'
+                                description: 'A relativistic position within the parent Moment.
+
+                                  You can sort Content by position to lay them
+
+                                  out in the intended order. Note that these positions are not
+
+                                  indices (1, 2, 3, 4...).
+
+                                  '
+                              status:
+                                type:
+                                - string
+                                - 'null'
+                                description: The workflow status of the Content.
+                                enum:
+                                - draft
+                                - for_approval
+                                - needs_revision
+                                - approved
+                                - null
+                              content_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: The Content Type name of the Content. This attribute is only `null` when the content is private from the currently authenticated user.
+                              content:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'The unstructured content string of the Content.
+
+                                  This is used for Content Types that do not rely on
+
+                                  Post Options to store content/assets of Content.
+
+                                  '
+                              is_published:
+                                type:
+                                - boolean
+                                - 'null'
+                                description: Whether or not the Content has been published.
+                              was_manually_published:
+                                type:
+                                - boolean
+                                - 'null'
+                                description: Whether or not the Content was manually published.
+                              is_ghost:
+                                type: boolean
+                                description: 'Indicates whether the Content is redacted for the requesting user.
+
+                                  '
+                              is_private:
+                                type: boolean
+                                description: 'Indicates whether the Content is set to private.
+
+                                  '
+                              show_code_name:
+                                type: boolean
+                                description: 'If `is_ghost` is true and `show_code_name` is true then the `name`
+
+                                  property is a "code name" for the piece of Content. The user must request
+
+                                  access to the Content to see the proper name.
+
+                                  '
+                              default_snapshot_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: A URL that serves up the default snapshot preview of this Content.
+                              live_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: The live URL to published Content.
+                              scheduled_at:
+                                type:
+                                - string
+                                - 'null'
+                                format: date-time
+                                description: 'An ISO8601 date-time. The date and time when the Content is scheduled to get published. If the Content has not been explicitly scheduled then this date is based on that of the Moment the Content lives within.
+
+                                  '
+                              start_interval:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'An ISO8601 interval, relative to the start of the related Moment''s schedule, representing the explicitly chosen start datetime of the Content. Values are normalized to a seconds-denominated interval (e.g. `PT86400S`). Null when no specific time has been chosen for the Content — in that case `scheduled_at` falls back to the start of the Moment''s schedule.
+
+                                  '
+                              takedown_scheduled_at:
+                                type:
+                                - string
+                                - 'null'
+                                format: date-time
+                                description: 'An ISO8601 date-time. The date and time when the Content is scheduled to get taken down.
+
+                                  '
+                              post_data:
+                                type:
+                                - object
+                                - 'null'
+                                description: 'A hash that can store any metadata associated with the Content.
+
+                                  '
+                                additionalProperties: true
+                              publishing_mode:
+                                type:
+                                - string
+                                - 'null'
+                                description: The way in which the Content will be published.
+                              post_state:
+                                type:
+                                - string
+                                - 'null'
+                                description: The state of the Content in the workflow process.
+                                enum:
+                                - published
+                                - held
+                                - failed
+                                - publishing
+                                - dispatched
+                                - dispatching
+                                - approved
+                                - pending
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              service_id:
+                                type: integer
+                          relationships:
+                            type: object
+                            required:
+                            - account
+                            - approval_phase_group
+                            - asset_references
+                            - brand
+                            - budget
+                            - delivery_record
+                            - inherited_labels
+                            - label_sets
+                            - labels
+                            - links
+                            - moment
+                            - placement
+                            - post_components
+                            - post_options
+                            - post_type
+                            - post_type_options
+                            - rich_text_document
+                            - service
+                            - stories
+                            - user
+                            additionalProperties: false
+                            properties:
+                              account:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - account
+                              approval_phase_group:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - phase-groups
+                              asset_references:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - asset_reference
+                              brand:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - brand
+                              budget:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - budget
+                              delivery_record:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - delivery_record
+                              inherited_labels:
+                                allOf:
+                                - type: object
+                                  required:
+                                  - data
+                                  additionalProperties: false
+                                  properties:
+                                    data:
+                                      type: array
+                                      items:
+                                        type: object
+                                        required:
+                                        - id
+                                        - type
+                                        additionalProperties: false
+                                        properties:
+                                          id:
+                                            type: string
+                                          type:
+                                            type: string
+                                            enum:
+                                            - label
+                                - description: 'Only inherited labels. See the [Labels Overview](/api/documentation/v2#tag/Labels/Labels-Overview) for information on inheritance.
+
+                                    '
+                              label_sets:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - label_set
+                              labels:
+                                allOf:
+                                - type: object
+                                  required:
+                                  - data
+                                  additionalProperties: false
+                                  properties:
+                                    data:
+                                      type: array
+                                      items:
+                                        type: object
+                                        required:
+                                        - id
+                                        - type
+                                        additionalProperties: false
+                                        properties:
+                                          id:
+                                            type: string
+                                          type:
+                                            type: string
+                                            enum:
+                                            - label
+                                - description: 'All labels (inherited or explicitly set). See the [Labels Overview](/api/documentation/v2#tag/Labels/Labels-Overview) for information on inheritance.
+
+                                    '
+                              links:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - link
+                              moment:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - moment
+                              placement:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - placement
+                              post_components:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - post_component
+                              post_options:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - post_option
+                              post_type:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - post_type
+                              post_type_options:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - post_option
+                              rich_text_document:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - rich_text_document
+                              service:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - service
+                              stories:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - story
+                              user:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - user
+                          links:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              web_url:
+                                type: string
+                      - title: phase
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - phase
+                          attributes:
+                            type: object
+                            required:
+                            - name
+                            - due_date
+                            - is_current
+                            - is_complete
+                            additionalProperties: false
+                            properties:
+                              name:
+                                type: string
+                                description: A string representing the name of the phase
+                              due_date:
+                                type:
+                                - string
+                                - 'null'
+                                format: date-time
+                                description: An ISO8601 date-time.
+                              is_current:
+                                type: boolean
+                                description: A boolean that represents whether or not the phase is current within its workflow
+                              is_complete:
+                                type: boolean
+                                description: "A boolean that represents whether or the phase is complete.\n\n Note that completion can either mean that all phase_items within a phase have been completed\n or an approval has been given in an approval phase that only requires a single approval.\n"
+                      - title: user
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - user
+                          meta:
+                            type:
+                            - object
+                            - 'null'
+                            description: Metadata around the Brand object
+                            properties:
+                              workspace_approval_counts:
+                                type: object
+                                description: Object representing the user's unseen approval counts per Workspace Id.
+                          attributes:
+                            type: object
+                            required:
+                            - created_at
+                            - email
+                            - first_name
+                            - full_name
+                            - is_active
+                            - last_name
+                            - title
+                            - transliterated_full_name
+                            - updated_at
+                            - uuid
+                            additionalProperties: false
+                            properties:
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              email:
+                                type: string
+                              first_name:
+                                type: string
+                              full_name:
+                                type: string
+                              is_active:
+                                type:
+                                - boolean
+                                - 'null'
+                              last_name:
+                                type: string
+                              role_name:
+                                type: string
+                              title:
+                                type:
+                                - string
+                                - 'null'
+                              transliterated_full_name:
+                                type: string
+                              feature_flags:
+                                type: object
+                                additionalProperties:
+                                  type: boolean
+                                  description: 'A named feature flag and `true` or `false` depending on whether the feature is enabled for the user or not.
+
+                                    '
+                                description: 'List of Feature Flags for this user, only available for the currently authenticated User.
+
+                                  '
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time indicating when the user was last updated.
+                                readOnly: true
+                              uuid:
+                                type: string
+                                format: uuid
+                          relationships:
+                            type: object
+                            required:
+                            - opal
+                            additionalProperties: false
+                            properties:
+                              avatar_asset_reference:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                              brands:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - brand
+                              brand_admin_users:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - brand_admin_user
+                              role:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - role
+                              profile:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - user_profile
+                              opal:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - opal
+                              moments_setting:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - moments_setting
+                  meta:
+                    type: object
+                    required:
+                    - total
+                    - resource_type
+                    - page
+                    - aggregate
+                    properties:
+                      total:
+                        type: integer
+                      resource_type:
+                        type: string
+                        enum:
+                        - phase_item
+                      page:
+                        type: object
+                        required:
+                        - limit
+                        - offset
+                        properties:
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+                      aggregate:
+                        type: object
+                        properties:
+                          overdue_total:
+                            type: integer
+              example:
+                data:
+                - id: '13'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T14:04:48.016-07:00'
+                    request: I'm overdue
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-05-04T10:09:53.007-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '8'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '3'
+                        type: content
+                - id: '12'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T14:02:39.481-07:00'
+                    request: null
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Approval
+                    updated_at: '2021-04-30T14:02:39.481-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '6'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '2'
+                        type: content
+                - id: '11'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T14:02:39.143-07:00'
+                    request: null
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Approval
+                    updated_at: '2021-04-30T14:02:39.143-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '6'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '3'
+                        type: user
+                    approvable:
+                      data:
+                        id: '2'
+                        type: content
+                - id: '10'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T14:02:03.163-07:00'
+                    request: null
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Approval
+                    updated_at: '2021-04-30T14:02:10.290-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '5'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '2'
+                        type: content
+                - id: '9'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:59:55.367-07:00'
+                    request: I am a future task assigned to Not Garth
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T14:00:07.309-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '3'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '4'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '8'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:59:43.964-07:00'
+                    request: I am a future task assigned to Garth
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T13:59:54.012-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '3'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '7'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:59:12.572-07:00'
+                    request: I am a current task assigned to someone else
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T13:59:22.613-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '2'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '4'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '6'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:59:02.141-07:00'
+                    request: I am a current task, completed by someone else
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T14:09:48.584-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '2'
+                        type: phase
+                    proxy_user:
+                      data:
+                        id: '29'
+                        type: user
+                    to_user:
+                      data:
+                        id: '2'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '5'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:58:49.876-07:00'
+                    request: I am a current task that will not be completed
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-05-05T09:56:53.057-07:00'
+                    status: incomplete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '2'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '4'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:58:36.353-07:00'
+                    request: I am a current task that will be completed
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T14:09:39.588-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '2'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '3'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:58:22.446-07:00'
+                    request: I will be completed by not Garth
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T13:59:38.134-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '1'
+                        type: phase
+                    proxy_user:
+                      data:
+                        id: '29'
+                        type: user
+                    to_user:
+                      data:
+                        id: '2'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '2'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:58:02.188-07:00'
+                    request: I will be completed
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T13:59:33.010-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '1'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                - id: '1'
+                  type: phase_item
+                  attributes:
+                    created_at: '2021-04-30T13:57:52.710-07:00'
+                    request: I have been completed
+                    response: null
+                    is_starred: false
+                    phase_item_type: Moments::Task
+                    updated_at: '2021-04-30T13:59:32.204-07:00'
+                    status: complete
+                  relationships:
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    from_user:
+                      data:
+                        id: '29'
+                        type: user
+                    phase:
+                      data:
+                        id: '1'
+                        type: phase
+                    proxy_user:
+                      data: null
+                    to_user:
+                      data:
+                        id: '29'
+                        type: user
+                    approvable:
+                      data:
+                        id: '1'
+                        type: content
+                included:
+                - id: '3'
+                  type: content
+                  attributes:
+                    position: 6755399441055743
+                    service_id: 3
+                    publishing_mode: none
+                    created_at: '2021-04-30T14:04:29.487-07:00'
+                    updated_at: '2021-04-30T14:05:52.930-07:00'
+                    scheduled_at: '2021-04-30T00:00:00.000-07:00'
+                    is_ghost: false
+                    show_code_name: false
+                    is_private: false
+                    default_snapshot_url: http://login.opal.docker/api/v1/snapshots/6/3d19b2f4-9081-40b0-80a1-81b9f89e32e0/mobile_news_feed@2x.png
+                    takedown_scheduled_at: '2021-04-30T00:00:00.000-07:00'
+                    live_url: null
+                    status: draft
+                    content_type: supported_facebook_image_ad
+                    content: ''
+                    name: Overdue Task
+                    is_published: false
+                    was_manually_published: false
+                  relationships:
+                    user:
+                      data:
+                        id: '10'
+                        type: user
+                    stories:
+                      data:
+                      - id: '49'
+                        type: story
+                    service:
+                      data:
+                        id: '3'
+                        type: service
+                    moment:
+                      data:
+                        id: '1'
+                        type: moment
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    approval_phase_group:
+                      data:
+                        id: '3'
+                        type: phase-groups
+                    placement:
+                      data: null
+                    account:
+                      data:
+                        id: '1'
+                        type: account
+                    budget:
+                      data: null
+                    post_components:
+                      data:
+                      - id: '1'
+                        type: post_component
+                    post_type:
+                      data:
+                        id: '21'
+                        type: post_type
+                    post_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    post_type_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    inherited_labels:
+                      data: []
+                    labels:
+                      data:
+                      - id: '1'
+                        type: label
+                      - id: '5'
+                        type: label
+                    label_sets:
+                      data:
+                      - id: '1'
+                        type: label_set
+                      - id: '2'
+                        type: label_set
+                    links:
+                      data:
+                      - id: '7'
+                        type: link
+                    asset_references:
+                      data: []
+                    delivery_record:
+                      data:
+                        id: '3'
+                        type: delivery_record
+                    rich_text_document:
+                      data: null
+                - id: '1'
+                  type: brand
+                  attributes:
+                    uuid: dc68d20c-3dd9-48f0-a8c5-8dd7b170ba99
+                    slug: labs
+                    name: labs
+                    start_of_week: 0
+                    timezone: America/Los_Angeles
+                  relationships:
+                    primary_label_set:
+                      data:
+                        id: '1'
+                        type: label_set
+                    accounts:
+                      data:
+                      - id: '1'
+                        type: account
+                    logo:
+                      data:
+                        id: '1'
+                        type: asset_reference
+                    dispatch_providers:
+                      data: []
+                - id: '8'
+                  type: phase
+                  attributes:
+                    name: Overdue Task Phase
+                    due_date: '2021-04-30T00:00:00.000-07:00'
+                    is_current: true
+                    is_complete: false
+                - id: '29'
+                  type: user
+                  attributes:
+                    created_at: '2021-04-30T14:01:16.071-07:00'
+                    email: garth@opal.com
+                    first_name: Garth
+                    last_name: Kunze
+                    title: null
+                    full_name: Garth Kunze
+                    transliterated_full_name: Garth Kunze
+                    is_active: true
+                    role_name: admin
+                    updated_at: '2021-04-30T14:01:16.071-07:00'
+                    uuid: 6a6667e4-d43c-4605-b4d1-7e694e2b67de
+                  relationships:
+                    avatar_asset_reference:
+                      data: null
+                    role:
+                      data:
+                        id: '1'
+                        type: role
+                    brands:
+                      data:
+                      - id: '1'
+                        type: brand
+                    opal:
+                      data:
+                        id: '1'
+                        type: opal
+                - id: '2'
+                  type: content
+                  attributes:
+                    position: 4503599627370495
+                    service_id: 3
+                    publishing_mode: none
+                    created_at: '2021-04-30T14:01:16.071-07:00'
+                    updated_at: '2021-04-30T14:02:39.535-07:00'
+                    scheduled_at: '2021-04-30T00:00:00.000-07:00'
+                    is_ghost: false
+                    is_private: false
+                    show_code_name: false
+                    default_snapshot_url: http://login.opal.docker/api/v1/snapshots/3/192ae8c5-da62-4f0c-a370-976e37ab74b2/desktop_news_feed@2x.png
+                    takedown_scheduled_at: null
+                    live_url: null
+                    status: for_approval
+                    content_type: supported_facebook_carousel
+                    content: ''
+                    name: Approval Workflow Test
+                    is_published: false
+                    was_manually_published: false
+                  relationships:
+                    user:
+                      data:
+                        id: '3'
+                        type: user
+                    stories:
+                      data:
+                      - id: '49'
+                        type: story
+                    service:
+                      data:
+                        id: '3'
+                        type: service
+                    moment:
+                      data:
+                        id: '1'
+                        type: moment
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    approval_phase_group:
+                      data:
+                        id: '2'
+                        type: phase-groups
+                    placement:
+                      data: null
+                    account:
+                      data:
+                        id: '1'
+                        type: account
+                    budget:
+                      data: null
+                    post_components:
+                      data:
+                      - id: '1'
+                        type: post_component
+                    post_type:
+                      data:
+                        id: '18'
+                        type: post_type
+                    post_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    post_type_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    inherited_labels:
+                      data: []
+                    labels:
+                      data:
+                      - id: '1'
+                        type: label
+                      - id: '5'
+                        type: label
+                    label_sets:
+                      data:
+                      - id: '1'
+                        type: label_set
+                      - id: '2'
+                        type: label_set
+                    links:
+                      data:
+                      - id: '7'
+                        type: link
+                    asset_references:
+                      data: []
+                    delivery_record:
+                      data:
+                        id: '2'
+                        type: delivery_record
+                    rich_text_document:
+                      data: null
+                - id: '6'
+                  type: phase
+                  attributes:
+                    name: Current Approval Phase
+                    due_date: null
+                    is_current: true
+                    is_complete: false
+                - id: '3'
+                  type: user
+                  attributes:
+                    created_at: '2021-04-30T14:01:16.071-07:00'
+                    email: vanetta@opal.com
+                    first_name: Vanetta
+                    last_name: Bradtke
+                    title: null
+                    full_name: Vanetta Bradtke
+                    transliterated_full_name: Vanetta Bradtke
+                    is_active: true
+                    role_name: admin
+                    updated_at: '2021-04-30T14:01:16.071-07:00'
+                    uuid: 6a6667e4-d43c-4605-b4d1-7e694e2b67de
+                  relationships:
+                    avatar_asset_reference:
+                      data: null
+                    role:
+                      data:
+                        id: '1'
+                        type: role
+                    brands:
+                      data:
+                      - id: '1'
+                        type: brand
+                    opal:
+                      data:
+                        id: '1'
+                        type: opal
+                - id: '5'
+                  type: phase
+                  attributes:
+                    name: Approval Phase
+                    due_date: null
+                    is_current: false
+                    is_complete: true
+                - id: '1'
+                  type: content
+                  attributes:
+                    position: 0
+                    service_id: 3
+                    publishing_mode: none
+                    created_at: '2021-04-30T13:53:29.551-07:00'
+                    updated_at: '2021-04-30T14:04:24.082-07:00'
+                    scheduled_at: '2021-04-30T00:00:00.000-07:00'
+                    is_ghost: false
+                    is_private: false
+                    show_code_name: false
+                    default_snapshot_url: http://login.opal.docker/api/v1/snapshots/4/683d6c27-be22-4c4e-b4ea-b15d522a0c4d/mobile_single@2x.png
+                    takedown_scheduled_at: null
+                    live_url: null
+                    status: draft
+                    content_type: supported_facebook_standard
+                    content: ''
+                    name: Pending Task Workflow Test
+                    is_published: false
+                    was_manually_published: false
+                  relationships:
+                    user:
+                      data:
+                        id: '6'
+                        type: user
+                    stories:
+                      data:
+                      - id: '49'
+                        type: story
+                    service:
+                      data:
+                        id: '3'
+                        type: service
+                    moment:
+                      data:
+                        id: '1'
+                        type: moment
+                    brand:
+                      data:
+                        id: '1'
+                        type: brand
+                    approval_phase_group:
+                      data:
+                        id: '1'
+                        type: phase-groups
+                    placement:
+                      data: null
+                    account:
+                      data:
+                        id: '1'
+                        type: account
+                    budget:
+                      data: null
+                    post_components:
+                      data:
+                      - id: '1'
+                        type: post_component
+                    post_type:
+                      data:
+                        id: '8'
+                        type: post_type
+                    post_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    post_type_options:
+                      data:
+                      - id: '4'
+                        type: post_option
+                    inherited_labels:
+                      data: []
+                    labels:
+                      data:
+                      - id: '1'
+                        type: label
+                      - id: '5'
+                        type: label
+                    label_sets:
+                      data:
+                      - id: '1'
+                        type: label_set
+                      - id: '2'
+                        type: label_set
+                    links:
+                      data:
+                      - id: '7'
+                        type: link
+                    asset_references:
+                      data: []
+                    delivery_record:
+                      data:
+                        id: '1'
+                        type: delivery_record
+                    rich_text_document:
+                      data: null
+                - id: '3'
+                  type: phase
+                  attributes:
+                    name: Future Task Phase
+                    due_date: null
+                    is_current: false
+                    is_complete: false
+                - id: '4'
+                  type: user
+                  attributes:
+                    created_at: '2021-04-30T14:01:16.071-07:00'
+                    email: dalene@opal.com
+                    first_name: Dalene
+                    last_name: Boyer
+                    title: null
+                    full_name: Dalene Boyer
+                    transliterated_full_name: Dalene Boyer
+                    is_active: true
+                    role_name: admin
+                    updated_at: '2021-04-30T14:01:16.071-07:00'
+                    uuid: 6a6667e4-d43c-4605-b4d1-7e694e2b67de
+                  relationships:
+                    avatar_asset_reference:
+                      data: null
+                    role:
+                      data:
+                        id: '1'
+                        type: role
+                    brands:
+                      data:
+                      - id: '1'
+                        type: brand
+                    opal:
+                      data:
+                        id: '1'
+                        type: opal
+                - id: '2'
+                  type: phase
+                  attributes:
+                    name: Current Task Phase
+                    due_date: '2022-05-13T00:00:00.000-07:00'
+                    is_current: true
+                    is_complete: false
+                - id: '2'
+                  type: user
+                  attributes:
+                    created_at: '2021-04-30T14:01:16.071-07:00'
+                    email: lara@opal.com
+                    first_name: Lara
+                    last_name: Balistreri
+                    title: null
+                    full_name: Lara Balistreri
+                    transliterated_full_name: Lara Balistreri
+                    is_active: true
+                    role_name: admin
+                    updated_at: '2021-04-30T14:01:16.071-07:00'
+                    uuid: 6a6667e4-d43c-4605-b4d1-7e694e2b67de
+                  relationships:
+                    avatar_asset_reference:
+                      data: null
+                    role:
+                      data:
+                        id: '1'
+                        type: role
+                    brands:
+                      data:
+                      - id: '1'
+                        type: brand
+                    opal:
+                      data:
+                        id: '1'
+                        type: opal
+                - id: '1'
+                  type: phase
+                  attributes:
+                    name: Task Phase
+                    due_date: null
+                    is_current: false
+                    is_complete: true
+                meta:
+                  total: 13
+                  resource_type: phase_item
+                  page:
+                    limit: 50
+                    offset: 0
+                  aggregate:
+                    overdue_total: 9
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+  /phase_items/v2/{phase_item_id}:
+    patch:
+      tags:
+      - Phase Items
+      operationId: UpdatePhaseItemV2
+      summary: Update a phase item
+      security:
+      - oauth2:
+        - offline_access
+      - api_key:
+        - Session-Token
+      parameters:
+      - name: phase_item_id
+        in: path
+        description: The primary identifier for the phase item
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - id
+                  - type
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                      - phase_item
+                    attributes:
+                      type: object
+                      properties:
+                        is_starred:
+                          type: boolean
+                          description: Indicate that the phase item is a starred/pinned item.
+                        request:
+                          type:
+                          - string
+                          - 'null'
+                          description: A description of the request being made.
+                        response:
+                          type:
+                          - string
+                          - 'null'
+                          description: A comment to be left by the approver.
+                        status:
+                          type: string
+                          description: The status of the phase item.
+                          enum:
+                          - complete
+                          - incomplete
+                          - rejected
+                    relationships:
+                      type: object
+                      properties:
+                        to_user:
+                          type: object
+                          required:
+                          - data
+                          additionalProperties: false
+                          properties:
+                            data:
+                              type:
+                              - object
+                              - 'null'
+                              required:
+                              - id
+                              - type
+                              additionalProperties: false
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  enum:
+                                  - user
+      responses:
+        '200':
+          description: A phase item resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: phase item
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        pattern: ^[0-9]+$
+                      type:
+                        type: string
+                        enum:
+                        - phase_item
+                      attributes:
+                        type: object
+                        required:
+                        - created_at
+                        - request
+                        - status
+                        - phase_item_type
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                          is_starred:
+                            type: boolean
+                            description: Indicates the phase item is starred/pinned.
+                          request:
+                            type:
+                            - string
+                            - 'null'
+                            description: A description of the request being made.
+                          response:
+                            type:
+                            - string
+                            - 'null'
+                            description: A comment to be left by the approver.
+                          status:
+                            type: string
+                            description: The status of the phase item.
+                            enum:
+                            - complete
+                            - incomplete
+                            - rejected
+                          type:
+                            type: string
+                            deprecated: true
+                            description: Deprecated. See `phase_item_type`.
+                            enum:
+                            - Moments::Approval
+                            - Moments::Task
+                          phase_item_type:
+                            type: string
+                            description: The specific type of phase item.
+                            enum:
+                            - Moments::Approval
+                            - Moments::Task
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          approvable:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - content
+                          brand:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - brand
+                          from_user:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type:
+                                - object
+                                - 'null'
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          phase:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - phase
+                          proxy_user:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type:
+                                - object
+                                - 'null'
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                          to_user:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type:
+                                - object
+                                - 'null'
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: This API uses OAuth 2.0 with the authorization code grant flow. You can find more detailed authentication instructions in the [Authentication Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0) section.
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    api_key:
+      type: apiKey
+      description: (Deprecated) This API also supports authentication via an API or session token set in the request headers.
+      in: header
+      name: Session-Token
+x-tagGroups:
+- name: JSON:API
+  tags:
+  - Accounts
+  - Activities
+  - Annotations
+  - Asset Reference Options
+  - Asset Reference Usage Rights Options
+  - Asset References
+  - Assets
+  - Brand Settings
+  - Brands
+  - Checkpoints
+  - Content
+  - Delivery Records
+  - Label Sets
+  - Labels
+  - Messages
+  - Moments
+  - Phase Items
+  - Placements
+  - Post Types
+  - Privacy
+  - Reactions
+  - Rich Texts
+  - Services
+  - Stamps
+  - Stories
+  - Url Uploads
+  - User Domain Views
+  - Users
+  - Workflows
+- name: Other
+  tags:
+  - Budgets
+  - URL Previews
+  - Search
+  - Stories V1
+- name: ⚠️  Unstable
+  tags: []
+- name: Additional Resources
+  tags:
+  - secondary_resources

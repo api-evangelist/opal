@@ -1,0 +1,669 @@
+openapi: 3.2.0
+info:
+  version: 3.0.0
+  title: Opal API (⚠️ WIP) Presentation Themes API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v2 API](/api/documentation/v2) is more complete than the v3 API. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n*Note:* Endpoints will be added to the v3 API as needed, and we will continue to support all v2 API endpoints in the  “JSON:API” and “Other” categories, even if we add an equivalent v3 API endpoint.\n\n# Key differences between v2 and v3 APIs\n\n## Resource Identifiers\n\nThe v3 API uses a different format for primary resource identifiers than the v2 API. Responses from v3 API endpoints include the resource’s v2 API id in the `attributes.legacy_id` field, in case you need to use both API versions. (v2 API resource identifiers are generally integers, but v2 API endpoints **MAY** use a different format.)\n\n*Note:* These are opaque strings, and you **MUST NOT** rely on the structure. Currently newly-created resources have a UUIDv4 identifier, but this behavior **MAY** change at any time. Existing identifiers will not be affected.\n\n# Documentation Organization\n\nv3 API endpoints are categorized by stability:\n\n1. Stable\n2. Unstable\n3. Proposed\n4. Experimental\n\nAll v3 API endpoints are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\nYour requests **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “Stable” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable,” \"Experimental,\" or “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Presentation Themes
+  description: Workspace brand presentation themes
+paths:
+  /v3/presentation_themes:
+    get:
+      tags:
+      - Presentation Themes
+      operationId: ReadPresentationThemesV3
+      summary: '[PROPOSED] Get the presentation themes of one or more workspaces.'
+      description: Presentation themes carry a workspace brand's presentation styling.
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: filter
+        in: query
+        description: Filters for limiting the results.
+        required: true
+        schema:
+          type: object
+          required:
+          - workspace_id
+          properties:
+            workspace_id:
+              description: 'The IDs of the workspaces whose presentation themes should be returned, as a comma separated list. This filter is required. For example, `filter[workspace_id]=798ac6d9-b3fc-4155-88ee-237f43f3404b,d79e513e-9246-454e-80bf-8268bc39cd6e` returns the themes of both workspaces.
+
+                '
+              type: array
+              items:
+                type: string
+                format: uuid
+        style: deepObject
+        explode: true
+      - name: include
+        in: query
+        required: false
+        description: A comma separated value of related objects to include.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - pptx_template_asset_reference
+        style: form
+        explode: false
+      - name: page
+        description: Specify an offset and limit for pagination
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            limit:
+              type: integer
+              default: 50
+            offset:
+              type: integer
+        style: deepObject
+        explode: true
+      responses:
+        '200':
+          description: A collection of presentation themes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      title: presentation_theme
+                      type: object
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      - relationships
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        type:
+                          type: string
+                          enum:
+                          - presentation_theme
+                        attributes:
+                          type: object
+                          required:
+                          - created_at
+                          - legacy_id
+                          - name
+                          - styles
+                          - updated_at
+                          additionalProperties: false
+                          properties:
+                            created_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time indicating when the presentation theme was created.
+                              readOnly: true
+                            legacy_id:
+                              type: string
+                              description: The presentation theme's legacy integer identifier, as a string.
+                              readOnly: true
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time indicating when the presentation theme was last updated.
+                              readOnly: true
+                            name:
+                              type:
+                              - string
+                              - 'null'
+                              description: The presentation theme's display name.
+                            styles:
+                              type: object
+                              additionalProperties: false
+                              description: The workspace's brand styling as a flat map of string values.
+                              properties:
+                                logo:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: URL of the brand logo image.
+                                logo_alignment:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  enum:
+                                  - center
+                                  - left
+                                  - right
+                                header_background_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Hex color behind the logo header.
+                                background_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Hex slide background color.
+                                secondary_background_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Hex accent background, derived from background_color.
+                                  readOnly: true
+                                background_image:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: URL of a slide background image.
+                                background_image_opacity:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Background image opacity between 0.0 and 1.0.
+                                content_card_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  enum:
+                                  - light
+                                  - dark
+                                title_font_family:
+                                  type:
+                                  - string
+                                  - 'null'
+                                title_font_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Hex title font color.
+                                title_font_size:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Title font size, e.g. "64px".
+                                title_font_weight:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  enum:
+                                  - normal
+                                  - bold
+                                body_font_family:
+                                  type:
+                                  - string
+                                  - 'null'
+                                body_font_color:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Hex body font color.
+                                body_font_size:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: Body font size, e.g. "24px".
+                                body_font_weight:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  enum:
+                                  - normal
+                                  - bold
+                        relationships:
+                          type: object
+                          required:
+                          - pptx_template_asset_reference
+                          - workspace
+                          additionalProperties: false
+                          properties:
+                            pptx_template_asset_reference:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - asset_reference
+                            workspace:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                      format: uuid
+                                    type:
+                                      type: string
+                                      enum:
+                                      - workspace
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: asset_reference
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - asset_reference
+                          attributes:
+                            type: object
+                            required:
+                            - asset_type
+                            - content_type
+                            - created_at
+                            - description
+                            - escaped_filename
+                            - filename
+                            - filesize
+                            - format
+                            - full_url
+                            - height
+                            - legacy_id
+                            - meta_data
+                            - original_url
+                            - preview_url
+                            - public_id
+                            - updated_at
+                            - width
+                            additionalProperties: false
+                            properties:
+                              asset_type:
+                                type:
+                                - string
+                                - 'null'
+                              content_type:
+                                type:
+                                - string
+                                - 'null'
+                              created_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              description:
+                                type:
+                                - string
+                                - 'null'
+                              escaped_filename:
+                                type: string
+                              filename:
+                                type:
+                                - string
+                                - 'null'
+                              filesize:
+                                type:
+                                - integer
+                                - 'null'
+                                description: Size of file in bytes.
+                              format:
+                                type:
+                                - string
+                                - 'null'
+                              full_url:
+                                type:
+                                - string
+                                - 'null'
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                              legacy_id:
+                                type: string
+                                description: A legacy ID that can be used with `v2` API endpoints.
+                              meta_data:
+                                type:
+                                - object
+                                - 'null'
+                              original_url:
+                                type:
+                                - string
+                                - 'null'
+                              preview_url:
+                                type:
+                                - string
+                                - 'null'
+                              public_id:
+                                type:
+                                - string
+                                - 'null'
+                                x-not-relationship: true
+                              updated_at:
+                                type: string
+                                description: An ISO8601 date-time. Formatted as an 'Internet Date/Time' (RFC 3339).
+                                format: date-time
+                                readOnly: true
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              asset:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset
+                              cover_asset_reference:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                  meta:
+                    type: object
+                    required:
+                    - total
+                    - page
+                    - resource_type
+                    properties:
+                      resource_type:
+                        type: string
+                      total:
+                        type: integer
+                      page:
+                        type: object
+                        required:
+                        - limit
+                        - offset
+                        properties:
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+              example:
+                data:
+                - id: 383f568a-5156-4501-8fbe-eee1ab189837
+                  type: presentation_theme
+                  attributes:
+                    created_at: '2026-07-01T17:32:28Z'
+                    legacy_id: '42'
+                    name: My Theme
+                    updated_at: '2026-07-15T09:10:11Z'
+                    styles:
+                      logo: https://ouropal.com/api/v1/asset_proxy/d2c8a2fa-1c38-44f9-ae16-a39202f998d0
+                      logo_alignment: left
+                      header_background_color: '#0b101b'
+                      background_color: '#0b101b'
+                      secondary_background_color: '#FF00FF'
+                      background_image: null
+                      background_image_opacity: '0.5'
+                      content_card_color: dark
+                      title_font_family: Helvetica
+                      title_font_color: '#FF6600'
+                      title_font_size: 36px
+                      title_font_weight: normal
+                      body_font_family: Helvetica
+                      body_font_color: '#ffffff'
+                      body_font_size: 20px
+                      body_font_weight: normal
+                  relationships:
+                    pptx_template_asset_reference:
+                      data:
+                        id: dc817ff3-49a8-4fc8-b7f4-9161e175a9a2
+                        type: asset_reference
+                    workspace:
+                      data:
+                        id: 0f5b5f5e-8007-4670-8659-7cd426fc0b98
+                        type: workspace
+                meta:
+                  resource_type: presentation_theme
+                  total: 1
+                  page:
+                    limit: 50
+                    offset: 0
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'This API uses OAuth 2.0 with the authorization code grant flow. You can
+
+        find more detailed authentication instructions in the [Authentication
+
+        Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+
+        section.
+
+        '
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    anonymous_oauth:
+      type: oauth2
+      description: 'The OAuth 2.0 client credentials flow is used for secure server-server
+
+        requests when Opal does not need to associate a request with a particular
+
+        Opal user. These anonymous requests are instead authorized based on the
+
+        OAuth scope.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            write:onboarding: Include this scope if you wish to make API requests to onboard new Opals.
+    api_key:
+      type: apiKey
+      description: '(Deprecated) This API also supports authentication via an API or session
+
+        token set in the request headers.
+
+        '
+      in: header
+      name: Session-Token
+    presentation_share_cookie:
+      type: apiKey
+      description: 'A cookie set and read by the Monolith service that authorizes a non-opal
+
+        user to view a presentation and the resources within it. Other services
+
+        can rely on this cookie by asking Monolith to authenticate it.
+
+        '
+      in: cookie
+      name: share_token
+x-tagGroups:
+- name: Stable
+  tags:
+  - Board Collaborators
+  - Board Objects
+  - Boards
+  - Content Schedules
+  - Moment Schedules
+  - Moments
+  - Onboarding
+- name: ⚠️  Unstable
+  tags:
+  - Block Connectors
+  - Board Columns
+  - Board Duplication
+  - Board Standard Columns
+  - Channels
+  - Custom Field Options
+  - Custom Field Types
+  - Custom Fields
+  - Moment Assignees
+  - Moment Custom Fields
+  - Planning Status
+  - Rich Text Documents
+  - User Groups
+  - Users
+  - Workspaces
+- name: ℹ️ Proposed
+  tags:
+  - Bulk Operations
+  - Gem Chats
+  - Gem Files
+  - Moment Duplication
+  - Presentation Themes
+  - Workflows
+  - Workflow Contexts
+  - Workflow Stages
+  - Workflow Assignments
+  - Workflow Responses
+- name: ⚛️ Experimental
+  tags:
+  - Blocks
+  - Block Custom Field Values
+  - Block Duplication
+  - Board User Settings
+  - Categories
+  - Category Types
+  - Charts
+  - Content
+  - Custom Field Colors
+  - Filter Sets
+  - Key Dates
+  - View Columns
+  - View Standard Columns
+  - Views
+  - View Colors
+  - Stories
+- name: Additional Resources
+  tags:
+  - secondary_resources

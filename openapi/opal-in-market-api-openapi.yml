@@ -1,0 +1,333 @@
+openapi: 3.2.0
+info:
+  version: 3.0.0
+  title: Asgard BFF In Market API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Design Principles\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: In Market
+paths:
+  /{workspace_id}/in_market/calendar:
+    get:
+      tags:
+      - In Market
+      operationId: ReadInMarketBFFV1
+      summary: Get in-market calendar view.
+      description: 'Returns a collection of in-market Content items such that the content is currently live or scheduled to go live across a given set of filter criteria.
+
+        '
+      security:
+      - oauth2:
+        - offline_access
+      - api_key:
+        - Session-Token
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        description: The ID of the current workspace to pull content from.
+        schema:
+          type: string
+          format: uuid
+      - name: filter
+        in: query
+        description: 'Filters for limiting the results. All filter parameters are optional except workspace_id (provided in path).
+
+          '
+        required: false
+        schema:
+          type: object
+          properties:
+            account_id:
+              type: array
+              items:
+                type: string
+                format: uuid
+              description: 'Filter content by comma-separated UUIDs. Matches content having the specified account UUID(s).
+
+                '
+            channel_id:
+              type: array
+              items:
+                type: string
+                format: uuid
+              description: 'Filter content by comma-separated UUIDs. Matches content having the specified channel UUID(s).
+
+                '
+            label_id:
+              type: array
+              items:
+                type: string
+                format: uuid
+              description: 'Filter by comma-separated UUIDs. Matches content with labels from directly assigned labels, or labels inherited from parent moment, story, or account.
+
+                '
+            label_set_id:
+              type: string
+              format: uuid
+              description: 'Filter by comma-separated UUIDs. Matches content with labels belonging to the specified label set, from directly assigned labels or labels inherited from parent moment, story, or account.
+
+                '
+            content_statuses:
+              type: array
+              items:
+                type: string
+                enum:
+                - draft
+                - for_approval
+                - needs_revision
+                - approved
+                - idea
+              description: 'Filter by comma-separated content workflow statuses. The "idea" status represents moments without any content/posts and will return an empty result when used alone, or will be stripped from the filter when combined with other statuses.
+
+                '
+            scheduled_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              description: 'Filter for content that is live/in-market during the specified time period (ISO 8601 format). Supports comparison operators: `eq` (equal to), `gt` (greater than), `gteq` (greater than or equal to), lt (less than), `lteq` (less than or equal to).
+
+                If no operator is specified, `eq` is assumed. For example, `filter[scheduled_at]=2025-01-01` is equivalent to `filter[scheduled_at][eq]=2025-01-01`.
+
+                The `eq` operator converts a date to a 24-hour range. For example, `filter[scheduled_at][eq]=2025-01-01` is equivalent to `filter[scheduled_at][gteq]=2025-01-01T00:00:00&filter[scheduled_at][lteq]=2025-01-02T00:00:00`.
+
+                Use `gteq` for range start and `lteq` for range end to query content scheduled within a date range.
+
+                This endpoint always considers both start and takedown dates when filtering by date range, returning content that is live during the specified period.
+
+                '
+        style: deepObject
+        explode: true
+      responses:
+        '200':
+          description: The requested in-market content items
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - content
+                    additionalProperties: false
+                    description: 'A collection of in-market Content items. Each item contains data from the Content resource and its related resources.
+
+                      '
+                    properties:
+                      content:
+                        type: object
+                        required:
+                        - by_id
+                        - list
+                        additionalProperties: false
+                        properties:
+                          by_id:
+                            type: object
+                            description: 'An object where the keys are content UUIDs and values are InMarketItem objects. Keys have no guaranteed order.
+
+                              '
+                            additionalProperties:
+                              type: object
+                              required:
+                              - id
+                              - dateRangeLabel
+                              - endDate
+                              - momentName
+                              - contentSnapshotUrl
+                              - contentName
+                              - contentUrl
+                              - channelSystemName
+                              - channelIcon
+                              - startDate
+                              - storyName
+                              additionalProperties: false
+                              properties:
+                                id:
+                                  type: string
+                                  format: uuid
+                                  description: The UUID of the content resource.
+                                dateRangeLabel:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: 'Human-readable date range label (e.g., "Oct 1" if only a start date, "Oct 24 - Oct 31" if both start and end dates). Derived from the content''s scheduled_at and takedown_scheduled_at attributes.
+
+                                    '
+                                endDate:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  format: date
+                                  description: 'The date portion (YYYY-MM-DD) of the scheduled end date/time for the content (when it will be taken down). Null if no takedown is scheduled. Derived from the content''s takedown_scheduled_at attribute, which may reflect the moment''s end date if the moment is configured to cascade its end date to content. Null if the content has no explicit takedown date and the moment either has no end date or is not configured to cascade.
+
+                                    '
+                                momentName:
+                                  type: string
+                                  description: The title/name of the associated moment. Empty string if no moment.
+                                storyName:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: The name of the associated story. Null if no story.
+                                contentSnapshotUrl:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: URL to the default snapshot/preview image for the content. Null if no snapshot available.
+                                contentName:
+                                  type: string
+                                  description: The name/title of the content.
+                                contentUrl:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: 'Relative URL path to the content in format: moments/{workspace_slug}/{moment_legacy_id}/posts/{post_legacy_id}. Null if any required component is missing.
+
+                                    '
+                                channelSystemName:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: 'The system name of the social media channel (e.g., "facebook", "instagram", "twitter"). Null if no channel associated.
+
+                                    '
+                                channelIcon:
+                                  type:
+                                  - string
+                                  - 'null'
+                                startDate:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  format: date
+                                  description: 'The date portion (YYYY-MM-DD) of the scheduled start date/time for the content (when it goes live). Null if no schedule is set.
+
+                                    '
+                          list:
+                            type: array
+                            description: 'An ordered array of Content UUIDs providing the display order for items, and is sorted by the Content''s scheduled start date/time (ascending, null values first), then contentName (alphabetical). Look up items in `by_id` using the UUIDs from this list.
+
+                              '
+                            items:
+                              type: string
+                              format: uuid
+              example:
+                data:
+                  content:
+                    by_id:
+                      bf886a14-6fdf-4c5a-95d5-6d2574ef2d06:
+                        id: bf886a14-6fdf-4c5a-95d5-6d2574ef2d06
+                        dateRangeLabel: Oct 24 - Oct 31
+                        endDate: '2025-10-31'
+                        momentName: Product Launch Campaign
+                        contentSnapshotUrl: https://foo.opal.com:443/api/v1/snapshots/bf886a14-6fdf-4c5a-95d5-6d2574ef2d06
+                        contentName: New Product Announcement
+                        contentUrl: moments/acme-corp/13/posts/13
+                        channelSystemName: facebook
+                        channelIcon: facebook
+                        startDate: '2025-10-24'
+                        storyName: Social Media Push
+                      c8997b25-7ee0-5d6b-a6e6-7e3685fa3e17:
+                        id: c8997b25-7ee0-5d6b-a6e6-7e3685fa3e17
+                        dateRangeLabel: Oct 25
+                        endDate: null
+                        momentName: Product Launch Campaign
+                        contentSnapshotUrl: https://foo.opal.com:443/api/v1/snapshots/c8997b25-7ee0-5d6b-a6e6-7e3685fa3e17
+                        contentName: Product Feature Highlight
+                        contentUrl: moments/acme-corp/13/posts/14
+                        channelSystemName: instagram
+                        channelIcon: instagram
+                        startDate: '2025-10-25'
+                        storyName: Social Media Push
+                    list:
+                    - bf886a14-6fdf-4c5a-95d5-6d2574ef2d06
+                    - c8997b25-7ee0-5d6b-a6e6-7e3685fa3e17
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: (Deprecated) This API also supports authentication via an API or session token set in the request headers.
+      in: header
+      name: Session-Token
+x-tagGroups:
+- name: ⚠️  Unstable
+  tags:
+  - Plans
+  - Blocks
+  - Custom Fields
+- name: ℹ️ Proposed
+  tags:
+  - Moments
+  - Smart Blocks
+  - In Market
+- name: 🔮 Experimental
+  tags:
+  - Experimental

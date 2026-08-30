@@ -1,0 +1,1112 @@
+openapi: 3.2.0
+info:
+  version: 3.0.0
+  title: Opal API (⚠️ WIP) Bulk Operations API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v2 API](/api/documentation/v2) is more complete than the v3 API. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n*Note:* Endpoints will be added to the v3 API as needed, and we will continue to support all v2 API endpoints in the  “JSON:API” and “Other” categories, even if we add an equivalent v3 API endpoint.\n\n# Key differences between v2 and v3 APIs\n\n## Resource Identifiers\n\nThe v3 API uses a different format for primary resource identifiers than the v2 API. Responses from v3 API endpoints include the resource’s v2 API id in the `attributes.legacy_id` field, in case you need to use both API versions. (v2 API resource identifiers are generally integers, but v2 API endpoints **MAY** use a different format.)\n\n*Note:* These are opaque strings, and you **MUST NOT** rely on the structure. Currently newly-created resources have a UUIDv4 identifier, but this behavior **MAY** change at any time. Existing identifiers will not be affected.\n\n# Documentation Organization\n\nv3 API endpoints are categorized by stability:\n\n1. Stable\n2. Unstable\n3. Proposed\n4. Experimental\n\nAll v3 API endpoints are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\nYour requests **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “Stable” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable,” \"Experimental,\" or “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Bulk Operations
+  description: "## Bulk Operations\n\nA Bulk Operation represents a number of individual actions to be performed.\n\n### Terms\n- **``Operation ID``**: A unique string identifier that corresponds to a\n  specific individual operation that can be made for a resource. If the request\n  is usable in the context of a bulk operation, the endpoint will have this\n  identifier documented as \"Operation-ID\".\n"
+paths:
+  /v3/bulk_operations:
+    post:
+      tags:
+      - Bulk Operations
+      operationId: CreateBulkOperationV3
+      summary: '[PROPOSED] Create a new Bulk Operation resource.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: sync
+        in: query
+        required: false
+        description: 'By default, an operation will be created with the `pending` status. It will
+
+          return early and complete asynchronously. When this parameter is `true`,
+
+          all operations will be processed synchronously and completely within one
+
+          request, and the server will not respond until all operations have
+
+          completed.
+
+
+          This option should be used with care as longer-running requests have the
+
+          potential to time out.
+
+          '
+        schema:
+          type: boolean
+      - name: include
+        in: query
+        required: false
+        description: A comma separated value of related objects to include.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - operations
+        style: form
+        explode: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: object
+                  required:
+                  - type
+                  - attributes
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - bulk_operation
+                    attributes:
+                      type: object
+                      required:
+                      - operations
+                      properties:
+                        operations:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                            - operation_identifier
+                            properties:
+                              operation_identifier:
+                                type: string
+                                description: The Operation ID of the specific API to be performed. These are documented as `Operation-ID` throughout this API documentation.
+                              request_body:
+                                type: object
+                                description: JSON:API data to use for the given API operation. This **MUST** match the documented data (`data`) in the request schema of the specified API Operation. This field **MUST** be present for `Create*` and `Update*` operations, and **MUST** be omitted for `Read*` and `Delete*` operations.
+                                required:
+                                - data
+                                properties:
+                                  data:
+                                    type: object
+                                    required:
+                                    - type
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                      attributes:
+                                        type: object
+                                      relationships:
+                                        type: object
+                              parameters:
+                                type: object
+                                description: Object for specifying query parameters to be used in the API operation. This object can contain key-value representations for both path and query parameters.
+            example:
+              data:
+                type: bulk_operation
+                attributes:
+                  operations:
+                  - operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                        type: block
+                        attributes:
+                          color: '#123456'
+                    parameters:
+                      block_id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                  - operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+                        type: block
+                        attributes:
+                          color: a really pretty blue
+                    parameters:
+                      block_id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+      responses:
+        '201':
+          description: A newly created Bulk Operation resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: bulk_operation
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - bulk_operation
+                      attributes:
+                        type: object
+                        required:
+                        - status
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          status:
+                            type: string
+                            enum:
+                            - pending
+                            - complete
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - operations
+                        - created_by_user
+                        properties:
+                          operations:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                      format: uuid
+                                    type:
+                                      type: string
+                                      enum:
+                                      - single_operation
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: single_operation
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - single_operation
+                          attributes:
+                            type: object
+                            required:
+                            - operation_identifier
+                            - request_body
+                            - parameters
+                            - operation_status
+                            - status_code
+                            - response_document
+                            - error
+                            - created_at
+                            - updated_at
+                            additionalProperties: false
+                            properties:
+                              operation_identifier:
+                                type: string
+                                description: The Operation ID of the specific API to be performed. These are documented as `Operation-ID` throughout this API documentation.
+                              request_body:
+                                type:
+                                - object
+                                - 'null'
+                                description: JSON:API data to use for the given API operation. For a `Delete*` or `Read*` operation, this data will be `null`.
+                                properties:
+                                  data:
+                                    required:
+                                    - type
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                      attributes:
+                                        type: object
+                                      relationships:
+                                        type: object
+                              parameters:
+                                type:
+                                - object
+                                - 'null'
+                                description: Object for specifying query parameters to be used in the operation. This object can contain key-value representations for both path and query parameters.
+                              operation_status:
+                                type: string
+                                enum:
+                                - pending
+                                - complete
+                                - failed
+                              status_code:
+                                description: The resulting status code for a completed or failed API operation.
+                                type:
+                                - integer
+                                - 'null'
+                              response_document:
+                                description: 'The resulting document for a successfully completed API operation. If the operation has failed, this property will be `null`. This document will match the response schema documented for the given Operation-ID.
+
+                                  *NOTE: Depending on when this data is read, it may no longer reflect the most up-to-date state of a given resource. It may also become unavailable after 24 hours.*'
+                                type:
+                                - object
+                                - 'null'
+                                properties:
+                                  data:
+                                    oneOf:
+                                    - type: object
+                                    - type: array
+                                      items:
+                                        type: object
+                                  errors:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - status
+                                      properties:
+                                        status:
+                                          type: string
+                                        title:
+                                          type: string
+                                        detail:
+                                          type: string
+                                        code:
+                                          type: string
+                                  included:
+                                    type: array
+                                    items:
+                                      type: object
+                                  meta:
+                                    type: object
+                              error:
+                                type:
+                                - string
+                                - 'null'
+                                description: For an operation that has failed, this property will contain a message indicating the reason for the failure.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+              example:
+                data:
+                  id: 7b07cdd2-6558-4c45-b6bf-408cb761d10a
+                  type: bulk_operation
+                  attributes:
+                    status: complete
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+                  relationships:
+                    operations:
+                      data:
+                      - id: bf455b99-be56-4390-8576-25e3ba9463cd
+                        type: single_operation
+                      - id: 1ad01680-28ee-448c-9535-e75b86434dd2
+                        type: single_operation
+                    created_by_user:
+                      data:
+                        id: 73563203-dae1-4380-b055-2b18da890cb7
+                        type: user
+                included:
+                - id: bf455b99-be56-4390-8576-25e3ba9463cd
+                  type: single_operation
+                  attributes:
+                    operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                        type: block
+                        attributes:
+                          color: '#123456'
+                    parameters:
+                      block_id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                    operation_status: complete
+                    status_code: 200
+                    response_document:
+                      data:
+                        id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                        type: block
+                        attributes:
+                          color: '#123456'
+                          description: null
+                          start_at: null
+                          end_at: null
+                          row_index: 1
+                          y_scale: 1
+                    error: null
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+                - id: 1ad01680-28ee-448c-9535-e75b86434dd2
+                  type: single_operation
+                  attributes:
+                    operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+                        type: block
+                        attributes:
+                          color: a really pretty blue
+                    parameters:
+                      block_id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+                    operation_status: failed
+                    status_code: 400
+                    response_document: null
+                    error: color must be a valid hex code
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+  /v3/bulk_operations/{bulk_operation_id}:
+    get:
+      tags:
+      - Bulk Operations
+      operationId: ReadBulkOperationV3
+      summary: '[PROPOSED] Get Bulk Operation available to the authenticated user by ID.'
+      security:
+      - oauth2:
+        - offline_access
+      - api_key: []
+      parameters:
+      - name: bulk_operation_id
+        in: path
+        required: true
+        description: The ID of the Bulk Operation.
+        schema:
+          type: string
+          format: uuid
+      - name: include
+        in: query
+        required: false
+        description: A comma separated value of related objects to include.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - operations
+        style: form
+        explode: false
+      responses:
+        '200':
+          description: A single Bulk Operation resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    title: bulk_operation
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum:
+                        - bulk_operation
+                      attributes:
+                        type: object
+                        required:
+                        - status
+                        - created_at
+                        - updated_at
+                        additionalProperties: false
+                        properties:
+                          status:
+                            type: string
+                            enum:
+                            - pending
+                            - complete
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: An ISO8601 date-time.
+                            readOnly: true
+                      relationships:
+                        type: object
+                        additionalProperties: false
+                        required:
+                        - operations
+                        - created_by_user
+                        properties:
+                          operations:
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                      format: uuid
+                                    type:
+                                      type: string
+                                      enum:
+                                      - single_operation
+                          created_by_user:
+                            title: User
+                            type: object
+                            required:
+                            - data
+                            additionalProperties: false
+                            properties:
+                              data:
+                                type: object
+                                required:
+                                - id
+                                - type
+                                additionalProperties: false
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                  type:
+                                    type: string
+                                    enum:
+                                    - user
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: single_operation
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          type:
+                            type: string
+                            enum:
+                            - single_operation
+                          attributes:
+                            type: object
+                            required:
+                            - operation_identifier
+                            - request_body
+                            - parameters
+                            - operation_status
+                            - status_code
+                            - response_document
+                            - error
+                            - created_at
+                            - updated_at
+                            additionalProperties: false
+                            properties:
+                              operation_identifier:
+                                type: string
+                                description: The Operation ID of the specific API to be performed. These are documented as `Operation-ID` throughout this API documentation.
+                              request_body:
+                                type:
+                                - object
+                                - 'null'
+                                description: JSON:API data to use for the given API operation. For a `Delete*` or `Read*` operation, this data will be `null`.
+                                properties:
+                                  data:
+                                    required:
+                                    - type
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                      attributes:
+                                        type: object
+                                      relationships:
+                                        type: object
+                              parameters:
+                                type:
+                                - object
+                                - 'null'
+                                description: Object for specifying query parameters to be used in the operation. This object can contain key-value representations for both path and query parameters.
+                              operation_status:
+                                type: string
+                                enum:
+                                - pending
+                                - complete
+                                - failed
+                              status_code:
+                                description: The resulting status code for a completed or failed API operation.
+                                type:
+                                - integer
+                                - 'null'
+                              response_document:
+                                description: 'The resulting document for a successfully completed API operation. If the operation has failed, this property will be `null`. This document will match the response schema documented for the given Operation-ID.
+
+                                  *NOTE: Depending on when this data is read, it may no longer reflect the most up-to-date state of a given resource. It may also become unavailable after 24 hours.*'
+                                type:
+                                - object
+                                - 'null'
+                                properties:
+                                  data:
+                                    oneOf:
+                                    - type: object
+                                    - type: array
+                                      items:
+                                        type: object
+                                  errors:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - status
+                                      properties:
+                                        status:
+                                          type: string
+                                        title:
+                                          type: string
+                                        detail:
+                                          type: string
+                                        code:
+                                          type: string
+                                  included:
+                                    type: array
+                                    items:
+                                      type: object
+                                  meta:
+                                    type: object
+                              error:
+                                type:
+                                - string
+                                - 'null'
+                                description: For an operation that has failed, this property will contain a message indicating the reason for the failure.
+                              created_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+                              updated_at:
+                                type: string
+                                format: date-time
+                                description: An ISO8601 date-time.
+                                readOnly: true
+              example:
+                data:
+                  id: 7b07cdd2-6558-4c45-b6bf-408cb761d10a
+                  type: bulk_operation
+                  attributes:
+                    status: complete
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+                  relationships:
+                    operations:
+                      data:
+                      - id: bf455b99-be56-4390-8576-25e3ba9463cd
+                        type: single_operation
+                      - id: 1ad01680-28ee-448c-9535-e75b86434dd2
+                        type: single_operation
+                    created_by_user:
+                      data:
+                        id: 73563203-dae1-4380-b055-2b18da890cb7
+                        type: user
+                included:
+                - id: bf455b99-be56-4390-8576-25e3ba9463cd
+                  type: single_operation
+                  attributes:
+                    operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                        type: block
+                        attributes:
+                          color: '#123456'
+                    parameters:
+                      block_id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                    operation_status: complete
+                    status_code: 200
+                    response_document:
+                      data:
+                        id: ce23daa7-dc0b-43b3-bdde-81cf64cbe0d0
+                        type: block
+                        attributes:
+                          color: '#123456'
+                          description: null
+                          start_at: null
+                          end_at: null
+                          row_index: 1
+                          y_scale: 1
+                    error: null
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+                - id: 1ad01680-28ee-448c-9535-e75b86434dd2
+                  type: single_operation
+                  attributes:
+                    operation_identifier: UpdateBlockV3
+                    request_body:
+                      data:
+                        id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+                        type: block
+                        attributes:
+                          color: a really pretty blue
+                    parameters:
+                      block_id: f590f288-eaf8-4746-b418-a04f76d2fe2a
+                    operation_status: failed
+                    status_code: 400
+                    response_document: null
+                    error: color must be a valid hex code
+                    created_at: '2025-08-12T15:42:01.881-08:00'
+                    updated_at: '2025-08-12T15:42:01.881-08:00'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          description: The http status code of the error response.
+                        title:
+                          type: string
+                          description: A short, human-readable summary of the error.
+                        detail:
+                          type: string
+                          description: A human-readable explanation of the error.
+                        code:
+                          type: string
+                          description: 'An system-readable error code to provide additional specificity for
+
+                            the error.
+
+                            '
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'This API uses OAuth 2.0 with the authorization code grant flow. You can
+
+        find more detailed authentication instructions in the [Authentication
+
+        Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0)
+
+        section.
+
+        '
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    anonymous_oauth:
+      type: oauth2
+      description: 'The OAuth 2.0 client credentials flow is used for secure server-server
+
+        requests when Opal does not need to associate a request with a particular
+
+        Opal user. These anonymous requests are instead authorized based on the
+
+        OAuth scope.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            write:onboarding: Include this scope if you wish to make API requests to onboard new Opals.
+    api_key:
+      type: apiKey
+      description: '(Deprecated) This API also supports authentication via an API or session
+
+        token set in the request headers.
+
+        '
+      in: header
+      name: Session-Token
+    presentation_share_cookie:
+      type: apiKey
+      description: 'A cookie set and read by the Monolith service that authorizes a non-opal
+
+        user to view a presentation and the resources within it. Other services
+
+        can rely on this cookie by asking Monolith to authenticate it.
+
+        '
+      in: cookie
+      name: share_token
+x-tagGroups:
+- name: Stable
+  tags:
+  - Board Collaborators
+  - Board Objects
+  - Boards
+  - Content Schedules
+  - Moment Schedules
+  - Moments
+  - Onboarding
+- name: ⚠️  Unstable
+  tags:
+  - Block Connectors
+  - Board Columns
+  - Board Duplication
+  - Board Standard Columns
+  - Channels
+  - Custom Field Options
+  - Custom Field Types
+  - Custom Fields
+  - Moment Assignees
+  - Moment Custom Fields
+  - Planning Status
+  - Rich Text Documents
+  - User Groups
+  - Users
+  - Workspaces
+- name: ℹ️ Proposed
+  tags:
+  - Bulk Operations
+  - Gem Chats
+  - Gem Files
+  - Moment Duplication
+  - Presentation Themes
+  - Workflows
+  - Workflow Contexts
+  - Workflow Stages
+  - Workflow Assignments
+  - Workflow Responses
+- name: ⚛️ Experimental
+  tags:
+  - Blocks
+  - Block Custom Field Values
+  - Block Duplication
+  - Board User Settings
+  - Categories
+  - Category Types
+  - Charts
+  - Content
+  - Custom Field Colors
+  - Filter Sets
+  - Key Dates
+  - View Columns
+  - View Standard Columns
+  - Views
+  - View Colors
+  - Stories
+- name: Additional Resources
+  tags:
+  - secondary_resources

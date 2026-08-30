@@ -1,0 +1,898 @@
+openapi: 3.2.0
+info:
+  version: 2.0.0
+  title: Opal Brands API
+  license:
+    name: Opal API License
+    url: https://www.workwithopal.com/api-license
+  description: "The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.\n\n# Other API Versions\n\nThe [v3 API](/api/documentation/v3) is less complete than the v2 API, and is still a work in progress. Currently, if a resource has endpoints in both the v2 API and the v3 API you **SHOULD** use the v2 API endpoints. At some point in the future we will recommend the v3 API instead.\n\n# Documentation Organization\n\nv2 API endpoints are categorized by stability:\n\n1. JSON:API\n2. Other\n3. Unstable\n4. Proposed\n\nv2 API endpoints in the “JSON:API”, “Unstable”, and “Proposed” categories are [JSON:API](https://jsonapi.org)-compliant ([specification](https://jsonapi.org/format/)) and can be used with any [JSON:API-compliant client](https://jsonapi.org/implementations/).\n\n<aside>\n\nTo strictly comply with the JSON:API specification your requests for endpoints in the “JSON:API”, “Unstable”, and “Proposed” categories **MUST** set the `Accept` HTTP header to `application/vnd.api+json`. The server response’s `Content-Type` HTTP header will also be `application/vnd.api+json`.\n\nYou **SHOULD** use `application/vnd.api+json` for maximum stability, but v2 API endpoints **MAY** allow the `Accept` HTTP header to be `application/json`; if so, the response’s `Content-Type` HTTP header will be `application/json`. This support for `application/json` **MAY** disappear from a given endpoint at any time, and is not available on all endpoints.\n</aside>\n\n“Other” endpoints are stable, but do not follow the JSON:API specification. (Some “Other” endpoints have data that resembles the JSON:API structure, but **MUST** be parsed as generic JSON.) Your requests **MUST** set the `Accept` HTTP header to `application/json`, and the response’s `Content-Type` HTTP header will be `application/json`.\n\n## Unstable Endpoints\n\n*Note:* This generally refers resources in the “Unstable” category, but includes endpoints with a summary that’s prefixed by `[UNSTABLE]`. These `[UNSTABLE]` endpoints may be part of a “Stable” resource.\n\nThe data structure and behavior of “Unstable” endpoints are not guaranteed, and we **MAY** change them at any time. You **MUST NOT** use these endpoints for production features, but **MAY** use them as a preview of upcoming features, and we welcome feedback.\n\n## Proposed Endpoints\n\n“Proposed” endpoints **MUST NOT** be used (they’re not yet implemented), and we **MAY** change or remove them at any time. We publish them at our discretion to share our plans and encourage internal feedback. We also welcome your feedback.\n\n# Design Principles\n\n## Breaking Changes\n\nWe **MAY** expand the data for “JSON:API” and “Other” resources, but will not change or remove existing attributes or relationships for these resources. These expansions should not require any changes to your code.\n\nWe provide no guarantees for “Unstable” and “Proposed” endpoints.\n\n## Firehose Rule\n\nBy default endpoints include all the relevant data that’s accessible to the authenticated user. Clients **MAY** specify filters, ordering, pagination, sparse fields, and other limiting mechanisms to pare down the desired data.\n\n*Note:* Existing endpoints **MAY NOT** follow this maximalist approach, but new endpoints will, and we **MAY** enhance existing endpoints.\n\n## Obscurity\n\nIn order to provide customers with as much privacy as possible, many API calls that fail authorization will return `404 Not Found` rather than `403 Forbidden`. Do not design frontends around the expectation that a `404 Not Found` status code means a resource would not be returned given different authentication credentials.\n\n# Authentication Strategies\n## OAuth 2.0\nOpal uses OAuth 2.0 (https://oauth.net/2) to authenticate users and grant access to protected resources. After registering your application as an OAuth client, you must get permission from each user before accessing their account.\n\nThe main steps are:\n\n1. Register your application\n2. Direct the user to Opal, to authorize your application\n3. Opal confirm's user identity, and asks the user to grant your application permissions\n4. Opal issues tokens your application can use to access the user's Opal resources\n5. Your application can begin making requests to the Opal API on behalf of the user\n\n### Roles\n#### Client\nThe 3rd-party application accessing the API on behalf of the User.\n\n#### API\nAPI endpoints used to interact with a User's resources in Opal.\n\n#### User\nThe person authorizing the Client to access to their Opal account.\n\n### Registering your application\nApplication registration is currently a manual process.\n\nTo begin, you will need to provide the following information to the Opal integrations team:\n\n- Application name\n- Logo URI\n- Redirect URI\n\nIn return, expect to receive:\n\n- Client ID\n  - public\n- Application secret\n  - keep this private\n  - keep this written down someplace safe. Opal cannot retrieve this for you if it is lost.\n\n### Authorization\nFor a Client to make API requests on behalf of Users, the User must first give consent.\nHere is an overview of the consent flow:\n\n1. Direct the User to grant access in Opal\n\n```\nhttps://login.ouropal.com/oauth2/auth?grant_type=authorization_code&scope=offline_access&response_type=code&client_id={client_id}&state={state}&redirect_uri={url_encoded_redirect}\n```\n\nParameters:\n- `client_id`: Provided by Opal.\n- `grant_type`: Set the value to authorization_code to receive a code string that can be exchanged for an access token.\n- `redirect_uri`: Defined by Client. After authentication, the user will be directed to this location.\n- `response_type`: The value code should be set for refresh tokens to be issued.\n- `scope`: The value offline_access must be present if you wish to use refresh tokens.\n- `state`: Defined by the Client. A unique value used to validate the response.\n\n\n2. If logged out, User is directed to log in to Opal\n\n3. User is redirected to consent page (if the User has not already given consent)\n\n```\nhttps://login.ouropal.com/oauth2/consent?consent_challenge=abc123\n```\n\n4. If the User grants permission, User is sent to the specified `redirect_uri`\n\n```\nhttps://example.com/defined-by-client?code=Mu9z2DndN7TfXSLaf99O8ReqqXqMabXhSqP5e0jlx_Q.naLKbko-GyfPJRGYcWyclxU0sBGwygPy05OSFww0XZ8&scope=offline_access&state={state}\n```\n\nParameters:\n- `code`: The Client may use this to get an access token.\n- `scope`: API permissions granted to the Client by the User.\n- `state`: The validation string provided by the Client in step 1.\n\nIf the User declines the consent prompt, User will be sent to the same `redirect_uri`, but with an error parameter :\n\n```\nhttps://example.com/defined-by-client?error=consent+request+denied&state={state}\n```\n\nParameters:\n- `error`: A brief description of the issue.\n- `state`: The validation string provided by the Client in step 1.\n\n### Retrieving Access Token\nYou must make a POST request to the token endpoint to get an access token, before the code expires:\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'code={code}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={client_secret}&grant_type=authorization_code'\n```\n\nParameters:\n- `code`\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to authorization_code .\n- `redirect_uri`: Optional.\n\nIf successful, a JSON-formatted response body will contain the access_token and refresh_token:\n\n```json\n{\n  \"access_token\":\"ABC123\",\n  \"token_type\":\"bearer\",\n  \"expires_in\":3600,\n  \"refresh_token\":\"DEF456\",\n  \"scope\":\"offline_access\"\n}\n```\n\n### Refreshing an Access Token\nOnce the access_token expires, you may generate a new one at the same token endpoint, but with different parameters.\nNote that in this request, a \"refresh_token\" parameter is used instead of \"code\", and the \"grant_type\" value is now \"refresh_token\" instead of \"authorization_code\".\n\n```\ncurl -X POST \\\n  https://login.ouropal.com/oauth2/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'refresh_token={refresh_token}&client_id={client_id}&redirect_uri={url_encoded_redirect}&client_secret={secret}&grant_type=refresh_token'\n```\n\nParameters:\n- `client_id`: Client ID provided by Opal.\n- `client_secret`: Client secret provided by Opal.\n- `grant_type`: Set value to refresh_token .\n- `redirect_uri`: Optional.\n- `refresh_token`: Refresh token value\n\n### Making Authenticated Requests\n\nSet an authorization header in your requests, specifying your access token as documented here: https://tools.ietf.org/html/rfc6750#section-2.1.\n\n**NOTE** that the `Authorization` header supercedes the `Session-Token` header described in the documentation for many endpoints. Specifying an `Authorization` header means you do not need to specify a `Session-Token` header.\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nFor example:\n```\n     GET /resource HTTP/1.1\n     Host: server.example.com\n     Authorization: Bearer mF_9.B5f-4.1JqM\n```\n\n### Client Revoke/Rolling OAuth secrets\nClient secrets must be kept secret and not exposed outside of the token retrieval requests. If a secret has been potentially compromised, please notify Opal as soon as possible and let us know the OAuth client id associated with the secret. We will roll/update the secret, which will invalidate all existing access and refresh tokens. Invalidating tokens will cause users to need to reauthenticate, but consent should be remembered.\n"
+servers:
+- url: https://login.ouropal.com
+tags:
+- name: Brands
+paths:
+  /brands/v2/brands:
+    get:
+      tags:
+      - Brands
+      operationId: ReadBrandsV2
+      summary: List all visible brands in the requesting users Opal
+      security:
+      - oauth2:
+        - offline_access
+      - api_key:
+        - Session-Token
+      parameters:
+      - name: include
+        in: query
+        required: false
+        description: A comma separated list of related objects to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - logo
+            - primary_label_set
+        style: form
+        explode: false
+      - name: expose
+        in: query
+        required: false
+        description: Expose response data that is only provided by request.
+        schema:
+          type: object
+          properties:
+            brand:
+              type: object
+              properties:
+                meta:
+                  type: object
+                  description: 'Expose the requesting user''s membership metadata on each brand resource.
+
+
+                    Use this parameter as: `?expose[brand][meta]`
+
+                    '
+      - name: fields
+        in: query
+        description: An object keyed by resource type, i.e. \"story\" or a story relationship, where each value is a CSV of attributes to include in the response.
+        required: false
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            slug:
+              type: string
+        style: deepObject
+        explode: true
+      - name: filter
+        in: query
+        description: 'Filters for limiting the results. Default scoped to the requesting user''s Opal.
+
+          All timestamp filters (`created_at`, `updated_at`) use the syntax `filter[field_name][gt]=2020-01-01T00:00:00-07:00`.
+
+          Timestamps use iso8601 formatting, such as `YYYY-MM-DD` or `YYYY-MM-DDThh:mmTZD`. Timestamps of the form `YYYY-MM-DD` will be converted to `YYY-MM-DDT00:00:00` in the `America/Los_Angeles` timezone. For example, `filter[created_at]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01`.
+
+          `eq` will convert a date to a 24 hour range. Thus `filter[created_at][eq]=2020-01-01` is equivalent to `filter[created_at][gteq]=2020-01-01T00:00:00-08:00&filter[created_at][lteq]=2020-01-02T00:00:00-08:00`.
+
+          '
+        required: false
+        schema:
+          type: object
+          properties:
+            created_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter brands by created_at time. Uses syntax `filter[created_at][gt]=2020-01-01T00:00:00-07:00`
+
+                  '
+            is_private:
+              type: boolean
+              description: 'Boolean true returns private brands, while boolean false returns public brands. Omission will return all brands.
+
+                '
+            updated_at:
+              allOf:
+              - type: object
+                properties:
+                  eq:
+                    type: string
+                    description: 'Equal to filter. If no other filter is specified, `eq` will be assumed.
+
+                      '
+                  gt:
+                    type: string
+                    description: Greater than filter
+                  gteq:
+                    type: string
+                    description: Greater than or equal to filter
+                  lt:
+                    type: string
+                    description: Less than filter
+                  lteq:
+                    type: string
+                    description: Less than or equal to filter
+              - format: date-time
+              - description: 'Filter by the brand updated_at time. Uses syntax `filter[updated_at][gt]=2020-01-01T00:00:00-07:00`.
+
+                  '
+        style: deepObject
+        explode: true
+      - name: page
+        description: Specify an offset and limit for pagination
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            limit:
+              type: integer
+              default: 50
+            offset:
+              type: integer
+        style: deepObject
+        explode: true
+      responses:
+        '200':
+          description: Returns a list of all brands visible to the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      title: brand
+                      type: object
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      - relationships
+                      additionalProperties: false
+                      properties:
+                        id:
+                          type: string
+                          pattern: ^[0-9]+$
+                        type:
+                          type: string
+                          enum:
+                          - brand
+                        meta:
+                          type:
+                          - object
+                          - 'null'
+                          description: Metadata around the Brand object
+                          properties:
+                            user_is_member:
+                              type: boolean
+                              description: Boolean that represents whether the requesting user is a member of the brand.
+                        attributes:
+                          type: object
+                          required:
+                          - slug
+                          - name
+                          - uuid
+                          - start_of_week
+                          - timezone
+                          additionalProperties: false
+                          properties:
+                            uuid:
+                              type: string
+                              format: uuid
+                              description: A unique identifier for the workspace.
+                            created_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time.
+                              readOnly: true
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: An ISO8601 date-time indicating when the user was last updated.
+                              readOnly: true
+                            slug:
+                              type: string
+                              description: The slug for the Brand/Workspace. This is a url-safe name for the Workspace.
+                            name:
+                              type: string
+                              description: The name of the Workspace.
+                            start_of_week:
+                              type: number
+                              enum:
+                              - 0
+                              - 1
+                              - 2
+                              - 3
+                              - 4
+                              - 5
+                              - 6
+                              description: 'The default start weekday index for the week view Calendar and for Plans. Specifies the days in a week, 0 to 6 (Sunday to Saturday). 0 (Sunday) is the default.
+
+                                With regards to the week view Calendar, values greater than 1 will be considered the same as 1.'
+                            timezone:
+                              type: string
+                              description: The IANA time zone identifier for the default time zone used when creating resources in the Brand/Workspace (e.g. America/New_York).
+                        relationships:
+                          type: object
+                          required:
+                          - primary_label_set
+                          - accounts
+                          - logo
+                          - dispatch_providers
+                          additionalProperties: false
+                          properties:
+                            primary_label_set:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - label_set
+                            accounts:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - account
+                            logo:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type:
+                                  - object
+                                  - 'null'
+                                  required:
+                                  - id
+                                  - type
+                                  additionalProperties: false
+                                  properties:
+                                    id:
+                                      type: string
+                                    type:
+                                      type: string
+                                      enum:
+                                      - asset_reference
+                            dispatch_providers:
+                              type: object
+                              required:
+                              - data
+                              additionalProperties: false
+                              properties:
+                                data:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - dispatch_provider
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                      - title: label_set
+                        type: object
+                        required:
+                        - id
+                        - type
+                        - attributes
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - label_set
+                          attributes:
+                            type: object
+                            required:
+                            - name
+                            - label_sort_method
+                            - is_active
+                            - is_shared
+                            - uuid
+                            additionalProperties: false
+                            properties:
+                              name:
+                                type: string
+                              uuid:
+                                type: string
+                                format: uuid
+                                description: A unique identifier for the label set.
+                              is_active:
+                                type: boolean
+                                description: 'Determines whether the label set will be available to use in the Opal platform. Note that inactive label sets are only even exposed via API when specifically filtered for.
+
+                                  '
+                              is_shared:
+                                type: boolean
+                                description: 'True when the label set is shared across workspaces.
+
+                                  '
+                              label_sort_method:
+                                type: string
+                                default: oldest_first
+                                enum:
+                                - alphabetical
+                                - newest_first
+                                - oldest_first
+                                - manual
+                          relationships:
+                            type: object
+                            required:
+                            - labels
+                            - paired_custom_field
+                            - parent_label
+                            additionalProperties: false
+                            properties:
+                              labels:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - label
+                              paired_custom_field:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                        format: uuid
+                                      type:
+                                        type: string
+                                        enum:
+                                        - custom_field
+                              parent_label:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - label
+                      - title: asset_reference
+                        type: object
+                        required:
+                        - id
+                        - attributes
+                        - type
+                        - relationships
+                        additionalProperties: false
+                        properties:
+                          id:
+                            type: string
+                            pattern: ^[0-9]+$
+                          type:
+                            type: string
+                            enum:
+                            - asset_reference
+                          attributes:
+                            type: object
+                            required:
+                            - asset_type
+                            - asset_uuid
+                            - content_type
+                            - format
+                            - filename
+                            - escaped_filename
+                            - filesize
+                            - full_url
+                            - meta_data
+                            - original_url
+                            - preview_url
+                            - public_id
+                            - width
+                            - height
+                            - uuid
+                            additionalProperties: false
+                            properties:
+                              asset_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'This field is semi-open ended but should be set to `image`, `audio`,
+
+                                  or `video` for those respective types of media and `file` for most
+
+                                  other types of media.
+
+                                  '
+                              asset_source:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'Asset Sources are pre-existing records indicating the origin of an
+
+                                  asset reference. You can''t set this field to arbitrary values. If you
+
+                                  know of an Asset Source and you''d like to indicate a new asset
+
+                                  reference originated with that source, this field should contain that
+
+                                  source''s name.
+
+                                  '
+                              asset_uuid:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'The `id` of an `asset` resource this asset reference will surface
+
+                                  within the Asset Library.
+
+                                  '
+                              content_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'This field was used by some legacy systems. It is exposed for
+
+                                  historical reasons. If set, setting it to the same value as
+
+                                  `asset_type` is generally a good idea. It is not a MIME type.
+
+                                  '
+                              description:
+                                type:
+                                - string
+                                - 'null'
+                              format:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'Used differently by some legacy systems but any new asset reference
+
+                                  should use the `format` field to store its filetype extension (ex. `png`,
+
+                                  `mp4`, `gif`, `mov`, etc.).
+
+                                  '
+                              filename:
+                                type:
+                                - string
+                                - 'null'
+                              escaped_filename:
+                                type: string
+                                readOnly: true
+                              filesize:
+                                type:
+                                - integer
+                                - 'null'
+                                description: Size of file in bytes.
+                              full_url:
+                                type:
+                                - string
+                                - 'null'
+                                description: 'When associating an asset with an asset reference, this field
+
+                                  should be set to the `url` property of the asset.
+
+                                  '
+                              meta_data:
+                                type:
+                                - object
+                                - 'null'
+                                description: Can contain arbitrary key-value pairs related to the asset.
+                                properties:
+                                  duration:
+                                    type: string
+                                    description: Parsed from video assets.
+                                  page_count:
+                                    type: string
+                                    description: Parsed from PDF assets.
+                                  processed_height:
+                                    type: string
+                                    description: Parsed from video assets.
+                                  processed_width:
+                                    type: string
+                                    description: Parsed from video assets.
+                                additionalProperties:
+                                  type: string
+                              original_url:
+                                type:
+                                - string
+                                - 'null'
+                              preview_url:
+                                type:
+                                - string
+                                - 'null'
+                                readOnly: true
+                              public_id:
+                                type:
+                                - string
+                                - 'null'
+                              width:
+                                type:
+                                - integer
+                                - 'null'
+                                description: 'When associating an asset with an asset reference, this field
+
+                                  should be set to the `width` of the asset.
+
+                                  '
+                              height:
+                                type:
+                                - integer
+                                - 'null'
+                                description: 'When associating an asset with an asset reference, this field
+
+                                  should be set to the `height` of the asset.
+
+                                  '
+                              uuid:
+                                type: string
+                                readOnly: true
+                                description: 'Use this ID when referring to the same asset reference from one of
+
+                                  Opal''s v3 APIs.
+
+                                  '
+                          relationships:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              brand:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - brand
+                              stories:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - story
+                              cover_asset_reference:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    required:
+                                    - id
+                                    - type
+                                    additionalProperties: false
+                                    properties:
+                                      id:
+                                        type: string
+                                      type:
+                                        type: string
+                                        enum:
+                                        - asset_reference
+                              labels:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - label
+                              asset_reference_options:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - asset_reference_option
+                              options:
+                                type: object
+                                required:
+                                - data
+                                additionalProperties: false
+                                properties:
+                                  data:
+                                    type: array
+                                    items:
+                                      type: object
+                                      required:
+                                      - id
+                                      - type
+                                      additionalProperties: false
+                                      properties:
+                                        id:
+                                          type: string
+                                        type:
+                                          type: string
+                                          enum:
+                                          - option
+                  meta:
+                    type: object
+                    required:
+                    - total
+                    - page
+                    - resource_type
+                    properties:
+                      resource_type:
+                        type: string
+                      total:
+                        type: integer
+                      page:
+                        type: object
+                        required:
+                        - limit
+                        - offset
+                        properties:
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+              example:
+                data:
+                - id: '1'
+                  type: brand
+                  attributes:
+                    uuid: dc68d20c-3dd9-48f0-a8c5-8dd7b170ba99
+                    created_at: '2020-06-03T13:20:15.757-07:00'
+                    slug: labs
+                    name: Labs
+                    start_of_week: 0
+                    timezone: America/Los_Angeles
+                    updated_at: '2020-06-03T13:20:20.853-07:00'
+                  relationships:
+                    primary_label_set:
+                      data:
+                        id: '1'
+                        type: label_set
+                    logo:
+                      data: null
+                    accounts:
+                      data:
+                      - id: '3'
+                        type: account
+                      - id: '2'
+                        type: account
+                      - id: '1'
+                        type: account
+                    dispatch_providers:
+                      data: []
+                  meta:
+                    user_is_member: true
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        detail:
+                          type: string
+                      required:
+                      - status
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: This API uses OAuth 2.0 with the authorization code grant flow. You can find more detailed authentication instructions in the [Authentication Strategies](/api/documentation#section/Authentication-Strategies/OAuth-2.0) section.
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/auth
+          tokenUrl: /oauth2/token
+          scopes:
+            offline_access: Include this scope if you wish to receive a refresh token
+    api_key:
+      type: apiKey
+      description: (Deprecated) This API also supports authentication via an API or session token set in the request headers.
+      in: header
+      name: Session-Token
+x-tagGroups:
+- name: JSON:API
+  tags:
+  - Accounts
+  - Activities
+  - Annotations
+  - Asset Reference Options
+  - Asset Reference Usage Rights Options
+  - Asset References
+  - Assets
+  - Brand Settings
+  - Brands
+  - Checkpoints
+  - Content
+  - Delivery Records
+  - Label Sets
+  - Labels
+  - Messages
+  - Moments
+  - Phase Items
+  - Placements
+  - Post Types
+  - Privacy
+  - Reactions
+  - Rich Texts
+  - Services
+  - Stamps
+  - Stories
+  - Url Uploads
+  - User Domain Views
+  - Users
+  - Workflows
+- name: Other
+  tags:
+  - Budgets
+  - URL Previews
+  - Search
+  - Stories V1
+- name: ⚠️  Unstable
+  tags: []
+- name: Additional Resources
+  tags:
+  - secondary_resources
