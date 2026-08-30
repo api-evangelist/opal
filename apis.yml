@@ -95,6 +95,8 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
@@ -1231,6 +1233,8 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - Message
+  tags_raw:
   - Messages
   properties:
   - type: OpenAPI
@@ -1903,6 +1907,8 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
