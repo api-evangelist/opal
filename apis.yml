@@ -170,6 +170,8 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - Annotation
+  tags_raw:
   - Annotations
   properties:
   - type: OpenAPI
@@ -2165,6 +2167,8 @@ apis:
   humanURL: https://login.ouropal.com/api/documentation/v2
   baseURL: https://login.ouropal.com
   tags:
+  - Workspace
+  tags_raw:
   - Workspaces
   properties:
   - type: OpenAPI
