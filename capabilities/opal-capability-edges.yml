@@ -1,0 +1,63 @@
+slug: opal
+provider: Opal
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Content
+  spec_file: opal-content-api-openapi.yml
+  capability_id: BC-400.70
+  capability_id_l1: BC-400
+  capability_name: Content Marketing Management
+  confidence: 0.85
+  evidence: POST /content/v2 CreateContentV2 Create a piece of Content; POST /content/v2/{content_id}/placements/{placement_id}
+    CreatePostPlacementV2 Join content to a placement
+  reason: Lifecycle of marketing content pieces and their attachment to channel placements is content
+    production and distribution, i.e. Content Marketing Management on a marketing content calendar platform.
+- tag: Content Schedules
+  spec_file: opal-content-schedules-api-openapi.yml
+  capability_id: BC-400.70
+  capability_id_l1: BC-400
+  capability_name: Content Marketing Management
+  confidence: 0.8
+  evidence: POST /content_schedules/v3 CreateContentScheduleV3 Create a new Content Schedule
+  reason: Scheduling of content items maps to editorial planning and content distribution within Content
+    Marketing Management for this marketing content calendar platform.
+- tag: Moments
+  spec_file: opal-moments-api-openapi.yml
+  capability_id: BC-400.70
+  capability_id_l1: BC-400
+  capability_name: Content Marketing Management
+  confidence: 0.75
+  evidence: POST /moments/v2 CreateMomentV2 Create a new public or private moment.  /  POST /asgard-bff/moments/add_to_plan
+    Add multiple moments to a plan
+  reason: Moments are the core marketing content items placed on Opal's editorial/content calendar and
+    grouped into plans and boards; CRUD over them realises content marketing/editorial planning.
+- tag: Moment Schedules
+  spec_file: opal-moment-schedules-api-openapi.yml
+  capability_id: BC-400.70
+  capability_id_l1: BC-400
+  capability_name: Content Marketing Management
+  confidence: 0.7
+  evidence: POST /moment_schedules/v3 CreateMomentScheduleV3 Create a new moment schedule.
+  reason: Scheduling of moments on the marketing content calendar corresponds to editorial planning and
+    content distribution scheduling in this planning/content-calendar platform.
+- tag: Onboarding
+  spec_file: opal-onboarding-api-openapi.yml
+  capability_id: BC-4240.30
+  capability_id_l1: BC-4240
+  capability_name: Subscription Provisioning
+  confidence: 0.7
+  evidence: GET /onboarding/v3/trial_invites/do/accept/{single_use_hash} AcceptTrialInviteV3 Start a new
+    Trial for a customer (accept a trial invite)
+  reason: Trial invite issuance and acceptance starting a trial for a customer is SaaS subscription provisioning
+    / trial activation, not marketing content.
