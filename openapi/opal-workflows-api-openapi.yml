@@ -5,12 +5,16 @@ info:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
   version: '1.0'
-  description: 'Operations tagged Workflows across 2 of this provider''s published API definitions: opal-v2-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Workflows across 2 of this provider''s published API definitions: opal-v2-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
 - name: Workflows
-  description: "## Workflows Overview\nIn Opal, a workflow is an arrangement of tasks and approvals required to progress through the lifecycle of a \nStoryFirst resource. \n\n**Historical Note:**\n*The v2 Workflows API will supersede the v2 [Phase Items](#tag/Phase-Items) API, although initial rollout will only include support for\nWorkflow on Moments which means there will be a period of time during which the Phase Items API remains the API\nfor Content Workflows.*\n\n### Workflow / Phase Items Translations\nThe following resources described below for the v2 Workflows API have fairly direct translations to the older Phase Items API.\n\n- A _workflow_ was known as a _phase group_.\n- A _stage_ was known as a _phase_.\n- An _assignment_ was known as a _phase item_.\n\n### Context\nWorkflows from the v2 Workflow API have an optional `context` relationship. These contexts tie workflows to the resources against\nwhich the workflow is being performed. Currently only the **Moment** context is supported.\n\nA workflow without a `context` is a reasonable thing to think about: Such a workflow might have common stages that apply broadly\nin more than one context. Although a workflow can conceptually be created without a context, it must be given a context before it can\nbe started.\n\nCurrently, the capabilities supported by contextless workflows are not built out in the Opal Platform. API requests should be made to\ncreate contexts for all workflows before building them out or starting them.\n\n**Important:** Contexts tie workflows to resources from neighboring services; although Opal has one coherent v2 API, a client must\nrequest StoryFirst resources (like `moment`s) from other services rather than `including` them on Workflow requests. For example,\na Workflow might have a `context` with a `moment_id` of `'3432'`; the client would make a request to `moments/v2/3432` to retrieve\ndetails for that Moment.\n\nSee the documentation on [`POST` **Create a Context**](#tag/Workflows/operation/CreateContextV2) for more information.\n\n### Resources\nA `workflow` is arranged into `stage`s, each of which is a `circuit_breaker`, an `approval` stage, or a `task` stage.\nAll stages can optionally specify a `due_date`, but if `null` then the due date is left up to interpretation of the user\nof the workflow -- For a Moment Workflow, perhaps the due date is the `scheduled_date` of the Moment, or perhaps\nthe exact date is not important.\n\nAssignments are completed by `POST`ing `response`s. Circuit breakers and tasks can be completed and approvals can be\napproved or declined. An approved response can be superseded by a following declined response on the same assignment.\nSimilarly, tasks can be \"undone\" after being marked complete by sending a follow-up response. Responses are a ledger with\nthe most recent response representing the current state of the assignment.\n\n#### Circuit Breaker\nCircuit breakers generally just contain one assignment. When the assignment is completed, the circuit breaker is completed\nand the following stage becomes active. Circuit breakers allow workflows to pause between any two stages and they are used\nto create the initial pause before a workflow is started (giving users time to build a workflow out before beginning work\nagainst it).\n\n#### Approval\nApproval stages can contain any number of approval `assignment`s. They can be configured such that all of those approvals\nmust be given for the workflow to progress (`metadata.completion_rules.all`) or they can be configured such that the workflow\nprogresses after any one of the approvals is given (`metadata.completion_rules.one`).\n\n##### Approval Response\nEach approval `response` can be either `approved` or `declined` and it can optionally contain a message from the approver.\n\nAs noted above, any number of responses can be given on a single assignment; the most recent response represents the state\nof the approval: approved, declined, or in the absence of a response, simply incomplete.\n\n#### Task\nTask stages can contain any number of task `assignment`s. A task stage is complete after all assignments within it have been\ncompleted.\n\n##### Task Response\nEach task `response` can be either _complete_ (`complete: true`) or _incomplete_ (`complete: false`).\n\nAs noted above, any number of responses can be given on a single task; the most recent response represents the state of the\ntask: complete or incomplete.\n\n### Templates\nCreation of a new workflow often involves creating a handful of the same resources every time. For this reason, there are templates\nthe allow you to create one of two types of workflows more easily. You always get a `circuit_breaker` with one assignment at the start\nand then you get either an `approval` or a `task` `stage` next, again with one assignment. All assignments start out unassigned.\n\nSee the documentation on [`POST` **Create a Workflow**](#tag/Workflows/operation/CreateWorkflowsV2) for more information.\n\n### Rewinding\nWorkflows can be \"rewound\" to undo some portion of them. \n\n**The big caveat being:** You are not allowed to rewind back to the start of (or before) a completed final approvel stage. Final approval\nstages (i.e. the last approval stage in a workflow) are special because they can have side effects that cannot be taken back --\nif workflow completion resulted in publishing to a third party platform, for example, then rewinding back to an unapproved state for the\nworkflow would leave the workflow unrepresentative of the fact that something had already been published.\n\nSee the documentation on [`PATCH` **Rewind a Workflow**](#tag/Workflows/operation/RewindWorkflowV2) for more information.\n"
+  description: '## Workflows Overview
+
+    In Opal, a workflow is an arrangement of tasks and approvals required to progress through the lifecycle of a
+
+    StoryFirst resource.'
 paths:
   /workflows/v2/contexts:
     post:
@@ -22,9 +26,7 @@ paths:
 
         should operate on. Currently, only `moment` resource is supported. Additionally, the
 
-        `workflow` relationship is required.
-
-        '
+        `workflow` relationship is required.'
       security:
       - oauth2:
         - offline_access
@@ -600,7 +602,16 @@ paths:
       - Workflows
       operationId: ReadWorkflowsV2
       summary: Get a collection of workflows
-      description: "This endpoint gets a response of created workflows. To be included, \na workflow will need to be put in the context of a StoryFirst resource \n(like a moment) using the `/workflows/v2/contexts` endpoint.\n\nIf you do not specify a pagination limit, a default page limit of 150 workflows will be\nused.\n"
+      description: 'This endpoint gets a response of created workflows. To be included,
+
+        a workflow will need to be put in the context of a StoryFirst resource
+
+        (like a moment) using the `/workflows/v2/contexts` endpoint.
+
+
+        If you do not specify a pagination limit, a default page limit of 150 workflows will be
+
+        used.'
       security:
       - oauth2:
         - offline_access
@@ -1671,9 +1682,7 @@ paths:
 
         want to use the `include` parameter to include `stages` and
 
-        `stages.assignment` in the response.
-
-        '
+        `stages.assignment` in the response.'
       security:
       - oauth2:
         - offline_access
@@ -3607,9 +3616,7 @@ paths:
       description: 'Rewinds a Workflow to the start of the given Stage.
 
 
-        Note that a Workflow cannot be rewound to the start of, or earlier than, the final completed Approval Stage. Any Task Stages following the final completed approval Stage may still be rewound.
-
-        '
+        Note that a Workflow cannot be rewound to the start of, or earlier than, the final completed Approval Stage. Any Task Stages following the final completed approval Stage may still be rewound.'
       parameters:
       - name: workflow_id
         in: path
@@ -4618,9 +4625,7 @@ paths:
       description: 'Duplicates a Workflow with its associated Stages and Assignments.
 
 
-        Note that all due dates will be omitted on duplicate.
-
-        '
+        Note that all due dates will be omitted on duplicate.'
       parameters:
       - name: workflow_id
         in: path
@@ -13449,9 +13454,7 @@ paths:
 
         These are not necessarily assignments assigned to the requesting user; if you wish to get assignments that are assigned to the user making the API request, pass the `assigned_user_id` filter set to the current user''s ID.
 
-        If you do not specify a pagination limit, a default page limit of 150 assignments will be used.
-
-        '
+        If you do not specify a pagination limit, a default page limit of 150 assignments will be used.'
       security:
       - oauth2:
         - offline_access
@@ -18151,9 +18154,7 @@ paths:
 
         want to use the `include` parameter to include `stages` or
 
-        `stages.assignments` in the response.
-
-        '
+        `stages.assignments` in the response.'
       security:
       - oauth2:
         - offline_access
@@ -20292,9 +20293,7 @@ paths:
       description: 'Duplicates a Workflow with its associated Stages and Assignments.
 
 
-        Note that all due dates will be omitted on duplicate.
-
-        '
+        Note that all due dates will be omitted on duplicate.'
       parameters:
       - name: include
         in: query
@@ -21412,8 +21411,8 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-v2-openapi.yml
-- opal-v3-openapi.yml
+- opal-v2-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:

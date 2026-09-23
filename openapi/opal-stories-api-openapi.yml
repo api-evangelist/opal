@@ -5,7 +5,7 @@ info:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
   version: '1.0'
-  description: 'Operations tagged Stories across 2 of this provider''s published API definitions: opal-v2-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Stories across 2 of this provider''s published API definitions: opal-v2-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
@@ -16,13 +16,15 @@ paths:
       tags:
       - Stories
       operationId: ReadBudgetV0
-      summary: Get a budget associated with a Story.
+      summary: Get a budget associated with a Story
       security:
       - oauth2:
         - offline_access
       - api_key:
         - Session-Token
-      description: "NOTE: When the Story exists but has no budget,\n  status 200 with an empty body will be returned instead of 404.\n"
+      description: 'NOTE: When the Story exists but has no budget,
+
+        status 200 with an empty body will be returned instead of 404.'
       parameters:
       - name: story_id
         in: path
@@ -216,7 +218,7 @@ paths:
       tags:
       - Stories
       operationId: CreateBudgetV0
-      summary: Create a budget for a Story.
+      summary: Create a budget for a Story
       security:
       - oauth2:
         - offline_access
@@ -447,7 +449,7 @@ paths:
       tags:
       - Stories
       operationId: DeleteBudgetV0
-      summary: Delete the budget with the given Id.
+      summary: Delete the budget with the given Id
       security:
       - oauth2:
         - offline_access
@@ -2164,9 +2166,7 @@ paths:
       - Stories
       operationId: GetStoryV3
       summary: Get a story by ID
-      description: 'Retrieves a single story by its UUID.
-
-        '
+      description: Retrieves a single story by its UUID.
       security:
       - oauth2:
         - offline_access
@@ -3369,9 +3369,7 @@ paths:
         in-app notification when the migration is complete.
 
 
-        At least one destination (plan_id or board_id) must be specified.
-
-        '
+        At least one destination (plan_id or board_id) must be specified.'
       security:
       - oauth2:
         - offline_access
@@ -3797,8 +3795,8 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-v2-openapi.yml
-- opal-v3-openapi.yml
+- opal-v2-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:

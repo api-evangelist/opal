@@ -5,7 +5,7 @@ info:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
   version: '1.0'
-  description: 'Operations tagged Content across 2 of this provider''s published API definitions: opal-v2-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Content across 2 of this provider''s published API definitions: opal-v2-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
@@ -8266,7 +8266,7 @@ paths:
       tags:
       - Content
       operationId: DeletePostPlacementV2
-      summary: Remove a piece of content from a placement.
+      summary: Remove a piece of content from a placement
       security:
       - oauth2:
         - offline_access
@@ -8311,7 +8311,7 @@ paths:
       tags:
       - Content
       operationId: ReadContentsV3
-      summary: '[UNSTABLE] Return all content available to the authenticated user.'
+      summary: '[UNSTABLE] Return all content available to the authenticated user'
       security:
       - oauth2:
         - offline_access
@@ -10541,7 +10541,7 @@ paths:
       tags:
       - Content
       operationId: ReadContentV3
-      summary: '[UNSTABLE] Get a content resource available to the authenticated user.'
+      summary: '[UNSTABLE] Get a content resource available to the authenticated user'
       security:
       - oauth2:
         - offline_access
@@ -11271,7 +11271,7 @@ paths:
       tags:
       - Content
       operationId: UpdateContentV3
-      summary: '[UNSTABLE] Update a content resource.'
+      summary: '[UNSTABLE] Update a content resource'
       security:
       - oauth2:
         - offline_access
@@ -12253,8 +12253,8 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-v2-openapi.yml
-- opal-v3-openapi.yml
+- opal-v2-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:

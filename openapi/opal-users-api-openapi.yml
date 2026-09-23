@@ -5,7 +5,7 @@ info:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
   version: '1.0'
-  description: 'Operations tagged Users across 2 of this provider''s published API definitions: opal-v2-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Users across 2 of this provider''s published API definitions: opal-v2-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
@@ -5994,7 +5994,7 @@ paths:
       tags:
       - Users
       operationId: ReadUsersV3
-      summary: '[UNSTABLE] Get users available to the authenticated user.'
+      summary: '[UNSTABLE] Get users available to the authenticated user'
       security:
       - oauth2:
         - offline_access
@@ -6800,7 +6800,7 @@ paths:
       tags:
       - Users
       operationId: ReadUserV3
-      summary: '[UNSTABLE] Get a specific user''s information.'
+      summary: '[UNSTABLE] Get a specific user''s information'
       security:
       - oauth2:
         - offline_access
@@ -7137,8 +7137,8 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-v2-openapi.yml
-- opal-v3-openapi.yml
+- opal-v2-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:

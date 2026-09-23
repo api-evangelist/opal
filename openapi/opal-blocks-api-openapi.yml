@@ -5,7 +5,7 @@ info:
   license:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
-  description: 'Operations tagged Blocks across 2 of this provider''s published API definitions: opal-asgard-bff-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Blocks across 2 of this provider''s published API definitions: opal-asgard-bff-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
@@ -16,7 +16,7 @@ paths:
       tags:
       - Blocks
       operationId: ReadBlockBFFV1
-      summary: Get a Block.
+      summary: Get a Block
       security:
       - oauth2:
         - offline_access
@@ -3485,7 +3485,7 @@ paths:
       tags:
       - Blocks
       operationId: ReadBlocksBFFV1
-      summary: Get a collection of Blocks.
+      summary: Get a collection of Blocks
       security:
       - oauth2:
         - offline_access
@@ -3844,7 +3844,7 @@ paths:
       tags:
       - Blocks
       operationId: ReadBlockConnectorCandidatesBFFV1
-      summary: Get a block's connector candidates.
+      summary: Get a block's connector candidates
       security:
       - oauth2:
         - offline_access
@@ -10035,9 +10035,7 @@ paths:
 
         If you create a moment-paired block and do not give it an `asset`, it will
 
-        borrow the moment''s asset.
-
-        '
+        borrow the moment''s asset.'
       security:
       - oauth2:
         - offline_access
@@ -17233,7 +17231,7 @@ paths:
       - Blocks
       operationId: UpdateBlockV3
       x-Operation-ID: UpdateBlockV3
-      summary: Update an existing Block.
+      summary: Update an existing Block
       security:
       - oauth2:
         - offline_access
@@ -21058,9 +21056,7 @@ paths:
       summary: Delete a Block by the given ID
       description: 'This operation will also delete the block''s child view, if one is associated.
 
-        You must also have permission to delete the child view.
-
-        '
+        You must also have permission to delete the child view.'
       security:
       - oauth2:
         - offline_access
@@ -21194,8 +21190,8 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-asgard-bff-openapi.yml
-- opal-v3-openapi.yml
+- opal-asgard-bff-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:

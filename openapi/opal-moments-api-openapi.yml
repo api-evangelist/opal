@@ -5,7 +5,7 @@ info:
     name: Opal API License
     url: https://www.workwithopal.com/api-license
   version: '1.0'
-  description: 'Operations tagged Moments across 3 of this provider''s published API definitions: opal-asgard-bff-openapi.yml, opal-v2-openapi.yml, opal-v3-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Moments across 3 of this provider''s published API definitions: opal-asgard-bff-openapi.json, opal-v2-openapi.json, opal-v3-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://login.ouropal.com
 tags:
@@ -33,9 +33,7 @@ paths:
 
         A 202 response indicates that the bulk operation has been successfully
 
-        started, and is being processed asynchronously.
-
-        '
+        started, and is being processed asynchronously.'
       security:
       - oauth2:
         - offline_access
@@ -290,9 +288,7 @@ paths:
 
         A 202 response indicates that the bulk operation has been successfully
 
-        started, and is being processed asynchronously.
-
-        '
+        started, and is being processed asynchronously.'
       security:
       - oauth2:
         - offline_access
@@ -608,7 +604,7 @@ paths:
       tags:
       - Moments
       operationId: ReadMomentsV2
-      summary: Return all moments available to the authenticated user.
+      summary: Return all moments available to the authenticated user
       security:
       - oauth2:
         - offline_access
@@ -2244,7 +2240,7 @@ paths:
       tags:
       - Moments
       operationId: CreateMomentV2
-      summary: Create a new public or private moment.
+      summary: Create a new public or private moment
       security:
       - oauth2:
         - offline_access
@@ -4105,7 +4101,7 @@ paths:
       tags:
       - Moments
       operationId: ReadMomentsV3
-      summary: Return all moments available to the authenticated user.
+      summary: Return all moments available to the authenticated user
       security:
       - oauth2:
         - offline_access
@@ -6065,7 +6061,7 @@ paths:
       tags:
       - Moments
       operationId: CreateMomentV3
-      summary: Create a new public or private moment.
+      summary: Create a new public or private moment
       security:
       - oauth2:
         - offline_access
@@ -12564,9 +12560,9 @@ components:
       in: cookie
       name: share_token
 x-refined-from:
-- opal-asgard-bff-openapi.yml
-- opal-v2-openapi.yml
-- opal-v3-openapi.yml
+- opal-asgard-bff-openapi.json
+- opal-v2-openapi.json
+- opal-v3-openapi.json
 x-tagGroups:
 - name: ⚠️  Unstable
   tags:
